@@ -58,6 +58,7 @@ Checks completed:
 - Plan selection QA returned no console errors and verified landing renders static plan cards while registration keeps the interactive shared selection mark.
 - Parent/children update QA returned no console errors: parent extra contact is manually revealed, parent header text computes RTL/start, child titles/cards reflect typed first names, first child can be removed, gan/class and allergy info box are removed, and save-later navigates to the final state.
 - Registration flow simplification QA returned no console errors: progress is reduced to four phases, plan/contract/documents are merged into `מסלול ואישורים`, summary remains the final phase, and the parent verification/update card is horizontally aligned on desktop.
+- Parent identity card alignment QA returned no console errors and verified the `פרטי ההורה הראשי` icon/text spacing on desktop and mobile.
 
 Remaining polish:
 - Some illustrative line icons are closest Lucide matches rather than custom generated parent/child artwork.
