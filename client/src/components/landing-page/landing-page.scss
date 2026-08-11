@@ -1,0 +1,598 @@
+:host {
+  display: block;
+}
+
+.landing-shell {
+  --screen-padding: clamp(1rem, 3vw, 2rem);
+
+  min-height: 100dvh;
+  overflow: hidden;
+  padding-inline: var(--screen-padding);
+  background:
+    radial-gradient(circle at 78% 11%, color-mix(in oklch, var(--surface-sage) 48%, transparent), transparent 20rem),
+    linear-gradient(180deg, var(--background), var(--surface-warm) 72%, var(--background));
+  color: var(--foreground);
+}
+
+.top-bar,
+.hero,
+.section-block,
+.accordion-section,
+.footer {
+  width: min(100% - 2rem, 70rem);
+  margin-inline: auto;
+}
+
+.top-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(100% + (2 * var(--screen-padding)));
+  min-height: 5.4rem;
+  margin-inline: calc(-1 * var(--screen-padding));
+  padding-inline: var(--screen-padding);
+  border-bottom: 0;
+}
+
+.top-bar::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--border);
+}
+
+.brand,
+.footer-brand,
+.my-registration {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--brand);
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.brand span:last-child,
+.my-registration span {
+  white-space: nowrap;
+}
+
+.brand {
+  font-size: clamp(1.25rem, 2.1vw, 1.55rem);
+  letter-spacing: 0;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.85rem;
+  height: 3rem;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.brand-mark.small {
+  width: 2.2rem;
+  height: 1.8rem;
+}
+
+.my-registration {
+  color: var(--foreground);
+  border-bottom: 1px solid currentColor;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(23rem, 1.08fr) minmax(20rem, 0.92fr);
+  align-items: center;
+  gap: 1rem;
+  direction: rtl;
+  padding-block: clamp(2.5rem, 7vw, 5rem) 2.5rem;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+  grid-column: 2;
+  grid-row: 1;
+  max-width: 34rem;
+}
+
+.hero h1 {
+  margin: 0;
+  color: var(--brand);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.hero p {
+  margin: 1.25rem 0 0;
+  max-width: 31rem;
+  color: color-mix(in oklch, var(--foreground) 82%, white);
+  font-size: clamp(0.92rem, 1.35vw, 1.1rem);
+  font-weight: 500;
+  line-height: 1.68;
+}
+
+.landing-shell [data-slot='button'].primary-cta {
+  min-width: min(100%, 18rem);
+  height: 3.1rem !important;
+  margin-top: 1.65rem;
+  border-radius: 0.7rem;
+  background: linear-gradient(180deg, color-mix(in oklch, var(--primary) 94%, white), var(--primary));
+  color: var(--primary-foreground);
+  font-size: clamp(0.88rem, 1.25vw, 1rem);
+  font-weight: 700;
+  box-shadow: 0 0.75rem 1.35rem color-mix(in oklch, var(--primary) 22%, transparent);
+}
+
+.hero .primary-cta {
+  display: flex !important;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 28rem;
+  margin-top: 1.7rem;
+}
+
+.fact {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  padding-inline: 0.8rem;
+  color: var(--foreground);
+  font-size: 0.84rem;
+}
+
+.fact + .fact {
+  border-inline-start: 1px solid var(--border);
+}
+
+.fact-icon {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--surface-sage) 65%, white);
+  color: var(--brand);
+}
+
+.hero-art {
+  grid-column: 1;
+  grid-row: 1;
+  width: min(112%, 53rem);
+  justify-self: end;
+  border-radius: 2rem;
+  mix-blend-mode: multiply;
+  opacity: 0.98;
+  filter: saturate(0.98) drop-shadow(0 1.25rem 1.5rem color-mix(in oklch, var(--brand) 8%, transparent));
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent 0%, #000 10%, #000 88%, transparent 100%),
+    linear-gradient(180deg, transparent 0%, #000 10%, #000 88%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, transparent 0%, #000 10%, #000 88%, transparent 100%),
+    linear-gradient(180deg, transparent 0%, #000 10%, #000 88%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.section-block {
+  padding-block: clamp(2.2rem, 6vw, 3.75rem);
+  text-align: center;
+}
+
+.section-title,
+.final-cta h2 {
+  margin: 0;
+  color: var(--brand);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.section-title {
+  font-size: clamp(1.45rem, 2.45vw, 2rem);
+  line-height: 1.2;
+}
+
+.section-title::before,
+.section-title::after,
+.final-cta h2::before,
+.final-cta h2::after {
+  content: '';
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 1.05rem;
+  background: url('/assets/section-leaf-divider.png') center / contain no-repeat;
+  opacity: 0.86;
+}
+
+.section-title::after,
+.final-cta h2::after {
+  transform: none;
+}
+
+.section-title::before,
+.final-cta h2::before {
+  transform: scaleX(-1);
+}
+
+.benefits {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1rem, 4vw, 4rem);
+  margin-top: 2.1rem;
+}
+
+.benefit {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+}
+
+.benefit ng-icon {
+  color: color-mix(in oklch, var(--brand) 78%, white);
+  font-size: 2.45rem;
+}
+
+.benefit h3 {
+  max-width: 12rem;
+  margin: 0;
+  color: var(--foreground);
+  font-size: 1.02rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.benefit p,
+.center-copy {
+  margin: 0;
+  color: color-mix(in oklch, var(--foreground) 74%, white);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.center-copy {
+  margin-top: 1.2rem;
+}
+
+.plans-section {
+  max-width: 58rem;
+}
+
+.plans {
+  display: grid;
+  gap: 1rem;
+  width: min(100%, 46rem);
+  margin-top: 1.6rem;
+  margin-inline: auto;
+}
+
+.plan {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  min-height: 4.7rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: color-mix(in oklch, var(--card) 82%, transparent);
+  color: var(--foreground);
+  text-align: start;
+}
+
+.plan-info,
+.price {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.plan-info strong {
+  color: var(--brand);
+  font-size: clamp(1.05rem, 1.85vw, 1.35rem);
+}
+
+.price {
+  text-align: start;
+}
+
+.price strong {
+  font-size: clamp(1.2rem, 2.05vw, 1.55rem);
+}
+
+.plan small,
+.insurance-note {
+  color: color-mix(in oklch, var(--foreground) 70%, white);
+  font-size: 0.82rem;
+}
+
+.insurance-note {
+  margin: 1.5rem 0 0;
+}
+
+.mid-cta {
+  margin-inline: auto;
+  min-width: min(100%, 22rem) !important;
+}
+
+.steps {
+  display: grid;
+  gap: 0.9rem;
+  width: fit-content;
+  margin: 1.8rem auto 0;
+  padding: 0;
+  list-style: none;
+  text-align: start;
+}
+
+.steps li {
+  display: grid;
+  grid-template-columns: 2.1rem 1fr;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: clamp(1rem, 1.9vw, 1.22rem);
+}
+
+.steps span {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 999px;
+  background: var(--surface-sage);
+  color: var(--brand);
+  font-weight: 900;
+}
+
+.accordion-section {
+  max-width: 54rem;
+  padding-block: 1rem 2rem;
+}
+
+.accordion-section hlm-accordion {
+  border-color: var(--border);
+  border-inline: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+:host ::ng-deep .accordion-trigger {
+  width: 100%;
+  min-height: 3.6rem;
+  padding-inline: 0;
+  color: var(--foreground);
+  font-size: 0.98rem;
+  text-decoration: none;
+}
+
+:host ::ng-deep .accordion-trigger > span {
+  flex: 1;
+  text-align: start;
+}
+
+:host ::ng-deep .accordion-row-icon {
+  flex: 0 0 auto;
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--foreground);
+  transition: transform 160ms ease;
+}
+
+:host ::ng-deep .accordion-trigger[aria-expanded='true'] .accordion-row-icon {
+  transform: rotate(-90deg);
+}
+
+:host ::ng-deep [data-slot='accordion-trigger-icon'] {
+  display: none !important;
+}
+
+:host ::ng-deep hlm-accordion-trigger,
+:host ::ng-deep [data-slot='accordion-trigger'] {
+  width: 100%;
+}
+
+:host ::ng-deep [data-slot='accordion-content'] {
+  overflow: hidden;
+  color: color-mix(in oklch, var(--foreground) 75%, white);
+  text-align: start;
+}
+
+:host ::ng-deep [data-slot='accordion-content'] p {
+  margin: 0;
+  padding: 0 0 1rem;
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.final-cta {
+  position: relative;
+  display: grid;
+  min-height: 21rem;
+  place-items: center;
+  width: calc(100% + (2 * clamp(1rem, 3vw, 2rem)));
+  margin-top: 1rem;
+  margin-inline: calc(-1 * var(--screen-padding));
+  overflow: hidden;
+  text-align: center;
+}
+
+.final-cta img {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.final-cta-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+}
+
+.final-cta h2 {
+  font-size: clamp(1.55rem, 3.1vw, 2.1rem);
+  line-height: 1.2;
+}
+
+.existing-link {
+  margin-top: 1rem;
+  color: var(--foreground);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-underline-offset: 0.25rem;
+}
+
+.footer {
+  display: grid;
+  justify-items: center;
+  gap: 0.8rem;
+  padding-block: 1.7rem 2.2rem;
+}
+
+.footer-brand span:last-child {
+  font-size: 1rem;
+}
+
+.footer nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer nav a {
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .hero,
+  .section-block,
+  .accordion-section,
+  .footer {
+    width: min(100% - 1.5rem, 43rem);
+  }
+
+  .top-bar {
+    width: calc(100% + (2 * var(--screen-padding)));
+    min-height: 4.8rem;
+    margin-inline: calc(-1 * var(--screen-padding));
+    padding-inline: var(--screen-padding);
+  }
+
+  .brand {
+    gap: 0.45rem;
+    font-size: 1.08rem;
+  }
+
+  .brand-mark {
+    width: 3.05rem;
+    height: 2.35rem;
+  }
+
+  .my-registration {
+    gap: 0.35rem;
+    font-size: 0.72rem;
+  }
+
+  .my-registration ng-icon {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .landing-shell [data-slot='button'].primary-cta {
+    min-width: min(100%, 17rem);
+  }
+
+  .section-title {
+    gap: 0.6rem;
+  }
+
+  .section-title::before,
+  .section-title::after,
+  .final-cta h2::before,
+  .final-cta h2::after {
+    width: 1.65rem;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 2rem;
+  }
+
+  .hero-copy {
+    grid-column: 1;
+    grid-row: auto;
+    order: 2;
+    max-width: none;
+  }
+
+  .hero-art {
+    grid-column: 1;
+    grid-row: auto;
+    order: 1;
+    justify-self: center;
+    width: 100%;
+    margin-top: -1rem;
+  }
+
+  .benefits {
+    grid-template-columns: 1fr;
+  }
+
+  .plan {
+    grid-template-columns: 1fr;
+  }
+
+  .price {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 420px) {
+  .top-bar {
+    width: calc(100% + (2 * var(--screen-padding)));
+  }
+
+  .brand {
+    font-size: 0.92rem;
+  }
+
+  .brand-mark {
+    width: 2.55rem;
+    height: 2rem;
+  }
+
+  .my-registration {
+    font-size: 0.66rem;
+  }
+}

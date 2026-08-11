@@ -1,0 +1,76 @@
+<main class="registration-screen" dir="rtl">
+  <header class="registration-top">
+    <a routerLink="/" class="back-link">
+      <ng-icon name="lucideChevronLeft" />
+      <span>{{ backLabel }}</span>
+    </a>
+    <a routerLink="/" class="brand" aria-label="הצהרון של אביב">
+      <span>הצהרון של אביב</span>
+      <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+    </a>
+  </header>
+
+  <section class="progress-area" aria-label="שלבי הרשמה">
+    <p>הרשמה לשנת תשפ״ז</p>
+    <ol class="progress-line" [style.--step-count]="steps.length">
+      @for (step of steps; track step.label; let index = $index) {
+        <li [class.active]="activeStep === index" [class.done]="activeStep > index">
+          <button hlmBtn variant="ghost" type="button" class="progress-dot" (click)="setActiveStep(index)">
+            @if (activeStep > index) {
+              <ng-icon name="lucideCheck" />
+            } @else {
+              {{ index + 1 }}
+            }
+          </button>
+          <span>{{ step.label }}</span>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <section class="stage-intro" [class.summary]="activeStep === steps.length - 1">
+    @if (activeStep === steps.length - 1) {
+      <img class="success-mark" src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+      <span class="status-chip">ממתינה לבדיקה</span>
+    } @else {
+      <p>שלב {{ activeStep + 1 }} מתוך {{ steps.length }}</p>
+    }
+    <h1>{{ stepTitle }}</h1>
+    <p>{{ stepDescription }}</p>
+  </section>
+
+  @switch (activeStep) {
+    @case (0) {
+      <app-parent-details-stage />
+    }
+    @case (1) {
+      <app-child-details-stage />
+    }
+    @case (2) {
+      <app-plan-stage />
+      <app-agreements-stage />
+      <app-documents-stage />
+    }
+    @case (3) {
+      <app-summary-stage />
+    }
+  }
+
+  <section class="registration-actions">
+    @if (activeStep !== steps.length - 1) {
+      <button hlmBtn class="primary-action" type="button" [disabled]="primaryDisabled" (click)="goNext()">
+        <span>{{ primaryLabel }}</span>
+        <ng-icon name="lucideArrowLeft" />
+      </button>
+      <button hlmBtn variant="link" class="save-action" type="button" (click)="setActiveStep(steps.length - 1)">שמירה והמשך מאוחר יותר</button>
+    } @else {
+      <button hlmBtn class="primary-action" type="button" routerLink="/">
+        <span>{{ primaryLabel }}</span>
+      </button>
+      <button hlmBtn variant="outline" class="outline-action" type="button">הורדת החוזה החתום</button>
+      <button hlmBtn variant="link" class="save-action" type="button">צפייה בהרשמות שלי</button>
+    }
+  </section>
+
+  <img class="registration-foliage" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+</main>

@@ -1,0 +1,63 @@
+<section class="mock-stage details-stage">
+  <article class="soft-card identity-card">
+    <ng-icon name="lucideUserRound" />
+    <div>
+      <h2>פרטי הילדים</h2>
+      <p>אפשר לרשום ילד אחד או להוסיף ילד נוסף לאותה הרשמה.</p>
+    </div>
+  </article>
+
+  <section class="children-overview" aria-label="ילדים בהרשמה">
+    @for (child of children; track child.id; let index = $index) {
+      <article class="child-summary-card" [class.active]="index === 0">
+        <ng-icon name="lucideUserRound" />
+        <span>
+          <strong>{{ childDisplayName(child, index) }}</strong>
+          <small>פרטים חדשים למילוי</small>
+        </span>
+        <button hlmBtn variant="ghost" type="button" class="icon-action" [attr.aria-label]="'הסרת ' + childDisplayName(child, index)" (click)="removeChild(child.id)">
+          <ng-icon name="lucideTrash2" />
+        </button>
+      </article>
+    }
+
+    <button hlmBtn variant="outline" type="button" class="add-child-action" (click)="addChild()">
+      <ng-icon name="lucidePlus" />
+      <span>הוספת ילד נוסף</span>
+    </button>
+  </section>
+
+  @for (child of children; track child.id; let index = $index) {
+    <section class="form-section" [class.secondary-child-form]="index > 0">
+      <h2 class="leaf-title">פרטים אישיים - {{ childDisplayName(child, index) }}</h2>
+      <div class="parent-field-grid">
+        <label class="field">
+          <span>שם פרטי</span>
+          <input hlmInput [(ngModel)]="child.name" [placeholder]="index === 0 ? 'לדוגמה: אורי' : 'שם פרטי'" [attr.aria-label]="'שם פרטי של ' + childDisplayName(child, index)" />
+        </label>
+        <label class="field">
+          <span>שם משפחה</span>
+          <input hlmInput [placeholder]="index === 0 ? 'לדוגמה: לוי' : 'שם משפחה'" [attr.aria-label]="'שם משפחה של ' + childDisplayName(child, index)" />
+        </label>
+        <label class="field">
+          <span>תאריך לידה</span>
+          <input hlmInput placeholder="DD.MM.YYYY" [attr.aria-label]="'תאריך לידה של ' + childDisplayName(child, index)" />
+        </label>
+      </div>
+
+      <section class="child-medical-section">
+        <h3>אלרגיות ורגישויות - {{ childDisplayName(child, index) }}</h3>
+        <p>האם לילד יש אלרגיות או רגישויות?</p>
+        <hlm-radio-group class="segmented" [value]="child.allergyAnswer" [attr.aria-label]="'אלרגיות ורגישויות עבור ' + childDisplayName(child, index)" (valueChange)="child.allergyAnswer = $event">
+          <hlm-radio value="yes" [class.selected]="child.allergyAnswer === 'yes'" (click)="child.allergyAnswer = 'yes'">
+            <span>כן</span>
+          </hlm-radio>
+          <hlm-radio value="no" [class.selected]="child.allergyAnswer === 'no'" (click)="child.allergyAnswer = 'no'">
+            <hlm-radio-indicator indicator />
+            <span>לא</span>
+          </hlm-radio>
+        </hlm-radio-group>
+      </section>
+    </section>
+  }
+</section>

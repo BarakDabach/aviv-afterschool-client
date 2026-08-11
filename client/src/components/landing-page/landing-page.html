@@ -1,0 +1,141 @@
+<main class="landing-shell">
+  <nav class="top-bar" aria-label="ניווט ראשי">
+    <a class="brand" href="#" aria-label="הצהרון של אביב">
+      <span class="brand-mark">
+        <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+      </span>
+      <span>הצהרון של אביב</span>
+    </a>
+
+    <a class="my-registration" routerLink="/registration">
+      <ng-icon name="lucideUser" />
+      <span>ההרשמה שלי</span>
+    </a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>מקום חם לגדול בו גם אחרי הגן</h1>
+      <p>
+        אנחנו כאן כדי להעניק לילדים סביבה בטוחה, חמה ומעשירה - עם יחס אישי,
+        פעילויות מגוונות וזמן איכות בכל יום.
+      </p>
+
+      <a hlmBtn size="lg" class="primary-cta" href="#plans">
+        <span>בחירת מסלול והרשמה</span>
+        <ng-icon name="lucideArrowLeft" data-icon="inline-end" />
+      </a>
+
+      <div class="hero-facts" aria-label="פרטי השנה">
+        @for (fact of heroFacts; track fact.label) {
+          <div class="fact">
+            <span class="fact-icon">
+              <ng-icon [name]="fact.icon" />
+            </span>
+            <span>{{ fact.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <img
+      class="hero-art"
+      src="/assets/landing-hero-garden.png"
+      alt="איור חמים של פינת גן עם בית משחק, צמחים וקוביות"
+    />
+  </section>
+
+  <section class="section-block">
+    <h2 class="section-title">אחר הצהריים עם לב</h2>
+    <div class="benefits">
+      @for (benefit of benefits; track benefit.title) {
+        <article class="benefit">
+          <ng-icon [name]="benefit.icon" />
+          <h3>{{ benefit.title }}</h3>
+          <p>{{ benefit.description }}</p>
+        </article>
+      }
+    </div>
+    <p class="center-copy">אנחנו רואים בכל ילד עולם ומלואו - ומלווים אותו במסירות ובאהבה בכל יום.</p>
+  </section>
+
+  <section id="plans" class="section-block plans-section">
+    <h2 class="section-title">המסלולים שלנו</h2>
+    <div class="plans" aria-label="מסלולים זמינים">
+      @for (plan of plans; track plan.name) {
+        <article class="plan">
+          <span class="plan-info">
+            <strong>{{ plan.name }}</strong>
+            <small>{{ plan.description }}</small>
+          </span>
+          <span class="price">
+            <strong>{{ plan.price }}</strong>
+            <small>לחודש</small>
+          </span>
+        </article>
+      }
+    </div>
+
+    <p class="insurance-note">תשלום ביטוח שנתי חד-פעמי: 200 ₪</p>
+
+      <a hlmBtn size="lg" class="primary-cta mid-cta" routerLink="/registration">
+      <span>בחירה והתחלת הרשמה</span>
+      <ng-icon name="lucideArrowLeft" data-icon="inline-end" />
+    </a>
+  </section>
+
+  <section id="register" class="section-block steps-section">
+    <h2 class="section-title">נרשמים בכמה צעדים פשוטים</h2>
+    <ol class="steps">
+      @for (step of steps; track step; let index = $index) {
+        <li>
+          <span>{{ index + 1 }}</span>
+          <strong>{{ step }}</strong>
+        </li>
+      }
+    </ol>
+    <p class="center-copy">את סטטוס ההרשמה תוכלו לראות בכל שלב באפליקציה.</p>
+  </section>
+
+  <section class="accordion-section">
+    <hlm-accordion type="single">
+      @for (question of questions; track question.title) {
+        <hlm-accordion-item [isOpened]="openedQuestionIndex === $index" (openedChange)="setQuestionOpen($index, $event)">
+          <hlm-accordion-trigger [triggerClass]="'accordion-trigger'">
+            <span>{{ question.title }}</span>
+            <ng-icon class="accordion-row-icon" name="lucideChevronLeft" />
+          </hlm-accordion-trigger>
+          <hlm-accordion-content>
+            <p>{{ question.content }}</p>
+          </hlm-accordion-content>
+        </hlm-accordion-item>
+      }
+    </hlm-accordion>
+  </section>
+
+  <section class="final-cta">
+    <img src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+    <div class="final-cta-content">
+      <h2>מוכנים להצטרף אלינו?</h2>
+      <a hlmBtn size="lg" class="primary-cta" routerLink="/registration">
+        <span>להתחלת הרשמה</span>
+        <ng-icon name="lucideArrowLeft" data-icon="inline-end" />
+      </a>
+      <a class="existing-link" routerLink="/registration">כבר התחלתי הרשמה</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <a class="footer-brand" href="#">
+      <span class="brand-mark small">
+        <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+      </span>
+      <span>הצהרון של אביב</span>
+    </a>
+    <nav aria-label="קישורי תחתית">
+      <a href="#">מדיניות פרטיות</a>
+      <a href="#">תנאי שימוש</a>
+      <a href="#">צור קשר</a>
+    </nav>
+  </footer>
+</main>

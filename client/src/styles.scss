@@ -1,0 +1,117 @@
+@import 'tailwindcss' source('.');
+@source '../libs/ui';
+
+@import '@spartan-ng/brain/hlm-tailwind-preset.css';
+
+:root {
+  color-scheme: light;
+
+  --font-sans: 'Noto Sans Hebrew', 'Assistant', 'Segoe UI', Arial, sans-serif;
+  --radius: 0.5rem;
+  --background: oklch(0.982 0.018 86);
+  --foreground: oklch(0.225 0.058 158);
+  --card: oklch(0.996 0.01 86);
+  --card-foreground: oklch(0.205 0.05 158);
+  --popover: oklch(0.996 0.01 86);
+  --popover-foreground: oklch(0.205 0.05 158);
+  --primary: oklch(0.73 0.18 55);
+  --primary-foreground: oklch(0.995 0.012 86);
+  --secondary: oklch(0.93 0.036 118);
+  --secondary-foreground: oklch(0.245 0.065 152);
+  --muted: oklch(0.955 0.022 88);
+  --muted-foreground: oklch(0.47 0.032 126);
+  --accent: oklch(0.36 0.095 153);
+  --accent-foreground: oklch(0.985 0.018 86);
+  --destructive: oklch(0.58 0.22 28);
+  --border: oklch(0.84 0.032 89);
+  --input: oklch(0.9 0.026 88);
+  --ring: oklch(0.66 0.14 55);
+  --sidebar: oklch(0.965 0.019 92);
+  --sidebar-foreground: oklch(0.225 0.058 158);
+  --sidebar-primary: oklch(0.36 0.095 153);
+  --sidebar-primary-foreground: oklch(0.985 0.018 86);
+  --sidebar-accent: oklch(0.9 0.04 118);
+  --sidebar-accent-foreground: oklch(0.245 0.065 152);
+  --sidebar-border: oklch(0.84 0.032 89);
+  --sidebar-ring: oklch(0.66 0.14 55);
+  --brand: oklch(0.32 0.092 153);
+  --brand-foreground: oklch(0.985 0.018 86);
+  --success: oklch(0.44 0.105 145);
+  --success-foreground: oklch(0.985 0.018 86);
+  --warning: oklch(0.72 0.16 63);
+  --warning-foreground: oklch(0.245 0.065 152);
+  --surface-warm: oklch(0.97 0.026 86);
+  --surface-sage: oklch(0.91 0.046 118);
+}
+
+:root.dark {
+  color-scheme: dark;
+
+  --background: oklch(0.18 0.035 156);
+  --foreground: oklch(0.94 0.024 88);
+  --card: oklch(0.23 0.04 155);
+  --card-foreground: oklch(0.94 0.024 88);
+  --popover: oklch(0.23 0.04 155);
+  --popover-foreground: oklch(0.94 0.024 88);
+  --primary: oklch(0.76 0.17 58);
+  --primary-foreground: oklch(0.18 0.035 156);
+  --secondary: oklch(0.3 0.052 142);
+  --secondary-foreground: oklch(0.94 0.024 88);
+  --muted: oklch(0.28 0.038 145);
+  --muted-foreground: oklch(0.76 0.036 92);
+  --accent: oklch(0.58 0.105 142);
+  --accent-foreground: oklch(0.12 0.028 156);
+  --destructive: oklch(0.66 0.19 28);
+  --border: oklch(0.42 0.035 142 / 70%);
+  --input: oklch(0.38 0.035 142 / 75%);
+  --ring: oklch(0.76 0.17 58);
+  --sidebar: oklch(0.2 0.035 156);
+  --sidebar-foreground: oklch(0.94 0.024 88);
+  --sidebar-primary: oklch(0.76 0.17 58);
+  --sidebar-primary-foreground: oklch(0.18 0.035 156);
+  --sidebar-accent: oklch(0.3 0.052 142);
+  --sidebar-accent-foreground: oklch(0.94 0.024 88);
+  --sidebar-border: oklch(0.42 0.035 142 / 70%);
+  --sidebar-ring: oklch(0.76 0.17 58);
+  --brand: oklch(0.66 0.105 145);
+  --brand-foreground: oklch(0.12 0.028 156);
+  --success: oklch(0.62 0.12 145);
+  --success-foreground: oklch(0.12 0.028 156);
+  --warning: oklch(0.78 0.15 68);
+  --warning-foreground: oklch(0.12 0.028 156);
+  --surface-warm: oklch(0.25 0.035 145);
+  --surface-sage: oklch(0.32 0.052 142);
+}
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-surface-warm: var(--surface-warm);
+  --color-surface-sage: var(--surface-sage);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    direction: rtl;
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    direction: rtl;
+    min-height: 100%;
+    margin: 0;
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+}

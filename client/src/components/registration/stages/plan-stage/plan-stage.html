@@ -1,0 +1,42 @@
+<section class="mock-stage plan-selection-stage">
+  <article class="soft-card identity-card">
+    <ng-icon name="lucideCalendarClock" />
+    <div>
+      <h2>בחירת מסלול</h2>
+      <p>בחרו את הימים והשעות עבור אורי. אפשר לעדכן את הבחירה לפני שליחה.</p>
+    </div>
+  </article>
+
+  <hlm-radio-group class="option-list" aria-label="בחירת מסלול" [value]="selectedPlan" (valueChange)="selectedPlan = $event">
+    <hlm-radio class="option-row" [class.selected]="selectedPlan === 'full'" value="full" (click)="selectedPlan = 'full'">
+      <app-selection-mark [selected]="selectedPlan === 'full'" />
+      <span class="option-main">
+        <strong>מסלול מלא</strong>
+        <small>ימים א׳-ה׳ · עד 16:30</small>
+        <em>הבחירה המתאימה למסגרת קבועה בכל השבוע</em>
+      </span>
+      <span class="option-price">
+        <strong>₪1,450</strong>
+        <small>לחודש</small>
+      </span>
+    </hlm-radio>
+
+    <hlm-radio class="option-row" [class.selected]="selectedPlan === 'three'" value="three" (click)="selectedPlan = 'three'">
+      <app-selection-mark [selected]="selectedPlan === 'three'" />
+      <span class="option-main">
+        <strong>שלושה ימים</strong>
+        <small>ימים לבחירה · עד 16:30</small>
+        <em>גמיש למשפחות שצריכות חלק מהשבוע</em>
+      </span>
+      <span class="option-price">
+        <strong>₪1,050</strong>
+        <small>לחודש</small>
+      </span>
+    </hlm-radio>
+  </hlm-radio-group>
+
+  <article class="hint-card">
+    <ng-icon name="lucideCheck" />
+    <span>תשלום ביטוח שנתי חד-פעמי: 200 ₪ לכל ילד.</span>
+  </article>
+</section>
