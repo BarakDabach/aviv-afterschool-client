@@ -59,6 +59,7 @@ Checks completed:
 - Parent/children update QA returned no console errors: parent extra contact is manually revealed, parent header text computes RTL/start, child titles/cards reflect typed first names, first child can be removed, gan/class and allergy info box are removed, and save-later navigates to the final state.
 - Registration flow simplification QA returned no console errors: progress is reduced to four phases, plan/contract/documents are merged into `מסלול ואישורים`, summary remains the final phase, and the parent verification/update card is horizontally aligned on desktop.
 - Parent identity card alignment QA returned no console errors and verified the `פרטי ההורה הראשי` icon/text spacing on desktop and mobile.
+- Registration requirements audit passed: removed non-required email, optional extra contact, child birth date, signer-name field, contract/document checkboxes, pre-uploaded standing-order file state, and automatic-updates copy. Parent now asks only for full name and mobile phone; child asks for full name and per-child allergies.
 
 Remaining polish:
 - Some illustrative line icons are closest Lucide matches rather than custom generated parent/child artwork.

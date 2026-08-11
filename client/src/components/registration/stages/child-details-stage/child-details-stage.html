@@ -32,16 +32,8 @@
       <h2 class="leaf-title">פרטים אישיים - {{ childDisplayName(child, index) }}</h2>
       <div class="parent-field-grid">
         <label class="field">
-          <span>שם פרטי</span>
-          <input hlmInput [(ngModel)]="child.name" [placeholder]="index === 0 ? 'לדוגמה: אורי' : 'שם פרטי'" [attr.aria-label]="'שם פרטי של ' + childDisplayName(child, index)" />
-        </label>
-        <label class="field">
-          <span>שם משפחה</span>
-          <input hlmInput [placeholder]="index === 0 ? 'לדוגמה: לוי' : 'שם משפחה'" [attr.aria-label]="'שם משפחה של ' + childDisplayName(child, index)" />
-        </label>
-        <label class="field">
-          <span>תאריך לידה</span>
-          <input hlmInput placeholder="DD.MM.YYYY" [attr.aria-label]="'תאריך לידה של ' + childDisplayName(child, index)" />
+          <span>שם מלא של הילד</span>
+          <input hlmInput [(ngModel)]="child.name" [placeholder]="index === 0 ? 'לדוגמה: אורי לוי' : 'שם מלא'" [attr.aria-label]="'שם מלא של ' + childDisplayName(child, index)" />
         </label>
       </div>
 

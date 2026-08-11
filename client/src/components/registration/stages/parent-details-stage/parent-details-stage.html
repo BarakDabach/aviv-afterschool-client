@@ -11,20 +11,12 @@
     <h2 class="leaf-title">פרטים אישיים</h2>
     <div class="parent-field-grid">
       <label class="field">
-        <span>שם פרטי</span>
-        <input hlmInput value="דנה" aria-label="שם פרטי" />
-      </label>
-      <label class="field">
-        <span>שם משפחה</span>
-        <input hlmInput value="לוי" aria-label="שם משפחה" />
+        <span>שם מלא של ההורה</span>
+        <input hlmInput value="דנה לוי" aria-label="שם מלא של ההורה" />
       </label>
       <label class="field">
         <span>מספר טלפון נייד</span>
         <input hlmInput value="050-123-4567" aria-label="מספר טלפון נייד" />
-      </label>
-      <label class="field">
-        <span>דוא״ל</span>
-        <input hlmInput value="dana@example.com" aria-label="דואר אלקטרוני" />
       </label>
     </div>
   </section>
@@ -35,33 +27,9 @@
     </span>
     <div>
       <h3>אימות ועדכונים</h3>
-      <p>נשלח הודעות ועדכונים רק למספר הטלפון שמופיע כאן.</p>
+      <p>מספר הטלפון ישמש לזיהוי ולצפייה בסטטוס ההרשמה.</p>
     </div>
   </article>
-
-  @if (showExtraContact) {
-    <section class="form-section">
-      <div class="optional-section-title">
-        <h2 class="leaf-title">איש קשר נוסף</h2>
-        <span>אופציונלי</span>
-      </div>
-      <div class="parent-field-grid">
-        <label class="field">
-          <span>שם מלא</span>
-          <input hlmInput placeholder="אפשר להשאיר ריק" aria-label="שם איש קשר נוסף אופציונלי" />
-        </label>
-        <label class="field">
-          <span>טלפון</span>
-          <input hlmInput placeholder="אפשר להשאיר ריק" aria-label="טלפון איש קשר נוסף אופציונלי" />
-        </label>
-      </div>
-    </section>
-  } @else {
-    <button hlmBtn variant="outline" type="button" class="add-child-action" (click)="showExtraContact = true">
-      <ng-icon name="lucidePlus" />
-      <span>הוספת איש קשר נוסף</span>
-    </button>
-  }
 
   <article class="hint-card">
     <ng-icon name="lucideShieldCheck" />

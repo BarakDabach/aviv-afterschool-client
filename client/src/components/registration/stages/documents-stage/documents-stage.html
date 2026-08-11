@@ -14,18 +14,12 @@
   <section class="upload-section">
     <h2>1. אישור הוראת קבע</h2>
     <p>העלו אישור מהבנק על הקמת הוראת הקבע.</p>
-    <article class="file-card">
-      <ng-icon name="lucideFile" />
-      <div>
-        <h3>אישור-הוראת-קבע.pdf</h3>
-        <p>428 KB</p>
-      </div>
-      <span><ng-icon name="lucideCheck" /> הקובץ הועלה</span>
-      <nav>
-        <button hlmBtn variant="link" type="button">החלפה</button>
-        <button hlmBtn variant="link" type="button">מחיקה</button>
-      </nav>
-      <button hlmBtn variant="secondary" type="button" class="link-child"><ng-icon name="lucideLink" /> משויך לאורי לוי</button>
+    <article class="drop-zone">
+      <ng-icon name="lucideFileUp" />
+      <h3>העלאת אישור הוראת קבע</h3>
+      <p>בחירת תמונה או PDF</p>
+      <div class="paper-leaf"></div>
+      <button hlmBtn variant="link" type="button"><ng-icon name="lucideCamera" /> צילום מסמך</button>
     </article>
   </section>
 
@@ -39,10 +33,6 @@
       <p>בחירת תמונה או PDF</p>
       <div class="paper-leaf"></div>
       <button hlmBtn variant="link" type="button"><ng-icon name="lucideCamera" /> צילום מסמך</button>
-      <label class="check-line inset">
-        <hlm-checkbox checked aria-label="האסמכתה שייכת לאורי לוי" />
-        <span>האסמכתה שייכת לאורי לוי</span>
-      </label>
     </article>
   </section>
 
