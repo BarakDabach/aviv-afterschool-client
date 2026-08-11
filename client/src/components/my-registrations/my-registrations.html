@@ -1,0 +1,82 @@
+<main class="my-registrations-screen" dir="rtl">
+  <header class="my-registrations-top">
+    <a routerLink="/" class="back-link">
+      <ng-icon name="lucideChevronLeft" />
+      <span>יציאה</span>
+    </a>
+    <a routerLink="/" class="brand" aria-label="הצהרון של אביב">
+      <span>הצהרון של אביב</span>
+      <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+    </a>
+  </header>
+
+  <section class="page-intro">
+    <p>ההרשמה שלי</p>
+    <h1>ההרשמות שלי</h1>
+    <p>מצאנו 2 הרשמות המשויכות למספר הטלפון שלך.</p>
+  </section>
+
+  <article class="parent-card">
+    <span class="parent-icon">
+      <ng-icon name="lucideUserRound" />
+    </span>
+    <div>
+      <strong>דנה לוי</strong>
+      <span>050-123-4567</span>
+    </div>
+  </article>
+
+  <section class="registration-picker" aria-label="הרשמות משויכות">
+    <h2>בחרו הרשמה לצפייה או המשך</h2>
+
+    @for (registration of registrations; track registration.childName) {
+      <article class="registration-card">
+        <div class="registration-card-main">
+          <span class="child-icon" [class.complete]="registration.status === 'complete'">
+            <ng-icon name="lucideUserRound" />
+          </span>
+          <div class="child-copy">
+            <h3>{{ registration.childName }}</h3>
+            <p>{{ registration.plan }}</p>
+            <p>{{ registration.year }}</p>
+          </div>
+        </div>
+
+        <span class="status-chip" [class.complete]="registration.status === 'complete'">
+          @if (registration.status === 'complete') {
+            <ng-icon name="lucideCheck" />
+          } @else {
+            <ng-icon name="lucideClock3" />
+          }
+          {{ registration.statusLabel }}
+        </span>
+
+        <p class="registration-note">{{ registration.note }}</p>
+
+        <div class="card-action-row">
+          @if (registration.actionVariant === 'outline') {
+            <a hlmBtn variant="outline" class="status-action" routerLink="/registration">
+              <ng-icon name="lucideArrowLeft" />
+              <span>{{ registration.actionLabel }}</span>
+            </a>
+          } @else {
+            <a hlmBtn variant="link" class="continue-action" routerLink="/registration">
+              <ng-icon name="lucideArrowLeft" />
+              <span>{{ registration.actionLabel }}</span>
+            </a>
+          }
+        </div>
+      </article>
+    }
+  </section>
+
+  <section class="screen-actions">
+    <a hlmBtn class="primary-action" routerLink="/registration">
+      <ng-icon name="lucideArrowLeft" />
+      <span>התחלת הרשמה לילד נוסף</span>
+    </a>
+    <a class="lookup-link" routerLink="/">חזרה להזנת מספר טלפון</a>
+  </section>
+
+  <img class="my-registrations-foliage" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+</main>

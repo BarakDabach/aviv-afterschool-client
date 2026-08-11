@@ -65,3 +65,25 @@ Remaining polish:
 - Signature rendering is a styled placeholder until signature capture logic is added.
 
 Final result: passed
+
+---
+
+# My Registrations Design QA
+
+Reference: `../mockups/parent-my-registrations-list.png`
+Prototype: `http://127.0.0.1:4200/my-registrations`
+Screenshot: `my-registrations-final-mobile.png`
+
+Checks completed:
+- Dedicated `/my-registrations` route renders the `ההרשמות שלי` screen.
+- Landing `ההרשמה שלי` link navigates to the new screen.
+- Header, parent identity card, two registration cards, primary CTA, lookup link, and footer foliage match the selected mock structure.
+- Registration card details are aligned on the right and status chips are aligned on the left, matching the RTL mock.
+- Spartan button primitives are used for the primary and card actions.
+- Browser console check returned no errors.
+- Mobile capture has no horizontal overflow.
+
+Remaining polish:
+- Child face artwork uses the closest existing line icon from the app icon library instead of custom illustrated portraits.
+
+Final result: passed
