@@ -133,12 +133,12 @@
 
 .landing-shell [data-slot='button'].primary-cta {
   min-width: min(100%, 18rem);
-  height: 3.1rem !important;
+  height: var(--app-button-height) !important;
   margin-top: 1.65rem;
-  border-radius: 0.7rem;
+  border-radius: var(--app-control-radius);
   background: linear-gradient(180deg, color-mix(in oklch, var(--primary) 94%, white), var(--primary));
   color: var(--primary-foreground);
-  font-size: clamp(0.88rem, 1.25vw, 1rem);
+  font-size: var(--app-button-size);
   font-weight: 700;
   box-shadow: 0 0.75rem 1.35rem color-mix(in oklch, var(--primary) 22%, transparent);
 }
@@ -217,7 +217,7 @@
 }
 
 .section-title {
-  font-size: clamp(1.45rem, 2.45vw, 2rem);
+  font-size: clamp(1.25rem, 2.25vw, 1.7rem);
   line-height: 1.2;
 }
 
@@ -300,10 +300,10 @@
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 1rem;
-  min-height: 4.7rem;
+  min-height: 4.35rem;
   padding: 0.8rem 1rem;
   border: 1px solid var(--border);
-  border-radius: 0.7rem;
+  border-radius: var(--app-control-radius);
   background: color-mix(in oklch, var(--card) 82%, transparent);
   color: var(--foreground);
   text-align: start;
@@ -317,7 +317,7 @@
 
 .plan-info strong {
   color: var(--brand);
-  font-size: clamp(1.05rem, 1.85vw, 1.35rem);
+  font-size: clamp(0.95rem, 1.7vw, 1.2rem);
 }
 
 .price {
@@ -325,7 +325,7 @@
 }
 
 .price strong {
-  font-size: clamp(1.2rem, 2.05vw, 1.55rem);
+  font-size: clamp(1.08rem, 1.85vw, 1.35rem);
 }
 
 .plan small,

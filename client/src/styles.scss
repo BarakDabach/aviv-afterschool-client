@@ -42,6 +42,22 @@
   --warning-foreground: oklch(0.245 0.065 152);
   --surface-warm: oklch(0.97 0.026 86);
   --surface-sage: oklch(0.91 0.046 118);
+  --app-content-width: 35rem;
+  --app-header-width: 35rem;
+  --app-card-radius: 0.72rem;
+  --app-control-radius: 0.7rem;
+  --app-page-title-size: clamp(1.38rem, 4.1vw, 1.82rem);
+  --app-section-title-size: 0.96rem;
+  --app-card-title-size: 0.95rem;
+  --app-body-size: 0.78rem;
+  --app-muted-size: 0.72rem;
+  --app-button-size: 0.88rem;
+  --app-button-height: 2.8rem;
+  --app-field-height: 2.75rem;
+  --app-section-gap: 1.18rem;
+  --app-section-margin: 1.55rem;
+  --app-between-section-margin: 2.15rem;
+  --app-card-min-height: 5.35rem;
 }
 
 :root.dark {

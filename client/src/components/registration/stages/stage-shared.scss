@@ -1,12 +1,12 @@
 .mock-stage {
   display: grid;
-  gap: 1.18rem;
-  width: min(100%, 35rem);
-  margin: 1.55rem auto 0;
+  gap: var(--app-section-gap);
+  width: min(100%, var(--app-content-width));
+  margin: var(--app-section-margin) auto 0;
 }
 
 .mock-stage + .mock-stage {
-  margin-top: 2.15rem;
+  margin-top: var(--app-between-section-margin);
 }
 
 .soft-card,
@@ -17,12 +17,12 @@
 .drop-zone,
 .family-card {
   border: 1px solid var(--border);
-  border-radius: 0.72rem;
+  border-radius: var(--app-card-radius);
   background: color-mix(in oklch, var(--card) 84%, transparent);
 }
 
 .soft-card {
-  min-height: 5.35rem;
+  min-height: var(--app-card-min-height);
   padding: 0.78rem 0.95rem;
   background:
     radial-gradient(circle at 44% 48%, color-mix(in oklch, var(--surface-sage) 22%, transparent), transparent 8rem),
@@ -50,14 +50,14 @@
 .identity-card h2 {
   margin: 0 0 0.45rem;
   color: var(--brand);
-  font-size: 0.95rem;
+  font-size: var(--app-card-title-size);
   font-weight: 850;
 }
 
 .identity-card p {
   margin: 0;
   color: color-mix(in oklch, var(--foreground) 78%, white);
-  font-size: 0.76rem;
+  font-size: var(--app-muted-size);
   line-height: 1.55;
 }
 
@@ -151,14 +151,14 @@
 
 .notice-card h3 {
   color: var(--brand);
-  font-size: 0.88rem;
+  font-size: var(--app-button-size);
   font-weight: 850;
 }
 
 .notice-card p {
   margin-top: 0.25rem;
   color: color-mix(in oklch, var(--foreground) 78%, white);
-  font-size: 0.72rem;
+  font-size: var(--app-muted-size);
 }
 
 .plan-card {
@@ -297,15 +297,15 @@ hlm-radio.option-row.selected {
 
 .field span {
   color: var(--foreground);
-  font-size: 0.78rem;
+  font-size: var(--app-body-size);
 }
 
 .field input[data-slot='input'] {
-  height: 2.75rem;
+  height: var(--app-field-height);
   border-radius: 0.48rem;
   background: color-mix(in oklch, var(--background) 74%, white);
   color: var(--foreground);
-  font-size: 0.8rem;
+  font-size: var(--app-body-size);
   text-align: center;
 }
 

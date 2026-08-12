@@ -18,7 +18,7 @@
 .my-registrations-screen > *:not(.my-registrations-foliage) {
   position: relative;
   z-index: 1;
-  width: min(100%, 35rem);
+  width: min(100%, var(--app-content-width));
   margin-inline: auto;
 }
 
@@ -31,7 +31,7 @@
   max-width: none;
   min-height: 5.15rem;
   margin-inline: calc(-1 * var(--screen-padding));
-  padding-inline: max(var(--screen-padding), calc((100vw - 35rem) / 2));
+  padding-inline: max(var(--screen-padding), calc((100vw - var(--app-header-width)) / 2));
   border-bottom: 1px solid var(--border);
 }
 
@@ -87,14 +87,14 @@
 
 .page-intro h1 {
   color: var(--brand);
-  font-size: clamp(1.52rem, 5vw, 1.95rem);
+  font-size: var(--app-page-title-size);
   font-weight: 900;
   line-height: 1.1;
 }
 
 .page-intro > p:last-child {
   color: color-mix(in oklch, var(--foreground) 82%, white);
-  font-size: clamp(0.78rem, 1.8vw, 0.9rem);
+  font-size: clamp(var(--app-body-size), 1.8vw, 0.9rem);
 }
 
 .parent-card {
@@ -105,7 +105,7 @@
   min-height: 4.35rem;
   margin-top: 1.75rem;
   padding: 0.72rem 0.9rem;
-  border-radius: 0.78rem;
+  border-radius: var(--app-card-radius);
   background:
     radial-gradient(circle at 20% 44%, color-mix(in oklch, white 58%, transparent), transparent 10rem),
     color-mix(in oklch, var(--surface-sage) 24%, var(--card));
@@ -133,7 +133,7 @@
 
 .parent-card strong {
   color: var(--brand);
-  font-size: 0.95rem;
+  font-size: var(--app-card-title-size);
   font-weight: 850;
 }
 
@@ -163,7 +163,7 @@
   gap: 0.72rem;
   padding: 0.95rem 1rem 0.85rem;
   border: 1px solid var(--border);
-  border-radius: 0.82rem;
+  border-radius: var(--app-card-radius);
   background:
     radial-gradient(circle at 22% 22%, color-mix(in oklch, white 52%, transparent), transparent 10rem),
     color-mix(in oklch, var(--card) 82%, transparent);
@@ -198,7 +198,7 @@
 
 .child-copy h3 {
   color: var(--brand);
-  font-size: 0.98rem;
+  font-size: var(--app-card-title-size);
   font-weight: 850;
 }
 
@@ -278,12 +278,12 @@
 
 .primary-action[data-slot='button'] {
   width: min(100%, 24rem);
-  height: 2.8rem;
+  height: var(--app-button-height);
   gap: 0.58rem;
-  border-radius: 0.68rem;
+  border-radius: var(--app-control-radius);
   background: linear-gradient(180deg, color-mix(in oklch, var(--primary) 96%, white), var(--primary));
   color: var(--primary-foreground);
-  font-size: 0.88rem;
+  font-size: var(--app-button-size);
   font-weight: 700;
   box-shadow: 0 0.9rem 1.45rem color-mix(in oklch, var(--primary) 18%, transparent);
 }

@@ -24,6 +24,24 @@ Final result: passed
 
 ---
 
+# Cross-App Sizing and RTL QA
+
+Screens:
+- `http://127.0.0.1:4200/`
+- `http://127.0.0.1:4200/registration`
+- `http://127.0.0.1:4200/my-registrations`
+
+Checks completed:
+- Shared sizing tokens are defined globally and used by landing, registration, stage cards, inputs, buttons, and my-registrations screens.
+- Mobile and desktop browser audit passed with no console errors.
+- Mobile and desktop browser audit found no horizontal overflow.
+- `html`, `body`, page shells, headers, primary sections, form fields, and Spartan primitive containers compute as `direction: rtl`.
+- Source scan found no explicit `direction: ltr`, `dir="ltr"`, or `text-align: left` rules in `client/src`.
+
+Final result: passed
+
+---
+
 # Registration Flow Design QA
 
 References:
