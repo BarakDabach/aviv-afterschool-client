@@ -109,3 +109,19 @@ Remaining polish:
 - Child face artwork uses the closest existing line icon from the app icon library instead of custom illustrated portraits.
 
 Final result: passed
+
+---
+
+# Parent Login Design QA
+
+Reference: `../mockups/parent-registration-lookup.png`
+Prototype: `http://127.0.0.1:4200/parent-login`
+
+Checks completed:
+- Dedicated `/parent-login` route renders the parent phone lookup screen.
+- Header, brand mark, back action, title, helper card, phone field, primary lookup CTA, new-registration link, privacy note, and footer foliage match the mock structure.
+- Existing parent lookup entry points route through `/parent-login` before the registrations list.
+- Spartan button and input primitives are used for the primary action and phone input.
+- Browser QA passed on mobile and desktop with no console errors, no horizontal overflow, RTL direction, and lookup CTA navigation to `/my-registrations`.
+
+Final result: passed
