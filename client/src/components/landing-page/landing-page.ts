@@ -86,7 +86,7 @@ export class LandingPage {
   protected readonly steps = [
     'בוחרים מסלול',
     'ממלאים פרטים',
-    'חותמים על החוזה',
+    'מעלים חוזה חתום',
     'מעלים אישורים',
   ];
 
