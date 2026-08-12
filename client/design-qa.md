@@ -116,6 +116,7 @@ Final result: passed
 
 Reference: `../mockups/parent-registration-lookup.png`
 Prototype: `http://127.0.0.1:4200/parent-login`
+Screenshot: `qa-parent-login.png`
 
 Checks completed:
 - Dedicated `/parent-login` route renders the parent phone lookup screen.
@@ -123,5 +124,43 @@ Checks completed:
 - Existing parent lookup entry points route through `/parent-login` before the registrations list.
 - Spartan button and input primitives are used for the primary action and phone input.
 - Browser QA passed on mobile and desktop with no console errors, no horizontal overflow, RTL direction, and lookup CTA navigation to `/my-registrations`.
+- Login content is vertically centered between the full-width header and footer foliage.
+- Header separator spans the full viewport width on mobile and desktop.
+
+Final result: passed
+
+---
+
+# Admin Screens Design QA
+
+References:
+- `../mockups/admin-registrations-dashboard.png`
+- `../mockups/admin-family-profile-history.png`
+- `../mockups/admin-school-year-settings.png`
+- `../mockups/admin-shared-documents-review.png`
+
+Prototypes:
+- `http://127.0.0.1:4200/admin`
+- `http://127.0.0.1:4200/admin/family`
+- `http://127.0.0.1:4200/admin/settings`
+- `http://127.0.0.1:4200/admin/documents`
+
+Screenshots:
+- `qa-admin.png`
+- `qa-admin-family.png`
+- `qa-admin-settings.png`
+- `qa-admin-documents.png`
+
+Checks completed:
+- Admin screens were created under `src/components/admin/*`.
+- Routes render the registrations dashboard, family profile/history, school-year settings, and shared-documents review screens.
+- Layouts follow the supplied admin mock structures: RTL header, compact intro, soft cards, status chips, action rows, bottom navigation, and footer foliage.
+- Sizing uses the existing global compact application tokens for buttons, inputs, cards, labels, and body text.
+- Spartan primitives are used for buttons and the dashboard search input.
+- Mobile browser QA passed with no console errors, no horizontal overflow, full-width headers, RTL direction, compact primitive sizing, and fixed bottom navigation that does not cover final actions.
+- Desktop spot-check passed at `1180px` width with no horizontal overflow, full-width headers, and RTL direction.
+
+Remaining polish:
+- Admin illustration/iconography uses close Lucide matches rather than custom drawn mock-specific icons.
 
 Final result: passed

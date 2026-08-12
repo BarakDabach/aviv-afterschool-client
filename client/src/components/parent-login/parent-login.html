@@ -10,43 +10,45 @@
     </a>
   </header>
 
-  <section class="login-intro">
-    <h1>ההרשמה שלי</h1>
-    <p>הזינו את מספר הטלפון ששימש להרשמה ונאתר עבורכם את התהליך.</p>
+  <section class="login-content">
+    <section class="login-intro">
+      <h1>ההרשמה שלי</h1>
+      <p>הזינו את מספר הטלפון ששימש להרשמה ונאתר עבורכם את התהליך.</p>
+    </section>
+
+    <article class="info-card identity-note">
+      <span class="note-icon">
+        <ng-icon name="lucideUserRound" />
+      </span>
+      <div>
+        <h2>אין צורך בסיסמה</h2>
+        <p>מספר הטלפון הוא אמצעי הזיהוי שלכם במערכת.</p>
+      </div>
+    </article>
+
+    <section class="lookup-form" aria-label="איתור הרשמה">
+      <label class="phone-field">
+        <span>מספר טלפון נייד</span>
+        <input hlmInput inputmode="tel" placeholder="05X-XXX-XXXX" aria-label="מספר טלפון נייד" />
+      </label>
+
+      <p>נשלח אתכם ישירות לסטטוס ההרשמה או להמשך התהליך.</p>
+
+      <a hlmBtn class="primary-action" routerLink="/my-registrations">
+        <span>איתור ההרשמה</span>
+        <ng-icon name="lucideArrowLeft" />
+      </a>
+
+      <a class="new-registration-link" routerLink="/registration">התחלת הרשמה חדשה</a>
+    </section>
+
+    <article class="info-card privacy-note">
+      <span class="shield-icon">
+        <ng-icon name="lucideShieldCheck" />
+      </span>
+      <p>המידע מוצג רק לפי מספר הטלפון שהוזן בהרשמה.</p>
+    </article>
   </section>
-
-  <article class="info-card identity-note">
-    <span class="note-icon">
-      <ng-icon name="lucideUserRound" />
-    </span>
-    <div>
-      <h2>אין צורך בסיסמה</h2>
-      <p>מספר הטלפון הוא אמצעי הזיהוי שלכם במערכת.</p>
-    </div>
-  </article>
-
-  <section class="lookup-form" aria-label="איתור הרשמה">
-    <label class="phone-field">
-      <span>מספר טלפון נייד</span>
-      <input hlmInput inputmode="tel" placeholder="05X-XXX-XXXX" aria-label="מספר טלפון נייד" />
-    </label>
-
-    <p>נשלח אתכם ישירות לסטטוס ההרשמה או להמשך התהליך.</p>
-
-    <a hlmBtn class="primary-action" routerLink="/my-registrations">
-      <span>איתור ההרשמה</span>
-      <ng-icon name="lucideArrowLeft" />
-    </a>
-
-    <a class="new-registration-link" routerLink="/registration">התחלת הרשמה חדשה</a>
-  </section>
-
-  <article class="info-card privacy-note">
-    <span class="shield-icon">
-      <ng-icon name="lucideShieldCheck" />
-    </span>
-    <p>המידע מוצג רק לפי מספר הטלפון שהוזן בהרשמה.</p>
-  </article>
 
   <img class="parent-login-foliage" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
 </main>

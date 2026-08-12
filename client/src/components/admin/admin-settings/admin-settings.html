@@ -1,0 +1,116 @@
+<main class="admin-screen" dir="rtl">
+  <header class="admin-top">
+    <a routerLink="/admin" class="top-action">
+      <ng-icon name="lucideChevronLeft" />
+      <span>חזרה</span>
+    </a>
+    <a routerLink="/" class="brand" aria-label="הצהרון של אביב">
+      <span>הצהרון של אביב</span>
+      <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+    </a>
+  </header>
+
+  <section class="admin-intro">
+    <p>הגדרות</p>
+    <h1>שנת לימודים</h1>
+    <p>ניהול השנה הפעילה והמידע שמוצג להורים</p>
+  </section>
+
+  <section class="admin-stack">
+    <article class="family-card">
+      <div class="family-header">
+        <span class="status-chip"><ng-icon name="lucideCheck" /> פעילה</span>
+        <div class="family-copy">
+          <h2>תשפ״ז · 2026/2027</h2>
+          <p>01.09.2026 - 30.06.2027</p>
+        </div>
+        <span></span>
+      </div>
+    </article>
+
+    <section class="settings-card">
+      <article class="settings-row">
+        <span class="switch" aria-hidden="true"></span>
+        <div class="settings-copy">
+          <h3>הרשמה פתוחה</h3>
+          <p>אפשר הרשמה חדשה לשנה זו</p>
+        </div>
+        <span></span>
+      </article>
+      <article class="settings-row">
+        <span class="switch" aria-hidden="true"></span>
+        <div class="settings-copy">
+          <h3>עמוד מידע גלוי להורים</h3>
+          <p>המידע על השנה מוצג באתר ההרשמה</p>
+        </div>
+        <span></span>
+      </article>
+      <article class="settings-row">
+        <div class="inline-control"><ng-icon name="lucidePlus" /> 30 ילדים <ng-icon name="lucideMinus" /></div>
+        <div class="settings-copy">
+          <h3>תפוסה מרבית</h3>
+          <p>מספר הילדים המרבי בשנה זו</p>
+        </div>
+        <span></span>
+      </article>
+      <article class="settings-row">
+        <div class="inline-control">200 ₪ לכל ילד</div>
+        <div class="settings-copy">
+          <h3>ביטוח שנתי</h3>
+          <p>סכום הביטוח השנתי לכל ילד</p>
+        </div>
+        <span></span>
+      </article>
+    </section>
+
+    <h2 class="section-title with-leaf">מסלולים</h2>
+    <article class="plan-card">
+      <div class="plan-row">
+        <div class="plan-copy">
+          <h3>מסלול מלא</h3>
+          <p>א׳-ה׳ · עד 16:30</p>
+          <span class="tag"><ng-icon name="lucideCheck" /> זמין לבחירה</span>
+        </div>
+        <div class="plan-price"><strong>₪1,450</strong><small>לחודש</small></div>
+        <a class="link-action" href="#"><ng-icon name="lucidePencil" /> עריכה</a>
+      </div>
+    </article>
+    <article class="plan-card">
+      <div class="plan-row">
+        <div class="plan-copy">
+          <h3>שלושה ימים</h3>
+          <p>ימים לבחירה · עד 16:30</p>
+          <span class="tag"><ng-icon name="lucideCheck" /> זמין לבחירה</span>
+        </div>
+        <div class="plan-price"><strong>₪1,050</strong><small>לחודש</small></div>
+        <a class="link-action" href="#"><ng-icon name="lucidePencil" /> עריכה</a>
+      </div>
+    </article>
+    <button hlmBtn variant="outline" class="outline-action" type="button"><ng-icon name="lucidePlus" /> הוספת מסלול</button>
+
+    <h2 class="section-title with-leaf">תוכן להורים</h2>
+    <section class="settings-card">
+      <article class="settings-row">
+        <ng-icon name="lucideFileText" />
+        <div class="settings-copy"><h3>נהלים והנחיות</h3></div>
+        <a class="link-action" href="#">עריכה <ng-icon name="lucideChevronLeft" /></a>
+      </article>
+      <article class="settings-row">
+        <ng-icon name="lucideCheck" />
+        <div class="settings-copy"><h3>חוזה וגרסאות</h3></div>
+        <a class="link-action" href="#">ניהול <ng-icon name="lucideChevronLeft" /></a>
+      </article>
+    </section>
+
+    <button hlmBtn class="primary-action" type="button"><ng-icon name="lucideSave" /> שמירת שינויים</button>
+    <a class="link-action" href="#">העתקה משנה קודמת</a>
+  </section>
+
+  <nav class="admin-bottom-nav" aria-label="ניווט ניהול">
+    <a routerLink="/admin/settings" class="active"><ng-icon name="lucideSettings" /><span>הגדרות</span></a>
+    <a routerLink="/admin/family"><ng-icon name="lucideUserRound" /><span>ילדים</span></a>
+    <a routerLink="/admin"><ng-icon name="lucideListChecks" /><span>הרשמות</span></a>
+  </nav>
+
+  <img class="admin-foliage" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+</main>

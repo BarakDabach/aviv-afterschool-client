@@ -1,0 +1,102 @@
+<main class="admin-screen" dir="rtl">
+  <header class="admin-top">
+    <a routerLink="/admin" class="top-action">
+      <ng-icon name="lucideChevronLeft" />
+      <span>חזרה</span>
+    </a>
+    <a routerLink="/" class="brand" aria-label="הצהרון של אביב">
+      <span>הצהרון של אביב</span>
+      <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+    </a>
+  </header>
+
+  <section class="admin-intro">
+    <p>כרטיס משפחה</p>
+    <h1>משפחת לוי</h1>
+    <p>דנה לוי · 050-123-4567</p>
+  </section>
+
+  <section class="admin-stack">
+    <article class="notice-card">
+      <ng-icon name="lucideShieldCheck" />
+      <div>
+        <h2>2 ילדים באותה שנת לימודים</h2>
+        <p>חוזה וקבצים משותפים</p>
+      </div>
+    </article>
+
+    <h2 class="section-title">ילדים</h2>
+    <article class="child-card active">
+      <div class="card-header">
+        <span class="card-icon"><ng-icon name="lucideUserRound" /></span>
+        <div class="child-copy">
+          <h3>נועה לוי</h3>
+          <p>מסלול מלא · תשפ״ז</p>
+        </div>
+        <span class="tag">ללא רגישויות</span>
+      </div>
+      <div class="card-actions">
+        <a class="link-action" routerLink="/admin/documents">צפייה בהרשמה <ng-icon name="lucideChevronLeft" /></a>
+      </div>
+    </article>
+
+    <article class="child-card">
+      <div class="card-header">
+        <span class="card-icon"><ng-icon name="lucideUserRound" /></span>
+        <div class="child-copy">
+          <h3>אורי לוי</h3>
+          <p>מסלול מלא · תשפ״ז</p>
+        </div>
+        <span class="tag">ללא רגישויות</span>
+      </div>
+      <div class="card-actions">
+        <a class="link-action" routerLink="/admin/documents">צפייה בהרשמה <ng-icon name="lucideChevronLeft" /></a>
+      </div>
+    </article>
+
+    <h2 class="section-title">מסמכים משותפים</h2>
+    <section class="history-card">
+      <div class="history-row">
+        <ng-icon name="lucideFileText" />
+        <p>חוזה משותף</p>
+        <span class="status-chip"><ng-icon name="lucideCheck" /> נחתם</span>
+      </div>
+      <div class="history-row">
+        <ng-icon name="lucideClock3" />
+        <p>אישור הוראת קבע</p>
+        <span class="status-chip warning">לבדיקה</span>
+      </div>
+      <div class="history-row">
+        <ng-icon name="lucideShieldCheck" />
+        <p>תשלום ביטוח · 400 ₪</p>
+        <span class="status-chip warning">לבדיקה</span>
+      </div>
+    </section>
+
+    <h2 class="section-title">היסטוריית הרשמות</h2>
+    <article class="history-card">
+      <div class="history-row">
+        <ng-icon name="lucideCheck" />
+        <div>
+          <h3>2026/2027 · תשפ״ז</h3>
+          <p>2 הרשמות פעילות</p>
+        </div>
+        <span class="status-chip"><ng-icon name="lucideCheck" /></span>
+      </div>
+    </article>
+
+    <div class="two-actions">
+      <a hlmBtn class="primary-action" routerLink="/admin/documents"><ng-icon name="lucideClock3" /> בדיקת אישורים</a>
+      <button hlmBtn variant="outline" class="danger-action" type="button"><ng-icon name="lucideTrash2" /> הסרת ילד</button>
+    </div>
+    <a class="link-action" href="#">הוספת הערה פנימית</a>
+  </section>
+
+  <nav class="admin-bottom-nav" aria-label="ניווט ניהול">
+    <a routerLink="/admin/settings"><ng-icon name="lucideSettings" /><span>הגדרות</span></a>
+    <a routerLink="/admin/family" class="active"><ng-icon name="lucideUserRound" /><span>ילדים</span></a>
+    <a routerLink="/admin"><ng-icon name="lucideListChecks" /><span>הרשמות</span></a>
+  </nav>
+
+  <img class="admin-foliage" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+</main>

@@ -1,0 +1,100 @@
+<main class="admin-screen" dir="rtl">
+  <header class="admin-top">
+    <a routerLink="/admin" class="top-action">
+      <ng-icon name="lucideChevronLeft" />
+      <span>חזרה להרשמות</span>
+    </a>
+    <a routerLink="/" class="brand" aria-label="הצהרון של אביב">
+      <span>הצהרון של אביב</span>
+      <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+    </a>
+  </header>
+
+  <section class="admin-intro">
+    <p>בדיקת אישורים</p>
+    <h1>משפחת לוי</h1>
+    <p>2 ילדים · מסמכים משותפים</p>
+  </section>
+
+  <section class="admin-stack">
+    <article class="family-card">
+      <div class="family-header">
+        <span class="card-icon"><ng-icon name="lucideUsersRound" /></span>
+        <div class="family-copy">
+          <h2>דנה לוי</h2>
+          <p>050-123-4567</p>
+          <div class="tag-list">
+            <span class="tag">נועה לוי · מסלול מלא</span>
+            <span class="tag">אורי לוי · מסלול מלא</span>
+          </div>
+        </div>
+        <span class="tag"><ng-icon name="lucideUsersRound" /> אחים</span>
+      </div>
+    </article>
+
+    <article class="notice-card">
+      <ng-icon name="lucideShieldCheck" />
+      <div>
+        <h2>שתי ההרשמות נשלחו יחד</h2>
+        <p>חוזה וקבצים משותפים יחולו על שתי ההרשמות לאחר אישור.</p>
+      </div>
+    </article>
+
+    <h2 class="section-title">חוזה</h2>
+    <article class="document-card">
+      <div class="doc-row">
+        <span class="status-chip"><ng-icon name="lucideCheck" /> נחתם</span>
+        <div>
+          <h3>חוזה משותף נחתם</h3>
+          <p>11.08.2026</p>
+        </div>
+        <a class="link-action" href="#"><ng-icon name="lucideFileText" /> פתיחת חוזה</a>
+      </div>
+    </article>
+
+    <h2 class="section-title">אישור הוראת קבע</h2>
+    <article class="document-card">
+      <div class="doc-row">
+        <span class="file-preview"><ng-icon name="lucideFileText" /></span>
+        <div>
+          <h3>אישור-הוראת-קבע.pdf</h3>
+          <p>428 KB</p>
+          <div class="tag-list">
+            <span class="tag warning"><ng-icon name="lucideClock3" /> ממתין לבדיקה</span>
+            <span class="tag"><ng-icon name="lucideUsersRound" /> משויך לנועה ולאורי</span>
+          </div>
+        </div>
+        <span></span>
+      </div>
+      <div class="two-actions">
+        <button hlmBtn variant="outline" class="outline-action" type="button"><ng-icon name="lucideCheck" /> אישור המסמך</button>
+        <button hlmBtn variant="outline" class="danger-action" type="button"><ng-icon name="lucideX" /> דחייה</button>
+      </div>
+    </article>
+
+    <h2 class="section-title">תשלום ביטוח שנתי</h2>
+    <article class="document-card">
+      <div class="doc-row">
+        <span class="file-preview"><ng-icon name="lucideFileImage" /></span>
+        <div>
+          <h3>אסמכתת-ביטוח.jpg</h3>
+          <p>400 ₪ · 200 ₪ לכל ילד</p>
+          <div class="tag-list">
+            <span class="tag warning"><ng-icon name="lucideClock3" /> ממתין לבדיקה</span>
+            <span class="tag"><ng-icon name="lucideWalletCards" /> תשלום מרוכז</span>
+          </div>
+        </div>
+        <span></span>
+      </div>
+      <div class="two-actions">
+        <button hlmBtn variant="outline" class="outline-action" type="button"><ng-icon name="lucideCheck" /> אישור התשלום</button>
+        <button hlmBtn variant="outline" class="danger-action" type="button"><ng-icon name="lucideX" /> דחייה</button>
+      </div>
+    </article>
+
+    <button hlmBtn class="primary-action" type="button">שמירת ההחלטות</button>
+    <a class="link-action" href="#">הוספת הערה להורה</a>
+  </section>
+
+  <img class="admin-foliage" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+</main>
