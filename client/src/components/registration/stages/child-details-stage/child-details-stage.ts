@@ -9,6 +9,7 @@ import { HlmRadioGroupImports } from '@spartan-ng/helm/radio-group';
 type ChildRegistration = {
   id: number;
   name: string;
+  birthDate: string;
   allergyAnswer: string;
 };
 
@@ -42,6 +43,7 @@ export class ChildDetailsStage {
     return {
       id,
       name: '',
+      birthDate: '',
       allergyAnswer: 'no',
     };
   }

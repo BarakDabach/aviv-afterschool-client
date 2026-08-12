@@ -183,13 +183,13 @@
 
 hlm-radio.option-row {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) minmax(4.9rem, auto);
   align-items: center;
-  gap: 0.8rem;
-  min-height: 4.65rem;
-  padding: 0.75rem 0.9rem;
+  gap: 0.72rem;
+  min-height: 4.18rem;
+  padding: 0.66rem 0.78rem;
   border: 1px solid var(--border);
-  border-radius: 0.7rem;
+  border-radius: var(--app-control-radius);
   background: color-mix(in oklch, var(--card) 84%, transparent);
   cursor: pointer;
   transition:
@@ -208,6 +208,7 @@ hlm-radio.option-row.selected {
 .option-price {
   display: grid;
   gap: 0.15rem;
+  min-width: 0;
 }
 
 .option-main strong,
@@ -217,7 +218,7 @@ hlm-radio.option-row.selected {
 }
 
 .option-main strong {
-  font-size: 0.96rem;
+  font-size: var(--app-card-title-size);
 }
 
 .option-main small,
@@ -231,27 +232,31 @@ hlm-radio.option-row.selected {
 
 .option-price {
   text-align: start;
+  min-width: 4.9rem;
 }
 
 .option-price strong {
-  font-size: 1.04rem;
+  font-size: 1rem;
 }
 
 .form-section {
   display: grid;
   gap: 0.55rem;
+  direction: rtl;
   text-align: start;
 }
 
 .leaf-title {
   display: inline-flex;
   align-items: center;
-  justify-self: end;
+  justify-self: start;
   gap: 0.55rem;
   margin: 0;
   color: var(--brand);
-  font-size: 0.96rem;
+  direction: rtl;
+  font-size: var(--app-section-title-size);
   font-weight: 850;
+  text-align: start;
 }
 
 .optional-section-title {
@@ -305,6 +310,7 @@ hlm-radio.option-row.selected {
   border-radius: 0.48rem;
   background: color-mix(in oklch, var(--background) 74%, white);
   color: var(--foreground);
+  direction: rtl;
   font-size: var(--app-body-size);
   text-align: center;
 }
@@ -473,28 +479,40 @@ hlm-radio.option-row.selected {
 
 .children-card,
 .shared-card {
-  grid-template-columns: 1fr 1.4fr;
-  gap: 1rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.78rem;
+}
+
+.children-card {
+  min-height: 3.8rem;
+  padding: 0.58rem 0.72rem;
 }
 
 .children-count {
   display: grid;
   place-items: center;
+  gap: 0.25rem;
   color: var(--brand);
-  font-size: 1.08rem;
+  font-size: var(--app-muted-size);
   font-weight: 850;
+}
+
+.child-count-badge ng-icon {
+  width: 1.55rem;
+  height: 1.55rem;
+  color: var(--brand);
 }
 
 .child-list p {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  min-height: 1.9rem;
-  margin: 0.4rem 0 0;
-  padding: 0.35rem 0.75rem;
+  min-height: 1.72rem;
+  margin: 0;
+  padding: 0.3rem 0.62rem;
   border: 1px solid var(--border);
   border-radius: 0.45rem;
-  font-size: 0.82rem;
+  font-size: var(--app-body-size);
 }
 
 .child-list ng-icon {
@@ -504,7 +522,7 @@ hlm-radio.option-row.selected {
 }
 
 .contract-paper {
-  padding: 1.05rem 1.15rem;
+  padding: 0.92rem 1rem;
   text-align: center;
   background: color-mix(in oklch, var(--background) 88%, white);
 }
@@ -519,7 +537,7 @@ hlm-radio.option-row.selected {
 }
 
 .contract-paper h2 {
-  font-size: 1rem;
+  font-size: var(--app-card-title-size);
 }
 
 .contract-paper > p {
@@ -527,15 +545,15 @@ hlm-radio.option-row.selected {
 }
 
 .contract-paper h3 {
-  margin-top: 1.05rem;
+  margin-top: 0.86rem;
   text-align: start;
-  font-size: 0.86rem;
+  font-size: var(--app-button-size);
 }
 
 .contract-paper h3 + p {
-  margin: 0.55rem 0 0;
+  margin: 0.42rem 0 0;
   color: var(--foreground);
-  font-size: 0.84rem;
+  font-size: var(--app-body-size);
   line-height: 1.6;
   text-align: start;
 }
@@ -845,8 +863,11 @@ hlm-radio.option-row.selected {
 
   .field.compact,
   .parent-field-grid,
-  hlm-radio.option-row,
   .status-list article {
     grid-template-columns: 1fr;
+  }
+
+  .children-card {
+    grid-template-columns: auto minmax(0, 1fr);
   }
 }

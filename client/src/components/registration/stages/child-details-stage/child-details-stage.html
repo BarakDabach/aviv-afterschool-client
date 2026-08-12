@@ -35,6 +35,10 @@
           <span>שם מלא של הילד</span>
           <input hlmInput [(ngModel)]="child.name" [placeholder]="index === 0 ? 'לדוגמה: אורי לוי' : 'שם מלא'" [attr.aria-label]="'שם מלא של ' + childDisplayName(child, index)" />
         </label>
+        <label class="field">
+          <span>תאריך לידה</span>
+          <input hlmInput [(ngModel)]="child.birthDate" placeholder="לדוגמה: 12.04.2020" [attr.aria-label]="'תאריך לידה של ' + childDisplayName(child, index)" />
+        </label>
       </div>
 
       <section class="child-medical-section">

@@ -79,6 +79,7 @@ Checks completed:
 - Parent identity card alignment QA returned no console errors and verified the `פרטי ההורה הראשי` icon/text spacing on desktop and mobile.
 - Registration requirements audit passed: removed non-required email, optional extra contact, child birth date, signer-name field, contract/document checkboxes, pre-uploaded standing-order file state, and automatic-updates copy. Parent now asks only for full name and mobile phone; child asks for full name and per-child allergies.
 - Sizing and spacing QA passed: reduced oversized my-registration headings/cards/icons/buttons, tightened upload boxes, and added more vertical separation between merged registration sections and bottom actions.
+- Registration refinement QA passed: parent and child personal-details labels align RTL, parent verification card appears before inputs, child date of birth was added to the form and requirements, approval plan/child cards use compact global sizing, and plan option content widths are consistent.
 
 Remaining polish:
 - Some illustrative line icons are closest Lucide matches rather than custom generated parent/child artwork.
