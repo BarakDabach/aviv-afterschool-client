@@ -1,8 +1,12 @@
 .mock-stage {
   display: grid;
-  gap: 1rem;
+  gap: 1.18rem;
   width: min(100%, 35rem);
-  margin: 1.35rem auto 0;
+  margin: 1.55rem auto 0;
+}
+
+.mock-stage + .mock-stage {
+  margin-top: 2.15rem;
 }
 
 .soft-card,
@@ -18,8 +22,8 @@
 }
 
 .soft-card {
-  min-height: 5.8rem;
-  padding: 0.82rem 1rem;
+  min-height: 5.35rem;
+  padding: 0.78rem 0.95rem;
   background:
     radial-gradient(circle at 44% 48%, color-mix(in oklch, var(--surface-sage) 22%, transparent), transparent 8rem),
     color-mix(in oklch, var(--card) 76%, var(--surface-warm));
@@ -500,7 +504,7 @@ hlm-radio.option-row.selected {
 }
 
 .contract-paper {
-  padding: 1rem 1.2rem;
+  padding: 1.05rem 1.15rem;
   text-align: center;
   background: color-mix(in oklch, var(--background) 88%, white);
 }
@@ -515,7 +519,7 @@ hlm-radio.option-row.selected {
 }
 
 .contract-paper h2 {
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .contract-paper > p {
@@ -565,7 +569,7 @@ hlm-radio.option-row.selected {
 
 .signature-section {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.9rem;
 }
 
 .signature-box {
@@ -643,11 +647,12 @@ hlm-radio.option-row.selected {
 
 .upload-section {
   display: grid;
-  gap: 0.55rem;
+  gap: 0.72rem;
+  margin-top: 0.25rem;
 }
 
 .upload-section h2 {
-  font-size: 1.08rem;
+  font-size: 0.98rem;
 }
 
 .upload-section h3 {
@@ -717,22 +722,22 @@ hlm-radio.option-row.selected {
 .drop-zone {
   display: grid;
   justify-items: center;
-  gap: 0.55rem;
-  padding: 1rem 0.8rem 0.8rem;
+  gap: 0.42rem;
+  padding: 0.78rem 0.72rem 0.68rem;
   border-color: var(--brand);
   border-style: dashed;
   text-align: center;
 }
 
 .drop-zone > ng-icon {
-  width: 2.35rem;
-  height: 2.35rem;
+  width: 1.82rem;
+  height: 1.82rem;
   color: var(--brand);
 }
 
 .drop-zone [data-slot='button'] {
   color: var(--brand);
-  font-size: 0.86rem;
+  font-size: 0.78rem;
 }
 
 .disabled-note {
@@ -817,8 +822,12 @@ hlm-radio.option-row.selected {
 
 @media (max-width: 540px) {
   .mock-stage {
-    gap: 0.78rem;
-    margin-top: 1rem;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .mock-stage + .mock-stage {
+    margin-top: 1.8rem;
   }
 
   .notice-card,
