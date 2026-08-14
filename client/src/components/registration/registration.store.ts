@@ -34,6 +34,14 @@ type RegistrationFlowState = {
   registrationStatus: RegistrationStatus;
 };
 
+const createEmptyRegistrationChild = (id: number): RegistrationChildDraft => ({
+  id,
+  name: '',
+  birthDate: '',
+  allergyAnswer: AllergyAnswer.No,
+  allergyDetails: '',
+});
+
 export const RegistrationStore = signalStore(
   withState<RegistrationFlowState>({
     activeStep: 0,
@@ -41,9 +49,9 @@ export const RegistrationStore = signalStore(
       fullName: '',
       phone: '',
     },
-    children: [],
+    children: [createEmptyRegistrationChild(1)],
     childDetailsValid: false,
-    nextChildId: 1,
+    nextChildId: 2,
     selectedPlan: RegistrationPlanId.Full,
     savedDraft: null,
     registrationStatus: {
@@ -168,13 +176,7 @@ export const RegistrationStore = signalStore(
     };
   }),
   withMethods((store) => {
-    const createEmptyChild = (id: number): RegistrationChildDraft => ({
-      id,
-      name: '',
-      birthDate: '',
-      allergyAnswer: AllergyAnswer.No,
-      allergyDetails: '',
-    });
+    const createEmptyChild = createEmptyRegistrationChild;
     const createRegistrationStatus = (kind: RegistrationStatusKind, updatedAtIso: string): RegistrationStatus => ({
       kind,
       ...REGISTRATION_STATUS_PROPERTIES[kind],
@@ -190,7 +192,7 @@ export const RegistrationStore = signalStore(
       return store.globalStore.loggedIn() && activeStep === 0 ? 1 : activeStep;
     };
     const normalizeChildren = (children: RegistrationChildDraft[] | undefined): RegistrationChildDraft[] => {
-      if (!children?.length) return [];
+      if (!children?.length) return [createEmptyChild(1)];
 
       return children.map((child) => ({
         ...child,
@@ -199,7 +201,7 @@ export const RegistrationStore = signalStore(
       }));
     };
     const getNextChildId = (children: RegistrationChildDraft[] | undefined): number => {
-      if (!children?.length) return 1;
+      if (!children?.length) return 2;
 
       return Math.max(...children.map((child) => child.id)) + 1;
     };
@@ -308,7 +310,17 @@ export const RegistrationStore = signalStore(
       removeChild(childId: number): void {
         const nextChildren = store.children().filter((child) => child.id !== childId);
 
-        patchState(store, { children: nextChildren });
+        if (nextChildren.length) {
+          patchState(store, { children: nextChildren });
+          return;
+        }
+
+        const nextChildId = store.nextChildId();
+
+        patchState(store, {
+          children: [createEmptyChild(nextChildId)],
+          nextChildId: nextChildId + 1,
+        });
       },
       updateChild(childId: number, patch: Partial<Omit<RegistrationChildDraft, 'id'>>): void {
         patchState(store, {

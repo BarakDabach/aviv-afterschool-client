@@ -66,7 +66,11 @@ export class ChildDetailsStageStore {
   }
 
   removeChild(childId: number): void {
-    this.childrenModel.update((children) => children.filter((child) => child.id !== childId));
+    this.childrenModel.update((children) => {
+      const nextChildren = children.filter((child) => child.id !== childId);
+
+      return nextChildren.length ? nextChildren : [this.createEmptyChild(this.registrationStore.reserveChildId())];
+    });
   }
 
   setBirthDate(childField: ChildDetailsField, birthDate: string): void {
