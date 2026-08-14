@@ -1,15 +1,39 @@
-<section class="mock-stage summary-stage-content">
-  <article class="family-card">
+<section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[var(--app-section-gap)]">
+  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid grid-cols-[auto_1fr_auto] items-center gap-[var(--app-card-gap)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] max-[540px]:grid-cols-1 [&>ng-icon]:h-[var(--app-icon-xl)] [&>ng-icon]:w-[var(--app-icon-xl)] [&>ng-icon]:text-brand [&_h2]:m-0 [&_h2]:mb-[0.45rem] [&_h2]:text-[length:var(--app-card-title-size)] [&_h2]:font-extrabold [&_h2]:text-brand [&_p]:m-0 [&_p]:mt-1 [&_span]:mt-1 [&_span]:block [&_span]:w-fit [&_span]:rounded-[0.45rem] [&_span]:border [&_span]:border-border [&_span]:px-[0.65rem] [&_span]:py-[0.18rem] [&>strong]:self-start [&>strong]:rounded-full [&>strong]:bg-surface-sage [&>strong]:px-[0.8rem] [&>strong]:py-[0.3rem] [&>strong]:text-brand">
     <ng-icon name="lucideUsersRound" />
     <div>
-      <h2>משפחת לוי</h2>
-      <p>דנה לוי · 050-123-4567</p>
-      <span>אורי לוי · מסלול מלא</span>
+      <h2>{{ store.familyTitle() }}</h2>
+      <p>{{ store.parentDetails().fullName || 'פרטי ההורה נשמרו' }} · {{ store.parentDetails().phone || 'מספר הטלפון נשמר' }}</p>
+      <span>{{ store.childrenSummary() }}</span>
     </div>
-    <strong>ילד אחד</strong>
+    <strong>{{ store.childCountLabel() }}</strong>
   </article>
 
-  <section class="status-list">
+  <article class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] border px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] text-start" [ngClass]="{
+    'border-primary/35 bg-[color-mix(in_oklch,var(--primary)_14%,white)]': store.registrationStatus().tone === 'warning',
+    'border-brand/35 bg-surface-sage/60': store.registrationStatus().tone === 'success',
+    'border-destructive/35 bg-[color-mix(in_oklch,var(--destructive)_10%,white)]': store.registrationStatus().tone === 'danger',
+    'border-border bg-muted/55': store.registrationStatus().tone === 'neutral'
+  }">
+    <span class="grid h-[var(--app-icon-lg)] w-[var(--app-icon-lg)] place-items-center rounded-full" [ngClass]="{
+      'bg-primary/20 text-[color-mix(in_oklch,var(--foreground)_74%,var(--primary))]': store.registrationStatus().tone === 'warning',
+      'bg-brand/12 text-brand': store.registrationStatus().tone === 'success',
+      'bg-destructive/10 text-destructive': store.registrationStatus().tone === 'danger',
+      'bg-background/70 text-muted-foreground': store.registrationStatus().tone === 'neutral'
+    }">
+      @if (store.registrationStatus().kind === 'approved') {
+        <ng-icon name="lucideCheck" class="h-[var(--app-icon-sm)] w-[var(--app-icon-sm)]" />
+      } @else {
+        <ng-icon name="lucideClock" class="h-[var(--app-icon-sm)] w-[var(--app-icon-sm)]" />
+      }
+    </span>
+    <div class="grid gap-1">
+      <h2 class="m-0 text-[length:var(--app-card-title-size)] font-extrabold text-brand">{{ store.registrationStatus().label }}</h2>
+      <p class="m-0 text-[length:var(--app-body-size)] leading-[1.55] text-foreground/80">{{ store.registrationStatus().description }}</p>
+    </div>
+  </article>
+
+  <section class="grid [&_h2]:m-0 [&_h2]:mb-[0.7rem] [&_h2]:text-center [&_h2]:text-brand [&_article]:grid [&_article]:grid-cols-2 [&_article]:gap-[0.6rem] [&_article]:border-b [&_article]:border-border [&_article]:px-1 [&_article]:py-[0.62rem] max-[540px]:[&_article]:grid-cols-1 [&_span]:flex [&_span]:items-center [&_span]:gap-[0.45rem] [&_ng-icon]:h-[1.12rem] [&_ng-icon]:w-[1.12rem] [&_ng-icon]:text-brand [&_em]:col-start-1 [&_em]:w-fit [&_em]:rounded-full [&_em]:bg-[color-mix(in_oklch,var(--primary)_18%,white)] [&_em]:px-[0.6rem] [&_em]:py-[0.18rem] [&_em]:text-[0.68rem] [&_em]:not-italic [&_em]:text-[color-mix(in_oklch,var(--foreground)_78%,var(--primary))]">
     <h2>מצב ההרשמות</h2>
     <article>
       <span><ng-icon name="lucideCheck" /> הושלם</span>
@@ -35,7 +59,7 @@
     </article>
   </section>
 
-  <article class="hint-card">
+  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] flex min-h-[2.8rem] items-center gap-[0.65rem] bg-[color-mix(in_oklch,var(--surface-sage)_26%,white)] px-[0.8rem] py-[0.65rem] text-[0.76rem] leading-[1.55] text-foreground [&_ng-icon]:h-[var(--app-icon-md)] [&_ng-icon]:w-[var(--app-icon-md)] [&_ng-icon]:flex-none [&_ng-icon]:text-brand">
     <ng-icon name="lucideShieldCheck" />
     <span>פרטי ההורה, הילד, המסלול והמסמכים ייבדקו ידנית, ולאחר מכן סטטוס ההרשמה יתעדכן באפליקציה.</span>
   </article>

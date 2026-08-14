@@ -1,50 +1,45 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideTrash2, lucideUserRound } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmRadioGroupImports } from '@spartan-ng/helm/radio-group';
-
-type ChildRegistration = {
-  id: number;
-  name: string;
-  birthDate: string;
-  allergyAnswer: string;
-};
+import { RegistrationChildDraft } from '../../../../app/types/registration-status.type';
+import { RegistrationStore } from '../../registration.store';
 
 @Component({
   selector: 'app-child-details-stage',
-  imports: [FormsModule, NgIcon, HlmButtonImports, HlmInputImports, HlmRadioGroupImports],
+  imports: [FormsModule, NgIcon, NgClass, HlmButtonImports, HlmInputImports, HlmRadioGroupImports],
   providers: [provideIcons({ lucidePlus, lucideTrash2, lucideUserRound })],
   templateUrl: './child-details-stage.html',
-  styleUrl: '../stage-shared.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChildDetailsStage {
-  protected children: ChildRegistration[] = [this.createChild(1)];
-  private nextChildId = 2;
+  protected readonly store = inject(RegistrationStore);
 
   protected addChild(): void {
-    this.children = [...this.children, this.createChild(this.nextChildId)];
-    this.nextChildId += 1;
+    this.store.addChild();
   }
 
   protected removeChild(childId: number): void {
-    const nextChildren = this.children.filter((child) => child.id !== childId);
-    this.children = nextChildren.length > 0 ? nextChildren : [this.createChild(this.nextChildId++)];
+    this.store.removeChild(childId);
   }
 
-  protected childDisplayName(child: ChildRegistration, index: number): string {
+  protected updateChildName(childId: number, name: string): void {
+    this.store.updateChild(childId, { name });
+  }
+
+  protected updateChildBirthDate(childId: number, birthDate: string): void {
+    this.store.updateChild(childId, { birthDate });
+  }
+
+  protected updateChildAllergyAnswer(childId: number, allergyAnswer: string): void {
+    this.store.updateChild(childId, { allergyAnswer });
+  }
+
+  protected childDisplayName(child: RegistrationChildDraft, index: number): string {
     return child.name.trim() || `ילד ${index + 1}`;
-  }
-
-  private createChild(id: number): ChildRegistration {
-    return {
-      id,
-      name: '',
-      birthDate: '',
-      allergyAnswer: 'no',
-    };
   }
 }

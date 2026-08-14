@@ -8,7 +8,6 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
   imports: [NgIcon, HlmButtonImports],
   providers: [provideIcons({ lucideCamera, lucideFileUp, lucideShieldCheck })],
   templateUrl: './documents-stage.html',
-  styleUrl: '../stage-shared.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DocumentsStage {}

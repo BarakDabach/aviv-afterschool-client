@@ -1,57 +1,57 @@
-<section class="mock-stage uploads-stage">
-  <article class="soft-card shared-card">
+<section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[var(--app-section-gap)]">
+  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid min-h-[6.6rem] grid-cols-[1fr_auto_1fr] items-center gap-[var(--app-card-gap)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] max-[540px]:grid-cols-1 [&_h2]:m-0 [&_h2]:text-base [&_h2]:font-extrabold [&_h2]:text-brand [&_p]:m-0 [&_p]:mt-1 [&_p]:text-brand">
     <div>
       <h2>ילד בהרשמה</h2>
       <p>אורי לוי</p>
     </div>
-    <span class="divider"></span>
-    <div class="shared-check">
+    <span class="h-20 w-px bg-border max-[540px]:hidden"></span>
+    <div class="grid justify-items-center gap-[0.65rem] font-bold text-brand [&_ng-icon]:grid [&_ng-icon]:h-[var(--app-icon-lg)] [&_ng-icon]:w-[var(--app-icon-lg)] [&_ng-icon]:place-items-center [&_ng-icon]:rounded-full [&_ng-icon]:bg-brand [&_ng-icon]:text-brand-foreground">
       <ng-icon name="lucideFileUp" />
       <span>מסמכים להעלאה</span>
     </div>
   </article>
 
-  <section class="upload-section">
+  <section class="mt-1 grid gap-[0.72rem] [&_h2]:m-0 [&_h2]:text-[0.98rem] [&_h2]:font-extrabold [&_h2]:text-brand [&_h3]:m-0 [&_h3]:text-[0.9rem] [&_h3]:font-extrabold [&_h3]:text-brand [&_p]:m-0 [&_p]:text-[0.82rem] [&_p]:leading-[1.5] [&_p]:text-[color-mix(in_oklch,var(--foreground)_78%,white)]">
     <h2>1. חוזה חתום</h2>
     <p>העלו את החוזה לאחר חתימה מחוץ לאפליקציה.</p>
-    <article class="drop-zone">
+    <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid justify-items-center gap-[0.42rem] border-brand border-dashed px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center [&>ng-icon]:h-[1.82rem] [&>ng-icon]:w-[1.82rem] [&>ng-icon]:text-brand [&_[data-slot=button]]:text-[0.78rem] [&_[data-slot=button]]:text-brand">
       <ng-icon name="lucideFileUp" />
       <h3>העלאת חוזה חתום</h3>
       <p>בחירת תמונה או PDF</p>
-      <div class="paper-leaf"></div>
+      <div class="flex h-4 justify-center gap-[0.7rem] before:inline-block before:h-[0.68rem] before:w-[1.65rem] before:scale-x-[-1] before:bg-[url(/assets/section-leaf-divider.png)] before:bg-contain before:bg-center before:bg-no-repeat before:opacity-80 before:content-[''] after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']"></div>
       <button hlmBtn variant="link" type="button"><ng-icon name="lucideCamera" /> צילום מסמך</button>
     </article>
   </section>
 
-  <section class="upload-section">
+  <section class="mt-1 grid gap-[0.72rem] [&_h2]:m-0 [&_h2]:text-[0.98rem] [&_h2]:font-extrabold [&_h2]:text-brand [&_h3]:m-0 [&_h3]:text-[0.9rem] [&_h3]:font-extrabold [&_h3]:text-brand [&_p]:m-0 [&_p]:text-[0.82rem] [&_p]:leading-[1.5] [&_p]:text-[color-mix(in_oklch,var(--foreground)_78%,white)]">
     <h2>2. אישור הוראת קבע</h2>
     <p>העלו אישור מהבנק על הקמת הוראת הקבע.</p>
-    <article class="drop-zone">
+    <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid justify-items-center gap-[0.42rem] border-brand border-dashed px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center [&>ng-icon]:h-[1.82rem] [&>ng-icon]:w-[1.82rem] [&>ng-icon]:text-brand [&_[data-slot=button]]:text-[0.78rem] [&_[data-slot=button]]:text-brand">
       <ng-icon name="lucideFileUp" />
       <h3>העלאת אישור הוראת קבע</h3>
       <p>בחירת תמונה או PDF</p>
-      <div class="paper-leaf"></div>
+      <div class="flex h-4 justify-center gap-[0.7rem] before:inline-block before:h-[0.68rem] before:w-[1.65rem] before:scale-x-[-1] before:bg-[url(/assets/section-leaf-divider.png)] before:bg-contain before:bg-center before:bg-no-repeat before:opacity-80 before:content-[''] after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']"></div>
       <button hlmBtn variant="link" type="button"><ng-icon name="lucideCamera" /> צילום מסמך</button>
     </article>
   </section>
 
-  <section class="upload-section">
+  <section class="mt-1 grid gap-[0.72rem] [&_h2]:m-0 [&_h2]:text-[0.98rem] [&_h2]:font-extrabold [&_h2]:text-brand [&_h3]:m-0 [&_h3]:text-[0.9rem] [&_h3]:font-extrabold [&_h3]:text-brand [&_p]:m-0 [&_p]:text-[0.82rem] [&_p]:leading-[1.5] [&_p]:text-[color-mix(in_oklch,var(--foreground)_78%,white)]">
     <h2>3. תשלום ביטוח שנתי</h2>
     <h3>200 ₪ לילד</h3>
     <p>לאחר ביצוע העברה, העלו אסמכתה לתשלום הביטוח השנתי.</p>
-    <article class="drop-zone">
+    <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid justify-items-center gap-[0.42rem] border-brand border-dashed px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center [&>ng-icon]:h-[1.82rem] [&>ng-icon]:w-[1.82rem] [&>ng-icon]:text-brand [&_[data-slot=button]]:text-[0.78rem] [&_[data-slot=button]]:text-brand">
       <ng-icon name="lucideFileUp" />
       <h3>העלאת אסמכתה</h3>
       <p>בחירת תמונה או PDF</p>
-      <div class="paper-leaf"></div>
+      <div class="flex h-4 justify-center gap-[0.7rem] before:inline-block before:h-[0.68rem] before:w-[1.65rem] before:scale-x-[-1] before:bg-[url(/assets/section-leaf-divider.png)] before:bg-contain before:bg-center before:bg-no-repeat before:opacity-80 before:content-[''] after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']"></div>
       <button hlmBtn variant="link" type="button"><ng-icon name="lucideCamera" /> צילום מסמך</button>
     </article>
   </section>
 
-  <article class="hint-card">
+  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] flex min-h-[2.8rem] items-center gap-[0.65rem] bg-[color-mix(in_oklch,var(--surface-sage)_26%,white)] px-[0.8rem] py-[0.65rem] text-[0.76rem] leading-[1.55] text-foreground [&_ng-icon]:h-[var(--app-icon-md)] [&_ng-icon]:w-[var(--app-icon-md)] [&_ng-icon]:flex-none [&_ng-icon]:text-brand">
     <ng-icon name="lucideShieldCheck" />
     <span>המסמכים ייבדקו ידנית, ולאחר הבדיקה סטטוס ההרשמה יתעדכן באפליקציה.</span>
   </article>
 
-  <p class="disabled-note">יש להעלות את כל מסמכי האישור כדי להמשיך</p>
+  <p class="m-0 text-center text-muted-foreground">יש להעלות את כל מסמכי האישור כדי להמשיך</p>
 </section>

@@ -1,5 +1,5 @@
-<section class="mock-stage details-stage">
-  <article class="soft-card identity-card">
+<section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[var(--app-section-gap)]">
+  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid min-h-[var(--app-card-min-height)] items-center gap-[var(--app-card-gap)] bg-[radial-gradient(circle_at_44%_48%,color-mix(in_oklch,var(--surface-sage)_22%,transparent),transparent_8rem),color-mix(in_oklch,var(--card)_76%,var(--surface-warm))] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] [&_h2]:m-0 [&_h2]:mb-[0.45rem] [&_h2]:text-[length:var(--app-card-title-size)] [&_h2]:font-extrabold [&_h2]:text-brand [&_p]:m-0 [&_p]:text-[length:var(--app-muted-size)] [&_p]:leading-[1.55] [&_p]:text-[color-mix(in_oklch,var(--foreground)_78%,white)] [&>ng-icon]:h-[var(--app-icon-xl)] [&>ng-icon]:w-[var(--app-icon-xl)] [&>ng-icon]:text-brand grid-cols-[1fr_auto]">
     <ng-icon name="lucideUserRound" />
     <div>
       <h2>פרטי הילדים</h2>
@@ -7,48 +7,48 @@
     </div>
   </article>
 
-  <section class="children-overview" aria-label="ילדים בהרשמה">
-    @for (child of children; track child.id; let index = $index) {
-      <article class="child-summary-card" [class.active]="index === 0">
+  <section class="grid gap-[0.55rem]" aria-label="ילדים בהרשמה">
+    @for (child of store.children(); track child.id; let index = $index) {
+      <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid min-h-[3.1rem] grid-cols-[auto_1fr_auto] items-center gap-[0.65rem] px-[0.75rem] py-[0.58rem] max-[540px]:grid-cols-1 [&>ng-icon]:h-[1.45rem] [&>ng-icon]:w-[1.45rem] [&>ng-icon]:text-brand [&_strong]:block [&_strong]:text-[0.82rem] [&_strong]:text-brand [&_small]:mt-[0.08rem] [&_small]:block [&_small]:text-[0.68rem] [&_small]:text-muted-foreground" [ngClass]="{ 'border-[color-mix(in_oklch,var(--brand)_65%,transparent)] bg-[color-mix(in_oklch,var(--surface-sage)_34%,white)]': index === 0 }">
         <ng-icon name="lucideUserRound" />
         <span>
           <strong>{{ childDisplayName(child, index) }}</strong>
           <small>פרטים חדשים למילוי</small>
         </span>
-        <button hlmBtn variant="ghost" type="button" class="icon-action" [attr.aria-label]="'הסרת ' + childDisplayName(child, index)" (click)="removeChild(child.id)">
+        <button hlmBtn variant="ghost" type="button" class="h-8 w-8 min-w-0 p-0 text-brand [&_ng-icon]:h-4 [&_ng-icon]:w-4" [attr.aria-label]="'הסרת ' + childDisplayName(child, index)" (click)="removeChild(child.id)">
           <ng-icon name="lucideTrash2" />
         </button>
       </article>
     }
 
-    <button hlmBtn variant="outline" type="button" class="add-child-action" (click)="addChild()">
+    <button hlmBtn variant="outline" type="button" class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] min-h-[3.1rem] justify-center gap-[0.4rem] text-[0.82rem] font-bold text-brand [&_ng-icon]:h-4 [&_ng-icon]:w-4" (click)="addChild()">
       <ng-icon name="lucidePlus" />
       <span>הוספת ילד נוסף</span>
     </button>
   </section>
 
-  @for (child of children; track child.id; let index = $index) {
-    <section class="form-section" [class.secondary-child-form]="index > 0">
-      <h2 class="leaf-title">פרטים אישיים - {{ childDisplayName(child, index) }}</h2>
-      <div class="parent-field-grid">
-        <label class="field">
+  @for (child of store.children(); track child.id; let index = $index) {
+    <section class="grid gap-[0.55rem] text-start [direction:rtl]" [ngClass]="{ 'border-t border-border pt-[0.35rem]': index > 0 }">
+      <h2 class="inline-flex items-center justify-self-start gap-[0.55rem] text-start text-[length:var(--app-section-title-size)] font-extrabold text-brand after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']">פרטים אישיים - {{ childDisplayName(child, index) }}</h2>
+      <div class="grid grid-cols-2 gap-[0.65rem] max-[540px]:grid-cols-1">
+        <label class="grid gap-[0.3rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_small]:text-primary">
           <span>שם מלא של הילד</span>
-          <input hlmInput [(ngModel)]="child.name" [placeholder]="index === 0 ? 'לדוגמה: אורי לוי' : 'שם מלא'" [attr.aria-label]="'שם מלא של ' + childDisplayName(child, index)" />
+          <input hlmInput [ngModel]="child.name" (ngModelChange)="updateChildName(child.id, $event)" [placeholder]="index === 0 ? 'לדוגמה: אורי לוי' : 'שם מלא'" [attr.aria-label]="'שם מלא של ' + childDisplayName(child, index)" />
         </label>
-        <label class="field">
+        <label class="grid gap-[0.3rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_small]:text-primary">
           <span>תאריך לידה</span>
-          <input hlmInput [(ngModel)]="child.birthDate" placeholder="לדוגמה: 12.04.2020" [attr.aria-label]="'תאריך לידה של ' + childDisplayName(child, index)" />
+          <input hlmInput [ngModel]="child.birthDate" (ngModelChange)="updateChildBirthDate(child.id, $event)" placeholder="לדוגמה: 12.04.2020" [attr.aria-label]="'תאריך לידה של ' + childDisplayName(child, index)" />
         </label>
       </div>
 
-      <section class="child-medical-section">
+      <section class="mt-[0.45rem] grid gap-2 border-t border-[color-mix(in_oklch,var(--border)_72%,transparent)] pt-[0.65rem] [&_h3]:m-0 [&_h3]:text-[0.84rem] [&_h3]:font-extrabold [&_h3]:text-brand [&_p]:m-0 [&_p]:text-[0.78rem] [&_p]:text-foreground">
         <h3>אלרגיות ורגישויות - {{ childDisplayName(child, index) }}</h3>
         <p>האם לילד יש אלרגיות או רגישויות?</p>
-        <hlm-radio-group class="segmented" [value]="child.allergyAnswer" [attr.aria-label]="'אלרגיות ורגישויות עבור ' + childDisplayName(child, index)" (valueChange)="child.allergyAnswer = $event">
-          <hlm-radio value="yes" [class.selected]="child.allergyAnswer === 'yes'" (click)="child.allergyAnswer = 'yes'">
+        <hlm-radio-group class="grid grid-cols-2 gap-[0.35rem] [&_hlm-radio]:flex [&_hlm-radio]:min-h-[2.35rem] [&_hlm-radio]:cursor-pointer [&_hlm-radio]:items-center [&_hlm-radio]:justify-center [&_hlm-radio]:rounded-[0.48rem] [&_hlm-radio]:border [&_hlm-radio]:border-border [&_hlm-radio]:bg-[color-mix(in_oklch,var(--background)_78%,white)] [&_hlm-radio]:text-[0.78rem] [&_hlm-radio:last-child]:justify-around" [value]="child.allergyAnswer" [attr.aria-label]="'אלרגיות ורגישויות עבור ' + childDisplayName(child, index)" (valueChange)="updateChildAllergyAnswer(child.id, $event)">
+          <hlm-radio value="yes" [ngClass]="{ 'border-brand bg-[color-mix(in_oklch,var(--surface-sage)_42%,white)]': child.allergyAnswer === 'yes' }" (click)="updateChildAllergyAnswer(child.id, 'yes')">
             <span>כן</span>
           </hlm-radio>
-          <hlm-radio value="no" [class.selected]="child.allergyAnswer === 'no'" (click)="child.allergyAnswer = 'no'">
+          <hlm-radio value="no" [ngClass]="{ 'border-brand bg-[color-mix(in_oklch,var(--surface-sage)_42%,white)]': child.allergyAnswer === 'no' }" (click)="updateChildAllergyAnswer(child.id, 'no')">
             <hlm-radio-indicator indicator />
             <span>לא</span>
           </hlm-radio>

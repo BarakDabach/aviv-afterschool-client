@@ -1,14 +1,19 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideIdCard, lucidePhone, lucideShieldCheck, lucideUserRound } from '@ng-icons/lucide';
+import { NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { FormField } from '@angular/forms/signals';
+import { provideIcons } from '@ng-icons/core';
+import { lucideIdCard } from '@ng-icons/lucide';
 import { HlmInputImports } from '@spartan-ng/helm/input';
+import { DetailCard } from '../../../shared/detail-card/detail-card';
+import { ParentDetailsStageStore } from './parent-details-stage.store';
 
 @Component({
   selector: 'app-parent-details-stage',
-  imports: [NgIcon, HlmInputImports],
-  providers: [provideIcons({ lucideIdCard, lucidePhone, lucideShieldCheck, lucideUserRound })],
+  imports: [NgClass, FormField, HlmInputImports, DetailCard],
+  providers: [ParentDetailsStageStore, provideIcons({ lucideIdCard })],
   templateUrl: './parent-details-stage.html',
-  styleUrl: '../stage-shared.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ParentDetailsStage {}
+export class ParentDetailsStage {
+  protected readonly store = inject(ParentDetailsStageStore);
+}

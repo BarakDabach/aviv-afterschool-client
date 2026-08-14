@@ -1,18 +1,18 @@
-<section class="mock-stage contract-stage">
-  <article class="soft-card children-card">
-    <div class="children-count child-count-badge">
+<section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[var(--app-section-gap)]">
+  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid min-h-[3.8rem] grid-cols-[auto_minmax(0,1fr)] items-center gap-[var(--app-card-gap)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] [&_h2]:m-0 [&_h2]:mb-[0.45rem] [&_h2]:text-[length:var(--app-card-title-size)] [&_h2]:font-extrabold [&_h2]:text-brand">
+    <div class="grid place-items-center gap-1 text-[length:var(--app-muted-size)] font-extrabold text-brand [&_ng-icon]:h-[var(--app-icon-md)] [&_ng-icon]:w-[var(--app-icon-md)] [&_ng-icon]:text-brand">
       <ng-icon name="lucideBaby" />
       <span>ילד אחד</span>
     </div>
-    <div class="child-list">
+    <div class="[&_p]:m-0 [&_p]:flex [&_p]:min-h-[1.72rem] [&_p]:items-center [&_p]:gap-[0.45rem] [&_p]:rounded-[0.45rem] [&_p]:border [&_p]:border-border [&_p]:px-[0.62rem] [&_p]:py-[0.3rem] [&_p]:text-[length:var(--app-body-size)] [&_ng-icon]:h-[var(--app-icon-sm)] [&_ng-icon]:w-[var(--app-icon-sm)] [&_ng-icon]:text-brand">
       <p><ng-icon name="lucideUserRound" /> <strong>אורי לוי</strong> · מסלול מלא</p>
     </div>
   </article>
 
-  <article class="contract-paper">
+  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] bg-[color-mix(in_oklch,var(--background)_88%,white)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] text-center [&>p]:mx-0 [&>p]:mb-4 [&>p]:mt-[0.45rem] [&_h2]:m-0 [&_h2]:text-[length:var(--app-card-title-size)] [&_h2]:font-extrabold [&_h2]:text-brand [&_h3]:m-0 [&_h3]:mt-[0.86rem] [&_h3]:text-start [&_h3]:text-[length:var(--app-button-size)] [&_h3]:font-extrabold [&_h3]:text-brand [&_h3+p]:m-0 [&_h3+p]:mt-[0.42rem] [&_h3+p]:text-start [&_h3+p]:text-[length:var(--app-body-size)] [&_h3+p]:leading-[1.6] [&_h3+p]:text-foreground">
     <h2>חוזה הצטרפות לצהרון של אביב</h2>
     <p>שנת הלימודים תשפ״ז</p>
-    <div class="paper-leaf"></div>
+    <div class="flex h-4 justify-center gap-[0.7rem] before:inline-block before:h-[0.68rem] before:w-[1.65rem] before:scale-x-[-1] before:bg-[url(/assets/section-leaf-divider.png)] before:bg-contain before:bg-center before:bg-no-repeat before:opacity-80 before:content-[''] after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']"></div>
     <h3>1. הורדת החוזה</h3>
     <p>הורידו את החוזה, חתמו עליו מחוץ לאפליקציה והעלו אותו חתום בשלב המסמכים.</p>
     <h3>2. פרטי הילד והמסלול</h3>
@@ -21,7 +21,7 @@
     <p>יש להעלות חוזה חתום, אישור הוראת קבע ואסמכתה לתשלום הביטוח השנתי.</p>
   </article>
 
-  <div class="contract-links">
+  <div class="grid grid-cols-2 border-b border-border [&_[data-slot=button]]:h-auto [&_[data-slot=button]]:min-h-[var(--app-secondary-button-height)] [&_[data-slot=button]]:gap-[0.45rem] [&_[data-slot=button]]:p-0 [&_[data-slot=button]]:text-brand [&_[data-slot=button]]:underline [&_[data-slot=button]]:underline-offset-[0.22rem] [&_[data-slot=button]]:justify-self-center [&_[data-slot=button]+[data-slot=button]]:border-s [&_[data-slot=button]+[data-slot=button]]:border-border">
     <button hlmBtn variant="link" type="button"><ng-icon name="lucideFileText" /> פתיחת החוזה המלא</button>
     <button hlmBtn variant="link" type="button"><ng-icon name="lucideDownload" /> הורדת טיוטה</button>
   </div>
