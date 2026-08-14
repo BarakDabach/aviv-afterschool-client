@@ -40,7 +40,7 @@ export class ChildDetailsStageStore {
   });
 
   readonly children = computed(() => this.childrenModel());
-  readonly valid = computed(() => this.childrenForm().valid());
+  readonly valid = computed(() => this.children().length > 0 && this.childrenForm().valid());
 
   childField(index: number): ChildDetailsField {
     return this.childrenForm[index];
@@ -66,11 +66,12 @@ export class ChildDetailsStageStore {
   }
 
   removeChild(childId: number): void {
-    this.childrenModel.update((children) => {
-      const nextChildren = children.filter((child) => child.id !== childId);
+    this.childrenModel.update((children) => children.filter((child) => child.id !== childId));
+  }
 
-      return nextChildren.length > 0 ? nextChildren : [this.createEmptyChild(this.registrationStore.reserveChildId())];
-    });
+  setBirthDate(childField: ChildDetailsField, birthDate: string): void {
+    childField.birthDate().value.set(birthDate);
+    childField.birthDate().markAsTouched();
   }
 
   setAllergyAnswer(childField: ChildDetailsField, allergyAnswer: string): void {
