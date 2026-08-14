@@ -21,10 +21,10 @@
     @if (store.activeStep() === store.steps.length - 1) {
       <img class="h-[3.8rem] w-[5.1rem] object-contain" src="/assets/brand-mark.png" alt="" aria-hidden="true" />
       <span class="inline-flex min-h-8 items-center rounded-full px-[1.05rem] text-[0.92rem] font-semibold" [ngClass]="{
-        'bg-[color-mix(in_oklch,var(--primary)_20%,white)] text-[color-mix(in_oklch,var(--foreground)_74%,var(--primary))]': store.registrationStatus().tone === 'warning',
-        'bg-surface-sage text-brand': store.registrationStatus().tone === 'success',
-        'bg-[color-mix(in_oklch,var(--destructive)_12%,white)] text-destructive': store.registrationStatus().tone === 'danger',
-        'bg-muted text-muted-foreground': store.registrationStatus().tone === 'neutral'
+        'bg-[color-mix(in_oklch,var(--primary)_20%,white)] text-[color-mix(in_oklch,var(--foreground)_74%,var(--primary))]': store.registrationStatus().tone === registrationStatusTone.Warning,
+        'bg-surface-sage text-brand': store.registrationStatus().tone === registrationStatusTone.Success,
+        'bg-[color-mix(in_oklch,var(--destructive)_12%,white)] text-destructive': store.registrationStatus().tone === registrationStatusTone.Danger,
+        'bg-muted text-muted-foreground': store.registrationStatus().tone === registrationStatusTone.Neutral
       }">{{ store.registrationStatus().label }}</span>
     } @else {
       <p class="m-0 text-[0.84rem] font-medium text-brand">שלב {{ store.visibleStepNumber() }} מתוך {{ store.visibleSteps().length }}</p>

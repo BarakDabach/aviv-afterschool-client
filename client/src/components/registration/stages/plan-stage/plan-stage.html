@@ -8,8 +8,8 @@
   </article>
 
   <hlm-radio-group class="grid gap-[var(--app-card-gap)]" aria-label="בחירת מסלול" [value]="store.selectedPlan()" (valueChange)="store.setSelectedPlan($event)">
-    <hlm-radio class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid min-h-[4.18rem] cursor-pointer grid-cols-[auto_minmax(0,1fr)_minmax(4.9rem,auto)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-control-radius)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] transition-[border-color,box-shadow,background] duration-150" [ngClass]="{ 'border-brand bg-[color-mix(in_oklch,var(--surface-sage)_36%,white)] shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--brand)_22%,transparent)]': store.selectedPlan() === 'full' }" value="full" (click)="store.setSelectedPlan('full')">
-      <app-selection-mark [selected]="store.selectedPlan() === 'full'" />
+    <hlm-radio class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid min-h-[4.18rem] cursor-pointer grid-cols-[auto_minmax(0,1fr)_minmax(4.9rem,auto)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-control-radius)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] transition-[border-color,box-shadow,background] duration-150" [ngClass]="{ 'border-brand bg-[color-mix(in_oklch,var(--surface-sage)_36%,white)] shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--brand)_22%,transparent)]': store.isFullPlan() }" [value]="registrationPlanId.Full" (click)="store.setSelectedPlan(registrationPlanId.Full)">
+      <app-selection-mark [selected]="store.isFullPlan()" />
       <span class="grid min-w-0 gap-[0.15rem] [&_strong]:text-[length:var(--app-card-title-size)] [&_strong]:font-extrabold [&_strong]:text-brand [&_small]:text-[0.72rem] [&_small]:not-italic [&_small]:leading-[1.35] [&_small]:text-[color-mix(in_oklch,var(--foreground)_70%,white)]">
         <strong>מסלול מלא</strong>
         <small>ימים א׳-ה׳ · עד 16:30</small>
@@ -20,8 +20,8 @@
       </span>
     </hlm-radio>
 
-    <hlm-radio class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid min-h-[4.18rem] cursor-pointer grid-cols-[auto_minmax(0,1fr)_minmax(4.9rem,auto)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-control-radius)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] transition-[border-color,box-shadow,background] duration-150" [ngClass]="{ 'border-brand bg-[color-mix(in_oklch,var(--surface-sage)_36%,white)] shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--brand)_22%,transparent)]': store.selectedPlan() === 'three' }" value="three" (click)="store.setSelectedPlan('three')">
-      <app-selection-mark [selected]="store.selectedPlan() === 'three'" />
+    <hlm-radio class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid min-h-[4.18rem] cursor-pointer grid-cols-[auto_minmax(0,1fr)_minmax(4.9rem,auto)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-control-radius)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] transition-[border-color,box-shadow,background] duration-150" [ngClass]="{ 'border-brand bg-[color-mix(in_oklch,var(--surface-sage)_36%,white)] shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--brand)_22%,transparent)]': store.isThreePlan() }" [value]="registrationPlanId.Three" (click)="store.setSelectedPlan(registrationPlanId.Three)">
+      <app-selection-mark [selected]="store.isThreePlan()" />
       <span class="grid min-w-0 gap-[0.15rem] [&_strong]:text-[length:var(--app-card-title-size)] [&_strong]:font-extrabold [&_strong]:text-brand [&_small]:text-[0.72rem] [&_small]:not-italic [&_small]:leading-[1.35] [&_small]:text-[color-mix(in_oklch,var(--foreground)_70%,white)]">
         <strong>שלושה ימים</strong>
         <small>ימים לבחירה · עד 16:30</small>

@@ -1,6 +1,15 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { REGISTRATION_STATUS_PROPERTIES, type RegistrationChildDraft, type RegistrationDraftSnapshot, type RegistrationPlanId, type RegistrationStatus, type RegistrationStatusKind } from '../../app/types/registration-status.type';
-import { UserStore } from '../../app/stores/user.store';
+import { GlobalStore } from '../../app/stores/global.store';
+import {
+  AllergyAnswer,
+  REGISTRATION_STATUS_PROPERTIES,
+  RegistrationPlanId,
+  RegistrationStatusKind,
+  type RegistrationChildDraft,
+  type RegistrationDraftSnapshot,
+  type RegistrationStatus,
+} from '../../app/types/registration-status.type';
+import { isValidIsraeliMobilePhone } from '../shared/validations/phone.validation';
 
 type RegistrationStep = {
   index: number;
@@ -16,6 +25,7 @@ type RegistrationFlowState = {
   activeStep: number;
   parentDetails: RegistrationParentDetails;
   children: RegistrationChildDraft[];
+  childDetailsValid: boolean;
   nextChildId: number;
   selectedPlan: RegistrationPlanId;
   savedDraft: RegistrationDraftSnapshot | null;
@@ -40,12 +50,13 @@ const createEmptyChild = (id: number): RegistrationChildDraft => ({
   id,
   name: '',
   birthDate: '',
-  allergyAnswer: 'no',
+  allergyAnswer: AllergyAnswer.No,
+  allergyDetails: '',
 });
 
 @Injectable()
 export class RegistrationStore {
-  private readonly userStore = inject(UserStore);
+  private readonly globalStore = inject(GlobalStore);
   private readonly savedDraftFromStorage = this.readSavedDraft();
 
   readonly steps = STEPS;
@@ -53,9 +64,10 @@ export class RegistrationStore {
   private readonly state = signal<RegistrationFlowState>({
     activeStep: this.getInitialActiveStep(),
     parentDetails: this.savedDraftFromStorage?.parentDetails ?? EMPTY_PARENT_DETAILS,
-    children: this.savedDraftFromStorage?.children?.length ? this.savedDraftFromStorage.children : [createEmptyChild(1)],
+    children: this.normalizeChildren(this.savedDraftFromStorage?.children),
+    childDetailsValid: this.areChildrenValid(this.savedDraftFromStorage?.children),
     nextChildId: this.getNextChildId(this.savedDraftFromStorage?.children),
-    selectedPlan: this.savedDraftFromStorage?.selectedPlan ?? 'full',
+    selectedPlan: this.savedDraftFromStorage?.selectedPlan ?? RegistrationPlanId.Full,
     savedDraft: this.savedDraftFromStorage,
     registrationStatus: this.savedDraftFromStorage ? this.createDraftStatus(this.savedDraftFromStorage.savedAtIso) : this.createPendingReviewStatus(),
   });
@@ -63,7 +75,9 @@ export class RegistrationStore {
   readonly activeStep = computed(() => this.state().activeStep);
   readonly children = computed(() => this.state().children);
   readonly selectedPlan = computed(() => this.state().selectedPlan);
-  readonly selectedPlanLabel = computed(() => (this.selectedPlan() === 'full' ? 'מסלול מלא' : 'שלושה ימים'));
+  readonly selectedPlanLabel = computed(() => (this.selectedPlan() === RegistrationPlanId.Full ? 'מסלול מלא' : 'שלושה ימים'));
+  readonly isFullPlan = computed(() => this.selectedPlan() === RegistrationPlanId.Full);
+  readonly isThreePlan = computed(() => this.selectedPlan() === RegistrationPlanId.Three);
   readonly childCountLabel = computed(() => {
     const childCount = this.children().length;
 
@@ -76,14 +90,14 @@ export class RegistrationStore {
   });
   readonly savedDraft = computed(() => this.state().savedDraft);
   readonly registrationStatus = computed(() => this.state().registrationStatus);
-  readonly visibleSteps = computed(() => (this.userStore.loggedIn() ? this.steps.filter((step) => step.index !== 0) : this.steps));
+  readonly visibleSteps = computed(() => (this.globalStore.loggedIn() ? this.steps.filter((step) => step.index !== 0) : this.steps));
   readonly activeVisibleStepIndex = computed(() => this.visibleSteps().findIndex((step) => step.index === this.activeStep()));
   readonly visibleStepNumber = computed(() => Math.max(this.activeVisibleStepIndex(), 0) + 1);
   readonly parentDetails = computed(() => {
-    if (this.userStore.loggedIn()) {
+    if (this.globalStore.loggedIn()) {
       return {
-        fullName: this.userStore.fullName(),
-        phone: this.userStore.phoneNumber(),
+        fullName: this.globalStore.fullName(),
+        phone: this.globalStore.phoneNumber(),
       };
     }
 
@@ -95,23 +109,24 @@ export class RegistrationStore {
 
     return familyName ? `משפחת ${familyName}` : 'פרטי משפחה';
   });
-  readonly shouldShowParentDetailsStep = computed(() => !this.userStore.loggedIn());
+  readonly shouldShowParentDetailsStep = computed(() => !this.globalStore.loggedIn());
 
   readonly parentDetailsValid = computed(() => {
     const parent = this.parentDetails();
 
-    return parent.fullName.trim().length > 1 && this.isValidIsraeliMobile(parent.phone);
+    return parent.fullName.trim().length > 1 && isValidIsraeliMobilePhone(parent.phone);
   });
 
   readonly primaryDisabled = computed(() => {
     if (this.activeStep() === 0 && this.shouldShowParentDetailsStep()) return !this.parentDetailsValid();
+    if (this.activeStep() === 1) return !this.state().childDetailsValid;
 
     return false;
   });
 
   constructor() {
     effect(() => {
-      if (this.userStore.loggedIn() && this.activeStep() === 0) {
+      if (this.globalStore.loggedIn() && this.activeStep() === 0) {
         this.patchState({ activeStep: 1 });
       }
     });
@@ -139,7 +154,7 @@ export class RegistrationStore {
 
   readonly stepTitle = computed(() => {
     if (this.activeStep() === this.steps.length - 1) {
-      return this.registrationStatus().kind === 'draft' ? 'ההרשמה נשמרה' : 'ההרשמה נשלחה';
+      return this.registrationStatus().kind === RegistrationStatusKind.Draft ? 'ההרשמה נשמרה' : 'ההרשמה נשלחה';
     }
 
     return ['פרטי ההורה', 'פרטי הילדים', 'מסלול ואישורים'][this.activeStep()];
@@ -209,10 +224,28 @@ export class RegistrationStore {
     });
   }
 
-  setSelectedPlan(selectedPlan: string): void {
-    if (selectedPlan !== 'full' && selectedPlan !== 'three') return;
+  setChildren(children: RegistrationChildDraft[]): void {
+    this.patchState({
+      children: this.normalizeChildren(children),
+    });
+  }
 
-    this.patchState({ selectedPlan });
+  setChildDetailsValid(childDetailsValid: boolean): void {
+    this.patchState({ childDetailsValid });
+  }
+
+  reserveChildId(): number {
+    const nextChildId = this.state().nextChildId;
+
+    this.patchState({ nextChildId: nextChildId + 1 });
+
+    return nextChildId;
+  }
+
+  setSelectedPlan(selectedPlan: string): void {
+    if (selectedPlan !== RegistrationPlanId.Full && selectedPlan !== RegistrationPlanId.Three) return;
+
+    this.patchState({ selectedPlan: selectedPlan as RegistrationPlanId });
   }
 
   goBack(): void {
@@ -280,15 +313,9 @@ export class RegistrationStore {
   private normalizeActiveStep(step: number): number {
     const activeStep = Math.min(Math.max(step, 0), this.steps.length - 1);
 
-    if (this.userStore.loggedIn() && activeStep === 0) return 1;
+    if (this.globalStore.loggedIn() && activeStep === 0) return 1;
 
     return activeStep;
-  }
-
-  private isValidIsraeliMobile(phone: string): boolean {
-    const normalizedPhone = phone.replace(/\D/g, '');
-
-    return /^05\d{8}$/.test(normalizedPhone);
   }
 
   private getNextChildId(children: RegistrationChildDraft[] | undefined): number {
@@ -297,19 +324,41 @@ export class RegistrationStore {
     return Math.max(...children.map((child) => child.id)) + 1;
   }
 
+  private normalizeChildren(children: RegistrationChildDraft[] | undefined): RegistrationChildDraft[] {
+    if (!children?.length) return [createEmptyChild(1)];
+
+    return children.map((child) => ({
+      ...child,
+      allergyAnswer: child.allergyAnswer === AllergyAnswer.Yes ? AllergyAnswer.Yes : AllergyAnswer.No,
+      allergyDetails: child.allergyDetails ?? '',
+    }));
+  }
+
+  private areChildrenValid(children: RegistrationChildDraft[] | undefined): boolean {
+    const normalizedChildren = this.normalizeChildren(children);
+
+    return normalizedChildren.every((child) => {
+      const hasRequiredDetails = child.name.trim().length > 1 && child.birthDate.trim().length > 0;
+      const hasAllergyAnswer = child.allergyAnswer === AllergyAnswer.Yes || child.allergyAnswer === AllergyAnswer.No;
+      const hasAllergyDetails = child.allergyAnswer !== AllergyAnswer.Yes || child.allergyDetails.trim().length > 1;
+
+      return hasRequiredDetails && hasAllergyAnswer && hasAllergyDetails;
+    });
+  }
+
   private getInitialActiveStep(): number {
     if (this.savedDraftFromStorage) return this.normalizeActiveStep(this.savedDraftFromStorage.activeStep);
-    if (this.userStore.loggedIn()) return 1;
+    if (this.globalStore.loggedIn()) return 1;
 
     return 0;
   }
 
   private createDraftStatus(updatedAtIso = new Date().toISOString()): RegistrationStatus {
-    return this.createRegistrationStatus('draft', updatedAtIso);
+    return this.createRegistrationStatus(RegistrationStatusKind.Draft, updatedAtIso);
   }
 
   private createPendingReviewStatus(updatedAtIso = new Date().toISOString()): RegistrationStatus {
-    return this.createRegistrationStatus('pending_review', updatedAtIso);
+    return this.createRegistrationStatus(RegistrationStatusKind.PendingReview, updatedAtIso);
   }
 
   private createRegistrationStatus(kind: RegistrationStatusKind, updatedAtIso: string): RegistrationStatus {

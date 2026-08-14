@@ -1,5 +1,8 @@
-import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
+import { computed, effect, inject, signal, untracked } from '@angular/core';
 import { form, validate } from '@angular/forms/signals';
+import { signalStore, withComputed, withHooks, withProps } from '@ngrx/signals';
+import { isValidIsraeliMobilePhone } from '../../../shared/validations/phone.validation';
+import { hasMinimumTrimmedLength } from '../../../shared/validations/text.validation';
 import { RegistrationStore } from '../../registration.store';
 
 type ParentDetailsFormModel = {
@@ -7,40 +10,45 @@ type ParentDetailsFormModel = {
   phone: string;
 };
 
-@Injectable()
-export class ParentDetailsStageStore {
-  private readonly registrationStore = inject(RegistrationStore);
-  private readonly parentModel = signal<ParentDetailsFormModel>({
-    fullName: this.registrationStore.parentDetails().fullName,
-    phone: this.registrationStore.parentDetails().phone,
-  });
-
-  readonly parentForm = form(this.parentModel, (parent) => {
-    validate(parent.fullName, ({ value }) => {
-      return value().trim().length > 1 ? undefined : { kind: 'full-name', message: 'הזינו שם מלא' };
+export const ParentDetailsStageStore = signalStore(
+  withProps(() => {
+    const registrationStore = inject(RegistrationStore);
+    const parentModel = signal<ParentDetailsFormModel>({
+      fullName: registrationStore.parentDetails().fullName,
+      phone: registrationStore.parentDetails().phone,
     });
+    const parentForm = form(parentModel, (parent) => {
+      validate(parent.fullName, ({ value }) => {
+        return hasMinimumTrimmedLength(value(), 2) ? undefined : { kind: 'full-name', message: 'הזינו שם מלא' };
+      });
 
-    validate(parent.phone, ({ value }) => {
-      const normalizedPhone = value().replace(/\D/g, '');
-
-      return /^05\d{8}$/.test(normalizedPhone) ? undefined : { kind: 'phone', message: 'הזינו מספר נייד תקין' };
-    });
-  });
-
-  readonly fullNameHasError = computed(() => this.parentForm.fullName().touched() && this.parentForm.fullName().invalid());
-  readonly phoneHasError = computed(() => this.parentForm.phone().touched() && this.parentForm.phone().invalid());
-
-  readonly fullNameError = computed(() => (this.fullNameHasError() ? this.parentForm.fullName().errors()[0]?.message || 'הזינו שם מלא' : ''));
-  readonly phoneError = computed(() => (this.phoneHasError() ? this.parentForm.phone().errors()[0]?.message || 'הזינו מספר נייד תקין' : ''));
-
-  constructor() {
-    effect(() => {
-      const parent = this.parentModel();
-
-      untracked(() => {
-        this.registrationStore.setParentFullName(parent.fullName);
-        this.registrationStore.setParentPhone(parent.phone);
+      validate(parent.phone, ({ value }) => {
+        return isValidIsraeliMobilePhone(value()) ? undefined : { kind: 'phone', message: 'הזינו מספר נייד תקין' };
       });
     });
-  }
-}
+
+    return {
+      parentForm,
+      parentModel,
+      registrationStore,
+    };
+  }),
+  withComputed(({ parentForm }) => ({
+    fullNameHasError: computed(() => parentForm.fullName().touched() && parentForm.fullName().invalid()),
+    phoneHasError: computed(() => parentForm.phone().touched() && parentForm.phone().invalid()),
+    fullNameError: computed(() => (parentForm.fullName().touched() && parentForm.fullName().invalid() ? parentForm.fullName().errors()[0]?.message || 'הזינו שם מלא' : '')),
+    phoneError: computed(() => (parentForm.phone().touched() && parentForm.phone().invalid() ? parentForm.phone().errors()[0]?.message || 'הזינו מספר נייד תקין' : '')),
+  })),
+  withHooks(({ parentModel, registrationStore }) => ({
+    onInit(): void {
+    effect(() => {
+      const parent = parentModel();
+
+      untracked(() => {
+        registrationStore.setParentFullName(parent.fullName);
+        registrationStore.setParentPhone(parent.phone);
+      });
+    });
+    },
+  })),
+);

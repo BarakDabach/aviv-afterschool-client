@@ -1,6 +1,16 @@
-export type RegistrationStatusKind = 'draft' | 'pending_review' | 'approved' | 'rejected';
+export enum RegistrationStatusKind {
+  Draft = 'draft',
+  PendingReview = 'pending_review',
+  Approved = 'approved',
+  Rejected = 'rejected',
+}
 
-export type RegistrationStatusTone = 'neutral' | 'warning' | 'success' | 'danger';
+export enum RegistrationStatusTone {
+  Neutral = 'neutral',
+  Warning = 'warning',
+  Success = 'success',
+  Danger = 'danger',
+}
 
 export type RegistrationStatus = {
   kind: RegistrationStatusKind;
@@ -13,35 +23,44 @@ export type RegistrationStatus = {
 export type RegistrationStatusProperties = Omit<RegistrationStatus, 'kind' | 'updatedAtIso'>;
 
 export const REGISTRATION_STATUS_PROPERTIES: Record<RegistrationStatusKind, RegistrationStatusProperties> = {
-  draft: {
+  [RegistrationStatusKind.Draft]: {
     label: 'טיוטה נשמרה',
     description: 'שמרנו את פרטי ההרשמה שהוזנו עד עכשיו. אפשר לחזור מאוחר יותר ולהמשיך מאותה נקודה.',
-    tone: 'neutral',
+    tone: RegistrationStatusTone.Neutral,
   },
-  pending_review: {
+  [RegistrationStatusKind.PendingReview]: {
     label: 'ממתינה לבדיקה',
     description: 'ההרשמה התקבלה ותמתין לבדיקה ידנית של צוות הצהרון.',
-    tone: 'warning',
+    tone: RegistrationStatusTone.Warning,
   },
-  approved: {
+  [RegistrationStatusKind.Approved]: {
     label: 'מאושרת',
     description: 'ההרשמה אושרה על ידי צוות הצהרון.',
-    tone: 'success',
+    tone: RegistrationStatusTone.Success,
   },
-  rejected: {
+  [RegistrationStatusKind.Rejected]: {
     label: 'דורשת עדכון',
     description: 'נדרש עדכון בפרטי ההרשמה לפני שנוכל להשלים את התהליך.',
-    tone: 'danger',
+    tone: RegistrationStatusTone.Danger,
   },
 };
 
-export type RegistrationPlanId = 'full' | 'three';
+export enum RegistrationPlanId {
+  Full = 'full',
+  Three = 'three',
+}
+
+export enum AllergyAnswer {
+  Yes = 'yes',
+  No = 'no',
+}
 
 export type RegistrationChildDraft = {
   id: number;
   name: string;
   birthDate: string;
-  allergyAnswer: string;
+  allergyAnswer: AllergyAnswer;
+  allergyDetails: string;
 };
 
 export type RegistrationDraftSnapshot = {

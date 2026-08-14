@@ -10,18 +10,18 @@
   </article>
 
   <article class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] border px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] text-start" [ngClass]="{
-    'border-primary/35 bg-[color-mix(in_oklch,var(--primary)_14%,white)]': store.registrationStatus().tone === 'warning',
-    'border-brand/35 bg-surface-sage/60': store.registrationStatus().tone === 'success',
-    'border-destructive/35 bg-[color-mix(in_oklch,var(--destructive)_10%,white)]': store.registrationStatus().tone === 'danger',
-    'border-border bg-muted/55': store.registrationStatus().tone === 'neutral'
+    'border-primary/35 bg-[color-mix(in_oklch,var(--primary)_14%,white)]': store.registrationStatus().tone === registrationStatusTone.Warning,
+    'border-brand/35 bg-surface-sage/60': store.registrationStatus().tone === registrationStatusTone.Success,
+    'border-destructive/35 bg-[color-mix(in_oklch,var(--destructive)_10%,white)]': store.registrationStatus().tone === registrationStatusTone.Danger,
+    'border-border bg-muted/55': store.registrationStatus().tone === registrationStatusTone.Neutral
   }">
     <span class="grid h-[var(--app-icon-lg)] w-[var(--app-icon-lg)] place-items-center rounded-full" [ngClass]="{
-      'bg-primary/20 text-[color-mix(in_oklch,var(--foreground)_74%,var(--primary))]': store.registrationStatus().tone === 'warning',
-      'bg-brand/12 text-brand': store.registrationStatus().tone === 'success',
-      'bg-destructive/10 text-destructive': store.registrationStatus().tone === 'danger',
-      'bg-background/70 text-muted-foreground': store.registrationStatus().tone === 'neutral'
+      'bg-primary/20 text-[color-mix(in_oklch,var(--foreground)_74%,var(--primary))]': store.registrationStatus().tone === registrationStatusTone.Warning,
+      'bg-brand/12 text-brand': store.registrationStatus().tone === registrationStatusTone.Success,
+      'bg-destructive/10 text-destructive': store.registrationStatus().tone === registrationStatusTone.Danger,
+      'bg-background/70 text-muted-foreground': store.registrationStatus().tone === registrationStatusTone.Neutral
     }">
-      @if (store.registrationStatus().kind === 'approved') {
+      @if (store.registrationStatus().kind === registrationStatusKind.Approved) {
         <ng-icon name="lucideCheck" class="h-[var(--app-icon-sm)] w-[var(--app-icon-sm)]" />
       } @else {
         <ng-icon name="lucideClock" class="h-[var(--app-icon-sm)] w-[var(--app-icon-sm)]" />

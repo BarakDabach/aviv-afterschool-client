@@ -4,6 +4,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCalendarClock, lucideCheck } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmRadioGroupImports } from '@spartan-ng/helm/radio-group';
+import { RegistrationPlanId } from '../../../../app/types/registration-status.type';
 import { SelectionMark } from '../../../shared/selection-mark/selection-mark';
 import { RegistrationStore } from '../../registration.store';
 
@@ -16,4 +17,5 @@ import { RegistrationStore } from '../../registration.store';
 })
 export class PlanStage {
   protected readonly store = inject(RegistrationStore);
+  protected readonly registrationPlanId = RegistrationPlanId;
 }
