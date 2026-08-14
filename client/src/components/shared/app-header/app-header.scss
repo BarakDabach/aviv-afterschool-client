@@ -1,0 +1,284 @@
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: block;
+}
+
+.app-header {
+  min-height: var(--app-sticky-header-height);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklch, var(--background) 92%, white);
+  color: var(--foreground);
+  backdrop-filter: blur(16px);
+}
+
+.header-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  direction: ltr;
+  min-height: inherit;
+  padding-inline: max(1.25rem, calc((100vw - var(--app-header-width)) / 2));
+}
+
+.brand,
+.header-action,
+.admin-user,
+.admin-desktop-nav a,
+.mobile-drawer a {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.brand {
+  justify-self: end;
+  flex-direction: row-reverse;
+  gap: 0.48rem;
+  direction: rtl;
+  color: var(--brand);
+  font-size: clamp(0.98rem, 2.15vw, 1.25rem);
+  font-weight: 850;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.brand img {
+  width: 2.65rem;
+  height: 2.05rem;
+  object-fit: contain;
+}
+
+.header-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  direction: ltr;
+  gap: 0.75rem;
+}
+
+.header-action {
+  gap: 0.42rem;
+  direction: rtl;
+  color: var(--foreground);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.header-action ng-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.header-action span {
+  white-space: nowrap;
+}
+
+.desktop-action {
+  display: none;
+}
+
+.mobile-menu-button[data-slot='button'] {
+  width: 2.85rem;
+  height: 2.85rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 0.72rem;
+  background: color-mix(in oklch, var(--background) 78%, white);
+  color: var(--brand);
+  box-shadow: 0 0.45rem 1rem color-mix(in oklch, var(--foreground) 5%, transparent);
+}
+
+.mobile-menu-button ng-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.admin-user {
+  direction: ltr;
+  gap: 0.48rem;
+  color: var(--foreground);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.admin-user ng-icon {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
+.admin-desktop-nav {
+  display: none;
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  border: 0;
+  background: color-mix(in oklch, var(--foreground) 18%, transparent);
+}
+
+.mobile-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 61;
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  width: min(84vw, 20rem);
+  padding: 1.25rem;
+  border-inline-start: 1px solid var(--border);
+  background: color-mix(in oklch, var(--background) 94%, white);
+  box-shadow: -0.8rem 0 2rem color-mix(in oklch, var(--foreground) 12%, transparent);
+}
+
+.drawer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--brand);
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.drawer-close[data-slot='button'] {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  color: var(--brand);
+}
+
+.mobile-drawer nav {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.mobile-drawer a {
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding-inline: 0.85rem;
+  border-radius: var(--app-control-radius);
+  color: var(--muted-foreground);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.mobile-drawer a.active {
+  background: color-mix(in oklch, var(--surface-sage) 56%, white);
+  color: var(--brand);
+}
+
+.mobile-drawer ng-icon {
+  width: 1.18rem;
+  height: 1.18rem;
+}
+
+@media (max-width: 420px) {
+  .header-inner {
+    padding-inline: 1.25rem;
+  }
+
+  .brand {
+    gap: 0.35rem;
+    font-size: 0.84rem;
+  }
+
+  .brand img {
+    width: 2.15rem;
+    height: 1.65rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .desktop-action {
+    display: inline-flex;
+  }
+
+  .mobile-menu-button {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-header.admin {
+    min-height: 5.1rem;
+  }
+
+  .app-header.admin .header-inner {
+    display: block;
+    min-height: inherit;
+    padding-inline: 2.5rem;
+  }
+
+  .app-header.admin .brand {
+    position: absolute;
+    top: 1.05rem;
+    right: 2.5rem;
+    gap: 0.68rem;
+    font-size: 1.55rem;
+  }
+
+  .app-header.admin .brand img {
+    width: 3.7rem;
+    height: 2.8rem;
+  }
+
+  .admin-actions {
+    position: absolute;
+    top: 1.75rem;
+    left: 2.5rem;
+  }
+
+  .admin-user {
+    gap: 0.52rem;
+    font-size: 0.98rem;
+  }
+
+  .admin-user ng-icon {
+    width: 1.58rem;
+    height: 1.58rem;
+  }
+
+  .admin-desktop-nav {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 3.45rem;
+    transform: translateX(-50%);
+  }
+
+  .admin-desktop-nav a {
+    position: relative;
+    min-height: 5.1rem;
+    gap: 0.5rem;
+    color: var(--foreground);
+    font-size: 0.98rem;
+    font-weight: 700;
+  }
+
+  .admin-desktop-nav ng-icon {
+    display: none;
+  }
+
+  .admin-desktop-nav a.active {
+    color: var(--brand);
+  }
+
+  .admin-desktop-nav a.active::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 0.22rem;
+    border-radius: 999px;
+    background: var(--brand);
+  }
+}

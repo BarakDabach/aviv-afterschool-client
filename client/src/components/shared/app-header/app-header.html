@@ -1,0 +1,69 @@
+<header class="app-header" [class.admin]="variant() === 'admin'" dir="rtl">
+  <div class="header-inner">
+    <div class="header-actions" [class.admin-actions]="variant() === 'admin'">
+      <button
+        hlmBtn
+        variant="ghost"
+        class="mobile-menu-button"
+        type="button"
+        aria-label="פתיחת תפריט"
+        [attr.aria-expanded]="menuOpen()"
+        (click)="toggleMenu()"
+      >
+        <ng-icon name="lucideMenu" />
+      </button>
+
+      @if (variant() === 'admin') {
+        <span class="admin-user">
+          <ng-icon name="lucideUserRound" />
+          <span>אביב</span>
+        </span>
+      } @else {
+        <a class="header-action desktop-action" [routerLink]="actionRoute()">
+          @if (variant() === 'back') {
+            <ng-icon name="lucideChevronLeft" />
+          } @else {
+            <ng-icon name="lucideUserRound" />
+          }
+          <span>{{ actionLabel() }}</span>
+        </a>
+      }
+    </div>
+
+    <a routerLink="/" class="brand" aria-label="הצהרון של אביב" (click)="closeMenu()">
+      <span>הצהרון של אביב</span>
+      <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+    </a>
+
+    @if (variant() === 'admin') {
+      <nav class="admin-desktop-nav" aria-label="ניווט ניהול">
+        @for (item of adminItems; track item.label) {
+          <a [routerLink]="item.route" [class.active]="isActive(item.route)">
+            <ng-icon [name]="item.icon" />
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+    }
+  </div>
+</header>
+
+@if (menuOpen()) {
+  <button class="drawer-backdrop" type="button" aria-label="סגירת תפריט" (click)="closeMenu()"></button>
+  <aside class="mobile-drawer" aria-label="תפריט ניווט" dir="rtl">
+    <div class="drawer-heading">
+      <span>{{ variant() === 'admin' ? 'ניווט ניהול' : 'תפריט' }}</span>
+      <button hlmBtn variant="ghost" class="drawer-close" type="button" aria-label="סגירת תפריט" (click)="closeMenu()">
+        <ng-icon name="lucideX" />
+      </button>
+    </div>
+    <nav>
+      @for (item of mobileItems(); track item.label) {
+        <a [routerLink]="item.route" [class.active]="isActive(item.route)" (click)="closeMenu()">
+          <ng-icon [name]="item.icon" />
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+  </aside>
+}
