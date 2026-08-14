@@ -4,12 +4,12 @@ import { FormField } from '@angular/forms/signals';
 import { provideIcons } from '@ng-icons/core';
 import { lucideIdCard } from '@ng-icons/lucide';
 import { HlmInputImports } from '@spartan-ng/helm/input';
-import { DetailCard } from '../../../shared/detail-card/detail-card';
+import { DetailsCard } from '../../../shared/details-card/details-card';
 import { ParentDetailsStageStore } from './parent-details-stage.store';
 
 @Component({
   selector: 'app-parent-details-stage',
-  imports: [NgClass, FormField, HlmInputImports, DetailCard],
+  imports: [NgClass, FormField, HlmInputImports, DetailsCard],
   providers: [ParentDetailsStageStore, provideIcons({ lucideIdCard })],
   templateUrl: './parent-details-stage.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

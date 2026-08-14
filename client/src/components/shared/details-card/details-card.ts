@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { NgIcon } from '@ng-icons/core';
 
 @Component({
-  selector: 'app-detail-card',
+  selector: 'app-details-card',
   imports: [NgIcon],
-  templateUrl: './detail-card.html',
+  templateUrl: './details-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DetailCard {
+export class DetailsCard {
   @Input({ required: true }) iconName = '';
   @Input({ required: true }) title = '';
   @Input({ required: true }) description = '';
