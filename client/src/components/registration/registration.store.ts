@@ -1,4 +1,5 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
+import { patchState, signalStore, withComputed, withHooks, withMethods, withProps, withState } from '@ngrx/signals';
 import { GlobalStore } from '../../app/stores/global.store';
 import {
   AllergyAnswer,
@@ -10,6 +11,7 @@ import {
   type RegistrationStatus,
 } from '../../app/types/registration-status.type';
 import { isValidIsraeliMobilePhone } from '../shared/validations/phone.validation';
+import { hasMinimumTrimmedLength } from '../shared/validations/text.validation';
 
 type RegistrationStep = {
   index: number;
@@ -31,6 +33,8 @@ type RegistrationFlowState = {
   savedDraft: RegistrationDraftSnapshot | null;
   registrationStatus: RegistrationStatus;
 };
+
+type GlobalStoreInstance = InstanceType<typeof GlobalStore>;
 
 const REGISTRATION_DRAFT_STORAGE_KEY = 'aviv-registration-draft';
 
@@ -54,348 +58,324 @@ const createEmptyChild = (id: number): RegistrationChildDraft => ({
   allergyDetails: '',
 });
 
-@Injectable()
-export class RegistrationStore {
-  private readonly globalStore = inject(GlobalStore);
-  private readonly savedDraftFromStorage = this.readSavedDraft();
+const createRegistrationStatus = (kind: RegistrationStatusKind, updatedAtIso: string): RegistrationStatus => ({
+  kind,
+  ...REGISTRATION_STATUS_PROPERTIES[kind],
+  updatedAtIso,
+});
 
-  readonly steps = STEPS;
+const createDraftStatus = (updatedAtIso = new Date().toISOString()): RegistrationStatus => createRegistrationStatus(RegistrationStatusKind.Draft, updatedAtIso);
 
-  private readonly state = signal<RegistrationFlowState>({
-    activeStep: this.getInitialActiveStep(),
-    parentDetails: this.savedDraftFromStorage?.parentDetails ?? EMPTY_PARENT_DETAILS,
-    children: this.normalizeChildren(this.savedDraftFromStorage?.children),
-    childDetailsValid: this.areChildrenValid(this.savedDraftFromStorage?.children),
-    nextChildId: this.getNextChildId(this.savedDraftFromStorage?.children),
-    selectedPlan: this.savedDraftFromStorage?.selectedPlan ?? RegistrationPlanId.Full,
-    savedDraft: this.savedDraftFromStorage,
-    registrationStatus: this.savedDraftFromStorage ? this.createDraftStatus(this.savedDraftFromStorage.savedAtIso) : this.createPendingReviewStatus(),
+const createPendingReviewStatus = (updatedAtIso = new Date().toISOString()): RegistrationStatus =>
+  createRegistrationStatus(RegistrationStatusKind.PendingReview, updatedAtIso);
+
+const normalizeActiveStep = (step: number, loggedIn: boolean): number => {
+  const activeStep = Math.min(Math.max(step, 0), STEPS.length - 1);
+
+  return loggedIn && activeStep === 0 ? 1 : activeStep;
+};
+
+const getNextChildId = (children: RegistrationChildDraft[] | undefined): number => {
+  if (!children?.length) return 2;
+
+  return Math.max(...children.map((child) => child.id)) + 1;
+};
+
+const normalizeChildren = (children: RegistrationChildDraft[] | undefined): RegistrationChildDraft[] => {
+  if (!children?.length) return [createEmptyChild(1)];
+
+  return children.map((child) => ({
+    ...child,
+    allergyAnswer: child.allergyAnswer === AllergyAnswer.Yes ? AllergyAnswer.Yes : AllergyAnswer.No,
+    allergyDetails: child.allergyDetails ?? '',
+  }));
+};
+
+const areChildrenValid = (children: RegistrationChildDraft[] | undefined): boolean => {
+  const normalizedChildren = normalizeChildren(children);
+
+  return normalizedChildren.every((child) => {
+    const hasRequiredDetails = hasMinimumTrimmedLength(child.name, 2) && child.birthDate.trim().length > 0;
+    const hasAllergyAnswer = child.allergyAnswer === AllergyAnswer.Yes || child.allergyAnswer === AllergyAnswer.No;
+    const hasAllergyDetails = child.allergyAnswer !== AllergyAnswer.Yes || hasMinimumTrimmedLength(child.allergyDetails, 2);
+
+    return hasRequiredDetails && hasAllergyAnswer && hasAllergyDetails;
   });
+};
 
-  readonly activeStep = computed(() => this.state().activeStep);
-  readonly children = computed(() => this.state().children);
-  readonly selectedPlan = computed(() => this.state().selectedPlan);
-  readonly selectedPlanLabel = computed(() => (this.selectedPlan() === RegistrationPlanId.Full ? 'מסלול מלא' : 'שלושה ימים'));
-  readonly isFullPlan = computed(() => this.selectedPlan() === RegistrationPlanId.Full);
-  readonly isThreePlan = computed(() => this.selectedPlan() === RegistrationPlanId.Three);
-  readonly childCountLabel = computed(() => {
-    const childCount = this.children().length;
+const readSavedDraft = (): RegistrationDraftSnapshot | null => {
+  if (typeof localStorage === 'undefined') return null;
 
-    return childCount === 1 ? 'ילד אחד' : `${childCount} ילדים`;
-  });
-  readonly childrenSummary = computed(() => {
-    const childNames = this.children().map((child, index) => child.name.trim() || `ילד ${index + 1}`);
+  try {
+    const rawDraft = localStorage.getItem(REGISTRATION_DRAFT_STORAGE_KEY);
 
-    return `${childNames.join(', ')} · ${this.selectedPlanLabel()}`;
-  });
-  readonly savedDraft = computed(() => this.state().savedDraft);
-  readonly registrationStatus = computed(() => this.state().registrationStatus);
-  readonly visibleSteps = computed(() => (this.globalStore.loggedIn() ? this.steps.filter((step) => step.index !== 0) : this.steps));
-  readonly activeVisibleStepIndex = computed(() => this.visibleSteps().findIndex((step) => step.index === this.activeStep()));
-  readonly visibleStepNumber = computed(() => Math.max(this.activeVisibleStepIndex(), 0) + 1);
-  readonly parentDetails = computed(() => {
-    if (this.globalStore.loggedIn()) {
-      return {
-        fullName: this.globalStore.fullName(),
-        phone: this.globalStore.phoneNumber(),
-      };
-    }
+    return rawDraft ? (JSON.parse(rawDraft) as RegistrationDraftSnapshot) : null;
+  } catch {
+    return null;
+  }
+};
 
-    return this.state().parentDetails;
-  });
-  readonly familyTitle = computed(() => {
-    const parentName = this.parentDetails().fullName.trim();
-    const familyName = parentName.split(/\s+/).at(-1);
+const writeSavedDraft = (savedDraft: RegistrationDraftSnapshot): void => {
+  if (typeof localStorage === 'undefined') return;
 
-    return familyName ? `משפחת ${familyName}` : 'פרטי משפחה';
-  });
-  readonly shouldShowParentDetailsStep = computed(() => !this.globalStore.loggedIn());
+  localStorage.setItem(REGISTRATION_DRAFT_STORAGE_KEY, JSON.stringify(savedDraft));
+};
 
-  readonly parentDetailsValid = computed(() => {
-    const parent = this.parentDetails();
+const clearSavedDraft = (): void => {
+  if (typeof localStorage === 'undefined') return;
 
-    return parent.fullName.trim().length > 1 && isValidIsraeliMobilePhone(parent.phone);
-  });
+  localStorage.removeItem(REGISTRATION_DRAFT_STORAGE_KEY);
+};
 
-  readonly primaryDisabled = computed(() => {
-    if (this.activeStep() === 0 && this.shouldShowParentDetailsStep()) return !this.parentDetailsValid();
-    if (this.activeStep() === 1) return !this.state().childDetailsValid;
+const scrollToTop = (): void => {
+  if (typeof window === 'undefined') return;
 
-    return false;
-  });
+  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'auto' }));
+};
 
-  constructor() {
-    effect(() => {
-      if (this.globalStore.loggedIn() && this.activeStep() === 0) {
-        this.patchState({ activeStep: 1 });
+const createInitialRegistrationState = (globalStore: GlobalStoreInstance): RegistrationFlowState => {
+  const savedDraft = readSavedDraft();
+  const initialActiveStep = savedDraft ? normalizeActiveStep(savedDraft.activeStep, globalStore.loggedIn()) : globalStore.loggedIn() ? 1 : 0;
+
+  return {
+    activeStep: initialActiveStep,
+    parentDetails: savedDraft?.parentDetails ?? EMPTY_PARENT_DETAILS,
+    children: normalizeChildren(savedDraft?.children),
+    childDetailsValid: areChildrenValid(savedDraft?.children),
+    nextChildId: getNextChildId(savedDraft?.children),
+    selectedPlan: savedDraft?.selectedPlan ?? RegistrationPlanId.Full,
+    savedDraft,
+    registrationStatus: savedDraft ? createDraftStatus(savedDraft.savedAtIso) : createPendingReviewStatus(),
+  };
+};
+
+export const RegistrationStore = signalStore(
+  withState(() => createInitialRegistrationState(inject(GlobalStore))),
+  withProps(() => ({
+    globalStore: inject(GlobalStore),
+    steps: STEPS,
+  })),
+  withComputed(({ children, globalStore, parentDetails, registrationStatus, selectedPlan }) => ({
+    selectedPlanLabel: computed(() => (selectedPlan() === RegistrationPlanId.Full ? 'מסלול מלא' : 'שלושה ימים')),
+    isFullPlan: computed(() => selectedPlan() === RegistrationPlanId.Full),
+    isThreePlan: computed(() => selectedPlan() === RegistrationPlanId.Three),
+    childCountLabel: computed(() => {
+      const childCount = children().length;
+
+      return childCount === 1 ? 'ילד אחד' : `${childCount} ילדים`;
+    }),
+    visibleSteps: computed(() => (globalStore.loggedIn() ? STEPS.filter((step) => step.index !== 0) : STEPS)),
+    resolvedParentDetails: computed(() => {
+      if (globalStore.loggedIn()) {
+        return {
+          fullName: globalStore.fullName(),
+          phone: globalStore.phoneNumber(),
+        };
       }
-    });
-  }
 
-  readonly backLabel = computed(() => {
-    const activeStep = this.activeStep();
-    const activeVisibleStepIndex = this.activeVisibleStepIndex();
+      return parentDetails();
+    }),
+    shouldShowParentDetailsStep: computed(() => !globalStore.loggedIn()),
+    isDraftStatus: computed(() => registrationStatus().kind === RegistrationStatusKind.Draft),
+  })),
+  withComputed(({ activeStep, childDetailsValid, children, isDraftStatus, resolvedParentDetails, selectedPlanLabel, shouldShowParentDetailsStep, visibleSteps }) => ({
+    parentDetails: computed(() => resolvedParentDetails()),
+    activeVisibleStepIndex: computed(() => visibleSteps().findIndex((step) => step.index === activeStep())),
+    visibleStepNumber: computed(() => Math.max(visibleSteps().findIndex((step) => step.index === activeStep()), 0) + 1),
+    parentDetailsValid: computed(() => {
+      const parent = resolvedParentDetails();
 
-    if (activeVisibleStepIndex <= 0) return 'חזרה';
-    if (activeStep === this.steps.length - 1) return 'יציאה';
+      return hasMinimumTrimmedLength(parent.fullName, 2) && isValidIsraeliMobilePhone(parent.phone);
+    }),
+    familyTitle: computed(() => {
+      const parentName = resolvedParentDetails().fullName.trim();
+      const familyName = parentName.split(/\s+/).at(-1);
 
-    return `חזרה ל${this.visibleSteps()[activeVisibleStepIndex - 1].label}`;
-  });
+      return familyName ? `משפחת ${familyName}` : 'פרטי משפחה';
+    }),
+    childrenSummary: computed(() => {
+      const childNames = children().map((child, index) => child.name.trim() || `ילד ${index + 1}`);
 
-  readonly primaryLabel = computed(
-    () =>
-      [
-        'המשך לפרטי הילד',
-        'המשך למסלול ואישורים',
-        'שליחת ההרשמה',
-        'חזרה לעמוד הראשי',
-      ][this.activeStep()],
-  );
+      return `${childNames.join(', ')} · ${selectedPlanLabel()}`;
+    }),
+    primaryDisabled: computed(() => {
+      if (activeStep() === 0 && shouldShowParentDetailsStep()) {
+        const parent = resolvedParentDetails();
 
-  readonly stepTitle = computed(() => {
-    if (this.activeStep() === this.steps.length - 1) {
-      return this.registrationStatus().kind === RegistrationStatusKind.Draft ? 'ההרשמה נשמרה' : 'ההרשמה נשלחה';
-    }
+        return !hasMinimumTrimmedLength(parent.fullName, 2) || !isValidIsraeliMobilePhone(parent.phone);
+      }
 
-    return ['פרטי ההורה', 'פרטי הילדים', 'מסלול ואישורים'][this.activeStep()];
-  });
+      if (activeStep() === 1) return !childDetailsValid();
 
-  readonly stepDescription = computed(() => {
-    if (this.activeStep() === this.steps.length - 1) {
-      return this.registrationStatus().description;
-    }
+      return false;
+    }),
+    backLabel: computed(() => {
+      const activeVisibleStepIndex = visibleSteps().findIndex((step) => step.index === activeStep());
 
-    return [
-      'הזינו את פרטי ההורה שישמש כאיש הקשר הראשי להרשמה.',
-      'מלאו את פרטי הילדים. אפשר להוסיף ילד נוסף לפני שממשיכים למסלול.',
-      'בחרו מסלול והעלו את החוזה החתום יחד עם מסמכי האישור.',
-    ][this.activeStep()];
-  });
+      if (activeVisibleStepIndex <= 0) return 'חזרה';
+      if (activeStep() === STEPS.length - 1) return 'יציאה';
 
-  setParentFullName(fullName: string): void {
-    this.patchState({
-      parentDetails: {
-        ...this.parentDetails(),
-        fullName,
-      },
-    });
-  }
+      return `חזרה ל${visibleSteps()[activeVisibleStepIndex - 1].label}`;
+    }),
+    primaryLabel: computed(
+      () =>
+        [
+          'המשך לפרטי הילד',
+          'המשך למסלול ואישורים',
+          'שליחת ההרשמה',
+          'חזרה לעמוד הראשי',
+        ][activeStep()],
+    ),
+    stepTitle: computed(() => {
+      if (activeStep() === STEPS.length - 1) {
+        return isDraftStatus() ? 'ההרשמה נשמרה' : 'ההרשמה נשלחה';
+      }
 
-  setParentPhone(phone: string): void {
-    this.patchState({
-      parentDetails: {
-        ...this.parentDetails(),
-        phone,
-      },
-    });
-  }
+      return ['פרטי ההורה', 'פרטי הילדים', 'מסלול ואישורים'][activeStep()];
+    }),
+  })),
+  withComputed(({ activeStep, registrationStatus }) => ({
+    stepDescription: computed(() => {
+      if (activeStep() === STEPS.length - 1) {
+        return registrationStatus().description;
+      }
 
-  addChild(): void {
-    const nextChildId = this.state().nextChildId;
+      return [
+        'הזינו את פרטי ההורה שישמש כאיש הקשר הראשי להרשמה.',
+        'מלאו את פרטי הילדים. אפשר להוסיף ילד נוסף לפני שממשיכים למסלול.',
+        'בחרו מסלול והעלו את החוזה החתום יחד עם מסמכי האישור.',
+      ][activeStep()];
+    }),
+  })),
+  withMethods((store) => ({
+    setParentFullName(fullName: string): void {
+      patchState(store, {
+        parentDetails: {
+          ...store.parentDetails(),
+          fullName,
+        },
+      });
+    },
+    setParentPhone(phone: string): void {
+      patchState(store, {
+        parentDetails: {
+          ...store.parentDetails(),
+          phone,
+        },
+      });
+    },
+    addChild(): void {
+      const nextChildId = store.nextChildId();
 
-    this.patchState({
-      children: [
-        ...this.children(),
-        createEmptyChild(nextChildId),
-      ],
-      nextChildId: nextChildId + 1,
-    });
-  }
+      patchState(store, {
+        children: [
+          ...store.children(),
+          createEmptyChild(nextChildId),
+        ],
+        nextChildId: nextChildId + 1,
+      });
+    },
+    removeChild(childId: number): void {
+      const nextChildren = store.children().filter((child) => child.id !== childId);
 
-  removeChild(childId: number): void {
-    const nextChildren = this.children().filter((child) => child.id !== childId);
+      if (nextChildren.length > 0) {
+        patchState(store, { children: nextChildren });
+        return;
+      }
 
-    if (nextChildren.length > 0) {
-      this.patchState({ children: nextChildren });
-      return;
-    }
+      const nextChildId = store.nextChildId();
 
-    const nextChildId = this.state().nextChildId;
+      patchState(store, {
+        children: [createEmptyChild(nextChildId)],
+        nextChildId: nextChildId + 1,
+      });
+    },
+    updateChild(childId: number, patch: Partial<Omit<RegistrationChildDraft, 'id'>>): void {
+      patchState(store, {
+        children: store.children().map((child) => (child.id === childId ? { ...child, ...patch } : child)),
+      });
+    },
+    setChildren(children: RegistrationChildDraft[]): void {
+      patchState(store, {
+        children: normalizeChildren(children),
+      });
+    },
+    setChildDetailsValid(childDetailsValid: boolean): void {
+      patchState(store, { childDetailsValid });
+    },
+    reserveChildId(): number {
+      const nextChildId = store.nextChildId();
 
-    this.patchState({
-      children: [createEmptyChild(nextChildId)],
-      nextChildId: nextChildId + 1,
-    });
-  }
+      patchState(store, { nextChildId: nextChildId + 1 });
 
-  updateChild(childId: number, patch: Partial<Omit<RegistrationChildDraft, 'id'>>): void {
-    this.patchState({
-      children: this.children().map((child) => (child.id === childId ? { ...child, ...patch } : child)),
-    });
-  }
+      return nextChildId;
+    },
+    setSelectedPlan(selectedPlan: string): void {
+      if (selectedPlan !== RegistrationPlanId.Full && selectedPlan !== RegistrationPlanId.Three) return;
 
-  setChildren(children: RegistrationChildDraft[]): void {
-    this.patchState({
-      children: this.normalizeChildren(children),
-    });
-  }
+      patchState(store, { selectedPlan: selectedPlan as RegistrationPlanId });
+    },
+    goBack(): void {
+      if (store.activeStep() > 0) {
+        this.setActiveStep(store.activeStep() - 1);
+      }
+    },
+    goNext(): void {
+      if (store.primaryDisabled()) return;
 
-  setChildDetailsValid(childDetailsValid: boolean): void {
-    this.patchState({ childDetailsValid });
-  }
+      const nextStep = Math.min(STEPS.length - 1, store.activeStep() + 1);
 
-  reserveChildId(): number {
-    const nextChildId = this.state().nextChildId;
+      if (nextStep === STEPS.length - 1) {
+        this.submitRegistration();
+        return;
+      }
 
-    this.patchState({ nextChildId: nextChildId + 1 });
+      this.setActiveStep(nextStep);
+    },
+    saveAndContinueLater(): void {
+      const savedAtIso = new Date().toISOString();
+      const savedDraft: RegistrationDraftSnapshot = {
+        activeStep: store.activeStep(),
+        parentDetails: store.parentDetails(),
+        children: store.children(),
+        selectedPlan: store.selectedPlan(),
+        savedAtIso,
+      };
 
-    return nextChildId;
-  }
+      writeSavedDraft(savedDraft);
+      patchState(store, {
+        activeStep: STEPS.length - 1,
+        savedDraft,
+        registrationStatus: createDraftStatus(savedAtIso),
+      });
+      scrollToTop();
+    },
+    setActiveStep(step: number): void {
+      const activeStep = normalizeActiveStep(step, store.globalStore.loggedIn());
 
-  setSelectedPlan(selectedPlan: string): void {
-    if (selectedPlan !== RegistrationPlanId.Full && selectedPlan !== RegistrationPlanId.Three) return;
+      if (step > store.activeStep() && store.primaryDisabled()) return;
+      if (activeStep === store.activeStep()) return;
 
-    this.patchState({ selectedPlan: selectedPlan as RegistrationPlanId });
-  }
-
-  goBack(): void {
-    if (this.activeStep() > 0) {
-      this.setActiveStep(this.activeStep() - 1);
-    }
-  }
-
-  goNext(): void {
-    if (this.primaryDisabled()) return;
-
-    const nextStep = Math.min(this.steps.length - 1, this.activeStep() + 1);
-
-    if (nextStep === this.steps.length - 1) {
-      this.submitRegistration();
-      return;
-    }
-
-    this.setActiveStep(nextStep);
-  }
-
-  saveAndContinueLater(): void {
-    const savedAtIso = new Date().toISOString();
-    const savedDraft: RegistrationDraftSnapshot = {
-      activeStep: this.activeStep(),
-      parentDetails: this.parentDetails(),
-      children: this.children(),
-      selectedPlan: this.selectedPlan(),
-      savedAtIso,
-    };
-
-    this.writeSavedDraft(savedDraft);
-    this.patchState({
-      activeStep: this.steps.length - 1,
-      savedDraft,
-      registrationStatus: this.createDraftStatus(savedAtIso),
-    });
-    this.scrollToTop();
-  }
-
-  setActiveStep(step: number): void {
-    const activeStep = this.normalizeActiveStep(step);
-
-    if (step > this.activeStep() && this.primaryDisabled()) return;
-    if (activeStep === this.activeStep()) return;
-
-    this.patchState({ activeStep });
-    this.scrollToTop();
-  }
-
-  private submitRegistration(): void {
-    this.clearSavedDraft();
-    this.patchState({
-      activeStep: this.steps.length - 1,
-      savedDraft: null,
-      registrationStatus: this.createPendingReviewStatus(),
-    });
-    this.scrollToTop();
-  }
-
-  private patchState(patch: Partial<RegistrationFlowState>): void {
-    this.state.update((state) => ({ ...state, ...patch }));
-  }
-
-  private normalizeActiveStep(step: number): number {
-    const activeStep = Math.min(Math.max(step, 0), this.steps.length - 1);
-
-    if (this.globalStore.loggedIn() && activeStep === 0) return 1;
-
-    return activeStep;
-  }
-
-  private getNextChildId(children: RegistrationChildDraft[] | undefined): number {
-    if (!children?.length) return 2;
-
-    return Math.max(...children.map((child) => child.id)) + 1;
-  }
-
-  private normalizeChildren(children: RegistrationChildDraft[] | undefined): RegistrationChildDraft[] {
-    if (!children?.length) return [createEmptyChild(1)];
-
-    return children.map((child) => ({
-      ...child,
-      allergyAnswer: child.allergyAnswer === AllergyAnswer.Yes ? AllergyAnswer.Yes : AllergyAnswer.No,
-      allergyDetails: child.allergyDetails ?? '',
-    }));
-  }
-
-  private areChildrenValid(children: RegistrationChildDraft[] | undefined): boolean {
-    const normalizedChildren = this.normalizeChildren(children);
-
-    return normalizedChildren.every((child) => {
-      const hasRequiredDetails = child.name.trim().length > 1 && child.birthDate.trim().length > 0;
-      const hasAllergyAnswer = child.allergyAnswer === AllergyAnswer.Yes || child.allergyAnswer === AllergyAnswer.No;
-      const hasAllergyDetails = child.allergyAnswer !== AllergyAnswer.Yes || child.allergyDetails.trim().length > 1;
-
-      return hasRequiredDetails && hasAllergyAnswer && hasAllergyDetails;
-    });
-  }
-
-  private getInitialActiveStep(): number {
-    if (this.savedDraftFromStorage) return this.normalizeActiveStep(this.savedDraftFromStorage.activeStep);
-    if (this.globalStore.loggedIn()) return 1;
-
-    return 0;
-  }
-
-  private createDraftStatus(updatedAtIso = new Date().toISOString()): RegistrationStatus {
-    return this.createRegistrationStatus(RegistrationStatusKind.Draft, updatedAtIso);
-  }
-
-  private createPendingReviewStatus(updatedAtIso = new Date().toISOString()): RegistrationStatus {
-    return this.createRegistrationStatus(RegistrationStatusKind.PendingReview, updatedAtIso);
-  }
-
-  private createRegistrationStatus(kind: RegistrationStatusKind, updatedAtIso: string): RegistrationStatus {
-    return {
-      kind,
-      ...REGISTRATION_STATUS_PROPERTIES[kind],
-      updatedAtIso,
-    };
-  }
-
-  private readSavedDraft(): RegistrationDraftSnapshot | null {
-    if (typeof localStorage === 'undefined') return null;
-
-    try {
-      const rawDraft = localStorage.getItem(REGISTRATION_DRAFT_STORAGE_KEY);
-
-      return rawDraft ? (JSON.parse(rawDraft) as RegistrationDraftSnapshot) : null;
-    } catch {
-      return null;
-    }
-  }
-
-  private writeSavedDraft(savedDraft: RegistrationDraftSnapshot): void {
-    if (typeof localStorage === 'undefined') return;
-
-    localStorage.setItem(REGISTRATION_DRAFT_STORAGE_KEY, JSON.stringify(savedDraft));
-  }
-
-  private clearSavedDraft(): void {
-    if (typeof localStorage === 'undefined') return;
-
-    localStorage.removeItem(REGISTRATION_DRAFT_STORAGE_KEY);
-  }
-
-  private scrollToTop(): void {
-    if (typeof window === 'undefined') return;
-
-    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'auto' }));
-  }
-}
+      patchState(store, { activeStep });
+      scrollToTop();
+    },
+    submitRegistration(): void {
+      clearSavedDraft();
+      patchState(store, {
+        activeStep: STEPS.length - 1,
+        savedDraft: null,
+        registrationStatus: createPendingReviewStatus(),
+      });
+      scrollToTop();
+    },
+  })),
+  withHooks((store) => ({
+    onInit(): void {
+      effect(() => {
+        if (store.globalStore.loggedIn() && store.activeStep() === 0) {
+          patchState(store, { activeStep: 1 });
+        }
+      });
+    },
+  })),
+);
