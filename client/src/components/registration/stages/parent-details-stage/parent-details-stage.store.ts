@@ -1,6 +1,6 @@
 import { computed, effect, inject, signal, untracked } from '@angular/core';
 import { form, validate } from '@angular/forms/signals';
-import { signalStore, withComputed, withHooks, withProps } from '@ngrx/signals';
+import { signalStore, withComputed, withHooks, withMethods, withProps } from '@ngrx/signals';
 import { ISRAELI_MOBILE_PHONE_ERROR_MESSAGE, isValidIsraeliMobilePhone } from '../../../shared/validations/phone.validation';
 import { FULL_NAME_ERROR_MESSAGE, hasMinimumTrimmedLength } from '../../../shared/validations/text.validation';
 import { RegistrationStore } from '../../registration.store';
@@ -33,22 +33,32 @@ export const ParentDetailsStageStore = signalStore(
       registrationStore,
     };
   }),
-  withComputed(({ parentForm }) => ({
-    fullNameHasError: computed(() => parentForm.fullName().touched() && parentForm.fullName().invalid()),
-    phoneHasError: computed(() => parentForm.phone().touched() && parentForm.phone().invalid()),
-    fullNameError: computed(() => (parentForm.fullName().touched() && parentForm.fullName().invalid() ? parentForm.fullName().errors()[0]?.message || FULL_NAME_ERROR_MESSAGE : '')),
-    phoneError: computed(() =>
-      parentForm.phone().touched() && parentForm.phone().invalid() ? parentForm.phone().errors()[0]?.message || ISRAELI_MOBILE_PHONE_ERROR_MESSAGE : '',
-    ),
+  withComputed(({ parentForm }) => {
+    const fullNameHasError = computed(() => parentForm.fullName().touched() && parentForm.fullName().invalid());
+    const phoneHasError = computed(() => parentForm.phone().touched() && parentForm.phone().invalid());
+    const fullNameError = computed(() => (fullNameHasError() ? parentForm.fullName().errors()[0]?.message || FULL_NAME_ERROR_MESSAGE : ''));
+    const phoneError = computed(() => (phoneHasError() ? parentForm.phone().errors()[0]?.message || ISRAELI_MOBILE_PHONE_ERROR_MESSAGE : ''));
+
+    return {
+      fullNameHasError,
+      phoneHasError,
+      fullNameError,
+      phoneError,
+    };
+  }),
+  withMethods(({ registrationStore }) => ({
+    syncParentDetails(parent: ParentDetailsFormModel): void {
+      registrationStore.setParentFullName(parent.fullName);
+      registrationStore.setParentPhone(parent.phone);
+    },
   })),
-  withHooks(({ parentModel, registrationStore }) => ({
+  withHooks(({ parentModel, syncParentDetails }) => ({
     onInit(): void {
       effect(() => {
         const parent = parentModel();
 
         untracked(() => {
-          registrationStore.setParentFullName(parent.fullName);
-          registrationStore.setParentPhone(parent.phone);
+          syncParentDetails(parent);
         });
       });
     },
