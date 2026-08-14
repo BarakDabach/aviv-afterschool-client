@@ -10,7 +10,6 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
   imports: [NgIcon, RouterLink, HlmButtonImports, HlmInputImports],
   providers: [provideIcons({ lucideArrowLeft, lucideCheck, lucideChevronLeft, lucideShieldCheck, lucideUserRound })],
   templateUrl: './parent-login.html',
-  styleUrl: './parent-login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ParentLogin {}

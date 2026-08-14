@@ -34,7 +34,6 @@ type ParentRegistration = {
     }),
   ],
   templateUrl: './my-registrations.html',
-  styleUrl: './my-registrations.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MyRegistrations {

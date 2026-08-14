@@ -1,116 +1,99 @@
-<main class="admin-screen" dir="rtl">
-  <header class="admin-top">
-    <a routerLink="/admin" class="top-action">
-      <ng-icon name="lucideChevronLeft" />
-      <span>חזרה</span>
-    </a>
-    <a routerLink="/" class="brand" aria-label="הצהרון של אביב">
-      <span>הצהרון של אביב</span>
-      <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
-    </a>
-  </header>
-
-  <section class="admin-intro">
-    <p>הגדרות</p>
-    <h1>שנת לימודים</h1>
-    <p>ניהול השנה הפעילה והמידע שמוצג להורים</p>
+<main class="relative min-h-[calc(100dvh-var(--app-sticky-header-height))] overflow-hidden bg-[radial-gradient(circle_at_50%_20%,color-mix(in_oklch,var(--surface-sage)_14%,transparent),transparent_18rem),linear-gradient(180deg,var(--background),var(--surface-warm)_76%,var(--background))] px-[var(--app-screen-padding)] pb-[13.5rem] text-foreground" dir="rtl">
+  <section class="relative z-[1] mx-auto grid w-[min(100%,var(--app-content-width))] justify-items-center gap-2 pt-6 text-center">
+    <p class="m-0 text-[length:var(--app-body-size)]">הגדרות</p>
+    <h1 class="m-0 text-[length:var(--app-page-title-size)] font-black leading-tight text-brand">שנת לימודים</h1>
+    <p class="m-0 text-[length:var(--app-body-size)]">ניהול השנה הפעילה והמידע שמוצג להורים</p>
   </section>
 
-  <section class="admin-stack">
-    <article class="family-card">
-      <div class="family-header">
-        <span class="status-chip"><ng-icon name="lucideCheck" /> פעילה</span>
-        <div class="family-copy">
-          <h2>תשפ״ז · 2026/2027</h2>
-          <p>01.09.2026 - 30.06.2027</p>
+  <section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[var(--app-section-gap)]">
+    <article class="rounded-[var(--app-card-radius)] border border-border bg-card/80 px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)]">
+      <div class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[var(--app-card-gap)]">
+        <span class="inline-flex min-h-[var(--app-chip-height)] items-center gap-1 rounded-full bg-surface-sage/70 px-2.5 text-[length:var(--app-muted-size)] font-bold text-brand"><ng-icon name="lucideCheck" /> פעילה</span>
+        <div>
+          <h2 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-brand">תשפ״ז · 2026/2027</h2>
+          <p class="mt-1 mb-0 text-[length:var(--app-body-size)]">01.09.2026 - 30.06.2027</p>
         </div>
         <span></span>
       </div>
     </article>
 
-    <section class="settings-card">
-      <article class="settings-row">
-        <span class="switch" aria-hidden="true"></span>
-        <div class="settings-copy">
-          <h3>הרשמה פתוחה</h3>
-          <p>אפשר הרשמה חדשה לשנה זו</p>
-        </div>
+    <section class="grid rounded-[var(--app-card-radius)] border border-border bg-card/80 px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)]">
+      <article class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[var(--app-card-gap)] border-b border-border py-3">
+        <span class="relative h-6 w-11 justify-self-start rounded-full bg-brand shadow-inner after:absolute after:m-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:content-['']"></span>
+        <div><h3 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-foreground">הרשמה פתוחה</h3><p class="mt-1 mb-0 text-[length:var(--app-body-size)]">אפשר הרשמה חדשה לשנה זו</p></div>
         <span></span>
       </article>
-      <article class="settings-row">
-        <span class="switch" aria-hidden="true"></span>
-        <div class="settings-copy">
-          <h3>עמוד מידע גלוי להורים</h3>
-          <p>המידע על השנה מוצג באתר ההרשמה</p>
-        </div>
+      <article class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[var(--app-card-gap)] border-b border-border py-3">
+        <span class="relative h-6 w-11 justify-self-start rounded-full bg-brand shadow-inner after:absolute after:m-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:content-['']"></span>
+        <div><h3 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-foreground">עמוד מידע גלוי להורים</h3><p class="mt-1 mb-0 text-[length:var(--app-body-size)]">המידע על השנה מוצג באתר ההרשמה</p></div>
         <span></span>
       </article>
-      <article class="settings-row">
-        <div class="inline-control"><ng-icon name="lucidePlus" /> 30 ילדים <ng-icon name="lucideMinus" /></div>
-        <div class="settings-copy">
-          <h3>תפוסה מרבית</h3>
-          <p>מספר הילדים המרבי בשנה זו</p>
-        </div>
+      <article class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[var(--app-card-gap)] border-b border-border py-3">
+        <div class="inline-flex min-h-9 min-w-32 items-center justify-center gap-2 rounded-[var(--app-control-radius)] border border-border bg-background/80 px-3 text-center text-[length:var(--app-body-size)]"><ng-icon name="lucidePlus" /> 30 ילדים <ng-icon name="lucideMinus" /></div>
+        <div><h3 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-foreground">תפוסה מרבית</h3><p class="mt-1 mb-0 text-[length:var(--app-body-size)]">מספר הילדים המרבי בשנה זו</p></div>
         <span></span>
       </article>
-      <article class="settings-row">
-        <div class="inline-control">200 ₪ לכל ילד</div>
-        <div class="settings-copy">
-          <h3>ביטוח שנתי</h3>
-          <p>סכום הביטוח השנתי לכל ילד</p>
-        </div>
+      <article class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[var(--app-card-gap)] py-3">
+        <div class="inline-flex min-h-9 min-w-32 items-center justify-center rounded-[var(--app-control-radius)] border border-border bg-background/80 px-3 text-center text-[length:var(--app-body-size)]">200 ₪ לכל ילד</div>
+        <div><h3 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-foreground">ביטוח שנתי</h3><p class="mt-1 mb-0 text-[length:var(--app-body-size)]">סכום הביטוח השנתי לכל ילד</p></div>
         <span></span>
       </article>
     </section>
 
-    <h2 class="section-title with-leaf">מסלולים</h2>
-    <article class="plan-card">
-      <div class="plan-row">
-        <div class="plan-copy">
-          <h3>מסלול מלא</h3>
-          <p>א׳-ה׳ · עד 16:30</p>
-          <span class="tag"><ng-icon name="lucideCheck" /> זמין לבחירה</span>
+    <h2 class="m-0 inline-flex items-center gap-2 justify-self-end text-[length:var(--app-section-title-size)] font-[850] text-brand">
+      <span>מסלולים</span>
+      <img class="h-3 w-7 object-contain opacity-75" src="/assets/section-leaf-divider.png" alt="" aria-hidden="true" />
+    </h2>
+    <article class="rounded-[var(--app-card-radius)] border border-border bg-card/80 px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)]">
+      <div class="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-[var(--app-card-gap)]">
+        <div>
+          <h3 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-brand">מסלול מלא</h3>
+          <p class="mt-1 mb-0 text-[length:var(--app-body-size)]">א׳-ה׳ · עד 16:30</p>
+          <span class="mt-3 inline-flex min-h-[var(--app-chip-height)] items-center gap-1 rounded-full bg-surface-sage/70 px-2.5 text-[length:var(--app-muted-size)] font-bold text-brand"><ng-icon name="lucideCheck" /> זמין לבחירה</span>
         </div>
-        <div class="plan-price"><strong>₪1,450</strong><small>לחודש</small></div>
-        <a class="link-action" href="#"><ng-icon name="lucidePencil" /> עריכה</a>
+        <div><strong class="block text-lg text-foreground">₪1,450</strong><small class="text-[length:var(--app-muted-size)]">לחודש</small></div>
+        <a class="inline-flex items-center gap-1 text-[0.82rem] font-semibold text-brand underline-offset-4" href="#"><ng-icon name="lucidePencil" /> עריכה</a>
       </div>
     </article>
-    <article class="plan-card">
-      <div class="plan-row">
-        <div class="plan-copy">
-          <h3>שלושה ימים</h3>
-          <p>ימים לבחירה · עד 16:30</p>
-          <span class="tag"><ng-icon name="lucideCheck" /> זמין לבחירה</span>
+    <article class="rounded-[var(--app-card-radius)] border border-border bg-card/80 px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)]">
+      <div class="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-[var(--app-card-gap)]">
+        <div>
+          <h3 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-brand">שלושה ימים</h3>
+          <p class="mt-1 mb-0 text-[length:var(--app-body-size)]">ימים לבחירה · עד 16:30</p>
+          <span class="mt-3 inline-flex min-h-[var(--app-chip-height)] items-center gap-1 rounded-full bg-surface-sage/70 px-2.5 text-[length:var(--app-muted-size)] font-bold text-brand"><ng-icon name="lucideCheck" /> זמין לבחירה</span>
         </div>
-        <div class="plan-price"><strong>₪1,050</strong><small>לחודש</small></div>
-        <a class="link-action" href="#"><ng-icon name="lucidePencil" /> עריכה</a>
+        <div><strong class="block text-lg text-foreground">₪1,050</strong><small class="text-[length:var(--app-muted-size)]">לחודש</small></div>
+        <a class="inline-flex items-center gap-1 text-[0.82rem] font-semibold text-brand underline-offset-4" href="#"><ng-icon name="lucidePencil" /> עריכה</a>
       </div>
     </article>
-    <button hlmBtn variant="outline" class="outline-action" type="button"><ng-icon name="lucidePlus" /> הוספת מסלול</button>
+    <button hlmBtn variant="outline" class="h-[var(--app-button-height)] rounded-[var(--app-control-radius)] border-brand text-[length:var(--app-button-size)] font-bold text-brand" type="button"><ng-icon name="lucidePlus" /> הוספת מסלול</button>
 
-    <h2 class="section-title with-leaf">תוכן להורים</h2>
-    <section class="settings-card">
-      <article class="settings-row">
+    <h2 class="m-0 inline-flex items-center gap-2 justify-self-end text-[length:var(--app-section-title-size)] font-[850] text-brand">
+      <span>תוכן להורים</span>
+      <img class="h-3 w-7 object-contain opacity-75" src="/assets/section-leaf-divider.png" alt="" aria-hidden="true" />
+    </h2>
+    <section class="grid rounded-[var(--app-card-radius)] border border-border bg-card/80 px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)]">
+      <article class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[var(--app-card-gap)] border-b border-border py-3">
         <ng-icon name="lucideFileText" />
-        <div class="settings-copy"><h3>נהלים והנחיות</h3></div>
-        <a class="link-action" href="#">עריכה <ng-icon name="lucideChevronLeft" /></a>
+        <div><h3 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-foreground">נהלים והנחיות</h3></div>
+        <a class="inline-flex items-center gap-1 text-[0.82rem] font-semibold text-brand underline-offset-4" href="#">עריכה <ng-icon name="lucideChevronLeft" /></a>
       </article>
-      <article class="settings-row">
+      <article class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[var(--app-card-gap)] py-3">
         <ng-icon name="lucideCheck" />
-        <div class="settings-copy"><h3>חוזה וגרסאות</h3></div>
-        <a class="link-action" href="#">ניהול <ng-icon name="lucideChevronLeft" /></a>
+        <div><h3 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-foreground">חוזה וגרסאות</h3></div>
+        <a class="inline-flex items-center gap-1 text-[0.82rem] font-semibold text-brand underline-offset-4" href="#">ניהול <ng-icon name="lucideChevronLeft" /></a>
       </article>
     </section>
 
-    <button hlmBtn class="primary-action" type="button"><ng-icon name="lucideSave" /> שמירת שינויים</button>
-    <a class="link-action" href="#">העתקה משנה קודמת</a>
+    <button hlmBtn class="h-[var(--app-button-height)] rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/95 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground" type="button"><ng-icon name="lucideSave" /> שמירת שינויים</button>
+    <a class="text-[0.82rem] font-semibold text-brand underline-offset-4" href="#">העתקה משנה קודמת</a>
   </section>
 
-  <nav class="admin-bottom-nav" aria-label="ניווט ניהול">
-    <a routerLink="/admin/settings" class="active"><ng-icon name="lucideSettings" /><span>הגדרות</span></a>
-    <a routerLink="/admin/family"><ng-icon name="lucideUserRound" /><span>ילדים</span></a>
-    <a routerLink="/admin"><ng-icon name="lucideListChecks" /><span>הרשמות</span></a>
+  <nav class="fixed bottom-4 left-[max(1rem,calc((100vw-var(--app-content-width))/2))] right-[max(1rem,calc((100vw-var(--app-content-width))/2))] z-10 grid min-h-[4.75rem] grid-cols-3 rounded-[2rem] bg-background/90 shadow-xl shadow-foreground/15" aria-label="ניווט ניהול">
+    <a class="relative grid place-items-center gap-1 text-[length:var(--app-muted-size)] font-[850] text-brand no-underline after:absolute after:bottom-1.5 after:left-[26%] after:right-[26%] after:h-1 after:rounded-full after:bg-brand" routerLink="/admin/settings"><ng-icon name="lucideSettings" /><span>הגדרות</span></a>
+    <a class="relative grid place-items-center gap-1 text-[length:var(--app-muted-size)] text-foreground/70 no-underline" routerLink="/admin/family"><ng-icon name="lucideUserRound" /><span>ילדים</span></a>
+    <a class="relative grid place-items-center gap-1 text-[length:var(--app-muted-size)] text-foreground/70 no-underline" routerLink="/admin"><ng-icon name="lucideListChecks" /><span>הרשמות</span></a>
   </nav>
 
-  <img class="admin-foliage" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+  <img class="absolute inset-x-0 bottom-0 z-0 h-48 w-full object-cover object-bottom" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
 </main>

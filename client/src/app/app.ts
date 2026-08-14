@@ -7,7 +7,6 @@ import { AppHeader, AppHeaderVariant } from '../components/shared/app-header/app
   selector: 'app-root',
   imports: [RouterOutlet, AppHeader],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
 })
 export class App {
   private readonly router = inject(Router);
@@ -24,14 +23,14 @@ export class App {
     const path = this.currentPath();
     if (path === '/') return 'התחברות';
     if (path === '/my-registrations') return 'יציאה';
-    return 'חזרה';
+    return '';
   });
 
   protected readonly headerActionRoute = computed(() => {
     const path = this.currentPath();
     if (path === '/') return '/parent-login';
     if (path === '/my-registrations') return '/';
-    return '/';
+    return '';
   });
 
   constructor() {

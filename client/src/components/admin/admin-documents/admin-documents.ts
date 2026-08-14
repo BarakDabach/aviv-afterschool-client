@@ -33,7 +33,6 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
     }),
   ],
   templateUrl: './admin-documents.html',
-  styleUrl: '../admin-shared.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminDocuments {}

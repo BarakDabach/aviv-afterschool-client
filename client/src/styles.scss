@@ -1,5 +1,6 @@
 @import 'tailwindcss' source('.');
-@source '../libs/ui';
+@source './**/*.{html,ts}';
+@source '../libs/ui/**/*.{html,ts}';
 
 @import '@spartan-ng/brain/hlm-tailwind-preset.css';
 
@@ -44,20 +45,33 @@
   --surface-sage: oklch(0.91 0.046 118);
   --app-content-width: 35rem;
   --app-header-width: 35rem;
+  --app-screen-padding: 2.25rem;
   --app-card-radius: 0.72rem;
   --app-control-radius: 0.7rem;
-  --app-page-title-size: clamp(1.38rem, 4.1vw, 1.82rem);
-  --app-section-title-size: 0.96rem;
-  --app-card-title-size: 0.95rem;
-  --app-body-size: 0.78rem;
-  --app-muted-size: 0.72rem;
-  --app-button-size: 0.88rem;
-  --app-button-height: 2.8rem;
-  --app-field-height: 2.75rem;
-  --app-section-gap: 1.18rem;
-  --app-section-margin: 1.55rem;
-  --app-between-section-margin: 2.15rem;
-  --app-card-min-height: 5.35rem;
+  --app-page-title-size: clamp(1.26rem, 3.35vw, 1.62rem);
+  --app-section-title-size: 0.9rem;
+  --app-card-title-size: 0.88rem;
+  --app-body-size: 0.74rem;
+  --app-muted-size: 0.66rem;
+  --app-button-size: 0.82rem;
+  --app-button-height: 2.48rem;
+  --app-field-height: 2.42rem;
+  --app-section-gap: 1rem;
+  --app-section-margin: 1.3rem;
+  --app-between-section-margin: 1.85rem;
+  --app-card-min-height: 4.45rem;
+  --app-sticky-header-height: 4.35rem;
+  --app-card-padding-y: 0.64rem;
+  --app-card-padding-x: 0.76rem;
+  --app-card-gap: 0.62rem;
+  --app-chip-height: 1.42rem;
+  --app-secondary-button-height: 2.05rem;
+  --app-selection-size: 1.38rem;
+  --app-icon-xs: 0.72rem;
+  --app-icon-sm: 0.95rem;
+  --app-icon-md: 1.15rem;
+  --app-icon-lg: 1.85rem;
+  --app-icon-xl: 2.25rem;
 }
 
 :root.dark {
@@ -99,6 +113,37 @@
   --surface-sage: oklch(0.32 0.052 142);
 }
 
+@media (max-width: 540px) {
+  :root {
+    --app-screen-padding: 1.05rem;
+    --app-card-radius: 0.62rem;
+    --app-control-radius: 0.58rem;
+    --app-page-title-size: clamp(1.2rem, 5.5vw, 1.62rem);
+    --app-section-title-size: 0.9rem;
+    --app-card-title-size: 0.86rem;
+    --app-body-size: 0.72rem;
+    --app-muted-size: 0.64rem;
+    --app-button-size: 0.82rem;
+    --app-button-height: 2.42rem;
+    --app-field-height: 2.38rem;
+    --app-section-gap: 0.9rem;
+    --app-section-margin: 1.15rem;
+    --app-between-section-margin: 1.65rem;
+    --app-card-min-height: 4rem;
+    --app-card-padding-y: 0.62rem;
+    --app-card-padding-x: 0.72rem;
+    --app-card-gap: 0.58rem;
+    --app-chip-height: 1.42rem;
+    --app-secondary-button-height: 2.05rem;
+    --app-selection-size: 1.35rem;
+    --app-icon-xs: 0.72rem;
+    --app-icon-sm: 0.95rem;
+    --app-icon-md: 1.15rem;
+    --app-icon-lg: 1.85rem;
+    --app-icon-xl: 2.25rem;
+  }
+}
+
 @theme inline {
   --font-sans: var(--font-sans);
   --color-brand: var(--brand);
@@ -129,5 +174,32 @@
     font-family: var(--font-sans);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  @media (max-width: 540px) {
+    button[data-slot='button']:not(.admin-menu-button):not(.drawer-close):not(.progress-dot):not(.icon-action):not(.save-action):not(.link-action):not(.link-child):not(.continue-action):not(.status-action),
+    a[data-slot='button']:not(.admin-menu-button):not(.drawer-close):not(.progress-dot):not(.icon-action):not(.save-action):not(.link-action):not(.link-child):not(.continue-action):not(.status-action) {
+      min-height: var(--app-button-height);
+      border-radius: var(--app-control-radius);
+      font-size: var(--app-button-size);
+    }
+
+    input[data-slot='input'] {
+      min-height: var(--app-field-height);
+      border-radius: var(--app-control-radius);
+      font-size: var(--app-body-size);
+    }
+
+    [data-slot='radio-group-item'],
+    [data-slot='accordion-trigger'] {
+      font-size: var(--app-body-size);
+    }
+
+    [data-slot='checkbox'] brn-checkbox {
+      width: var(--app-icon-sm);
+      height: var(--app-icon-sm);
+    }
   }
 }

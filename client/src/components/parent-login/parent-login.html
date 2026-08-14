@@ -1,54 +1,58 @@
-<main class="parent-login-screen" dir="rtl">
-  <header class="parent-login-top">
-    <a routerLink="/" class="back-link">
-      <ng-icon name="lucideChevronLeft" />
-      <span>חזרה</span>
-    </a>
-    <a routerLink="/" class="brand" aria-label="הצהרון של אביב">
-      <span>הצהרון של אביב</span>
-      <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
-    </a>
-  </header>
-
-  <section class="login-content">
-    <section class="login-intro">
-      <h1>ההרשמה שלי</h1>
-      <p>הזינו את מספר הטלפון ששימש להרשמה ונאתר עבורכם את התהליך.</p>
+<main
+  class="relative grid min-h-[calc(100dvh-var(--app-sticky-header-height))] grid-rows-[minmax(0,1fr)] overflow-hidden bg-[radial-gradient(circle_at_50%_20%,color-mix(in_oklch,var(--surface-sage)_15%,transparent),transparent_18rem),linear-gradient(180deg,var(--background),var(--surface-warm)_74%,var(--background))] px-[var(--app-screen-padding)] pb-[18rem] text-foreground max-[540px]:pb-[18.6rem]"
+  dir="rtl"
+>
+  <section class="relative z-[1] mx-auto flex w-[min(100%,var(--app-content-width))] flex-col justify-center self-stretch py-8 max-[540px]:py-5">
+    <section class="grid justify-items-center gap-2 text-center">
+      <h1 class="m-0 text-[length:var(--app-page-title-size)] font-black leading-[1.1] text-brand">ההרשמה שלי</h1>
+      <p class="m-0 max-w-96 text-[clamp(var(--app-body-size),1.8vw,0.9rem)] leading-relaxed text-foreground">
+        הזינו את מספר הטלפון ששימש להרשמה ונאתר עבורכם את התהליך.
+      </p>
     </section>
 
-    <article class="info-card identity-note">
-      <span class="note-icon">
-        <ng-icon name="lucideUserRound" />
+    <article class="mt-7 grid min-h-[4.35rem] grid-cols-[auto_minmax(0,1fr)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] bg-[radial-gradient(circle_at_18%_35%,color-mix(in_oklch,white_55%,transparent),transparent_9rem),color-mix(in_oklch,var(--surface-sage)_22%,var(--card))] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] max-[540px]:mt-6 max-[540px]:min-h-[4.05rem]">
+      <span class="grid h-[var(--app-icon-xl)] w-[var(--app-icon-xl)] place-items-center rounded-lg border-2 border-brand text-brand">
+        <ng-icon name="lucideUserRound" class="h-[var(--app-icon-md)] w-[var(--app-icon-md)]" />
       </span>
       <div>
-        <h2>אין צורך בסיסמה</h2>
-        <p>מספר הטלפון הוא אמצעי הזיהוי שלכם במערכת.</p>
+        <h2 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-brand">אין צורך בסיסמה</h2>
+        <p class="mt-1.5 mb-0 text-[length:var(--app-body-size)] leading-relaxed text-foreground">מספר הטלפון הוא אמצעי הזיהוי שלכם במערכת.</p>
       </div>
     </article>
 
-    <section class="lookup-form" aria-label="איתור הרשמה">
-      <label class="phone-field">
+    <section class="mt-8 grid justify-items-center gap-4 text-center" aria-label="איתור הרשמה">
+      <label class="grid w-full gap-2 text-end text-[length:var(--app-card-title-size)] font-[850] text-brand">
         <span>מספר טלפון נייד</span>
-        <input hlmInput inputmode="tel" placeholder="05X-XXX-XXXX" aria-label="מספר טלפון נייד" />
+        <input
+          hlmInput
+          class="h-[var(--app-field-height)] w-full rounded-[var(--app-control-radius)] border-[1.5px] border-brand bg-background/80 text-center text-[length:var(--app-body-size)] font-medium text-foreground placeholder:text-foreground/40"
+          inputmode="tel"
+          placeholder="05X-XXX-XXXX"
+          aria-label="מספר טלפון נייד"
+        />
       </label>
 
-      <p>נשלח אתכם ישירות לסטטוס ההרשמה או להמשך התהליך.</p>
+      <p class="m-0 text-[length:var(--app-body-size)] leading-relaxed text-foreground">נשלח אתכם ישירות לסטטוס ההרשמה או להמשך התהליך.</p>
 
-      <a hlmBtn class="primary-action" routerLink="/my-registrations">
+      <a
+        hlmBtn
+        class="mt-3 h-[var(--app-button-height)] w-[min(100%,24rem)] gap-2 rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/95 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20"
+        routerLink="/my-registrations"
+      >
         <span>איתור ההרשמה</span>
         <ng-icon name="lucideArrowLeft" />
       </a>
 
-      <a class="new-registration-link" routerLink="/registration">התחלת הרשמה חדשה</a>
+      <a class="text-[0.82rem] font-medium text-brand underline-offset-4" routerLink="/registration">התחלת הרשמה חדשה</a>
     </section>
 
-    <article class="info-card privacy-note">
-      <span class="shield-icon">
-        <ng-icon name="lucideShieldCheck" />
+    <article class="mt-8 grid min-h-16 grid-cols-[auto_minmax(0,1fr)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] bg-[radial-gradient(circle_at_18%_35%,color-mix(in_oklch,white_55%,transparent),transparent_9rem),color-mix(in_oklch,var(--surface-sage)_22%,var(--card))] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] text-[length:var(--app-body-size)] leading-relaxed text-foreground">
+      <span class="text-brand">
+        <ng-icon name="lucideShieldCheck" class="h-[var(--app-icon-lg)] w-[var(--app-icon-lg)]" />
       </span>
-      <p>המידע מוצג רק לפי מספר הטלפון שהוזן בהרשמה.</p>
+      <p class="m-0">המידע מוצג רק לפי מספר הטלפון שהוזן בהרשמה.</p>
     </article>
   </section>
 
-  <img class="parent-login-foliage" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+  <img class="absolute inset-x-0 bottom-0 z-0 h-[18.2rem] w-full object-cover object-bottom max-[540px]:h-[19.8rem]" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
 </main>

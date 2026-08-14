@@ -1,35 +1,29 @@
-<main class="landing-shell">
-  <nav class="top-bar" aria-label="ניווט ראשי">
-    <a class="brand" href="#" aria-label="הצהרון של אביב">
-      <span class="brand-mark">
-        <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
-      </span>
-      <span>הצהרון של אביב</span>
-    </a>
-
-    <a class="my-registration" routerLink="/parent-login">
-      <ng-icon name="lucideUser" />
-      <span>ההרשמה שלי</span>
-    </a>
-  </nav>
-
-  <section class="hero">
-    <div class="hero-copy">
-      <h1>מקום חם לגדול בו גם אחרי הגן</h1>
-      <p>
-        אנחנו כאן כדי להעניק לילדים סביבה בטוחה, חמה ומעשירה - עם יחס אישי,
-        פעילויות מגוונות וזמן איכות בכל יום.
+<main
+  class="min-h-[calc(100dvh-var(--app-sticky-header-height))] overflow-hidden bg-[radial-gradient(circle_at_78%_11%,color-mix(in_oklch,var(--surface-sage)_48%,transparent),transparent_20rem),linear-gradient(180deg,var(--background),var(--surface-warm)_72%,var(--background))] px-[clamp(1rem,3vw,2rem)] text-foreground"
+>
+  <section
+    class="relative mx-auto grid w-[min(100%_-_2rem,70rem)] grid-cols-[minmax(23rem,1.08fr)_minmax(20rem,0.92fr)] items-center gap-4 py-[clamp(2.5rem,7vw,5rem)_2.5rem] [direction:rtl] max-[760px]:w-[min(100%_-_1.5rem,43rem)] max-[760px]:grid-cols-1 max-[760px]:pt-8"
+  >
+    <div class="relative z-[1] col-start-2 row-start-1 max-w-[34rem] max-[760px]:col-start-1 max-[760px]:row-auto max-[760px]:order-2 max-[760px]:max-w-none">
+      <h1 class="m-0 text-[clamp(2rem,4vw,3.2rem)] font-black leading-[1.1] text-brand">מקום חם לגדול בו גם אחרי הגן</h1>
+      <p class="mt-5 max-w-[31rem] text-[clamp(0.92rem,1.35vw,1.1rem)] font-medium leading-[1.68] text-foreground/80">
+        אנחנו כאן כדי להעניק לילדים סביבה בטוחה, חמה ומעשירה - עם יחס אישי, פעילויות מגוונות וזמן איכות בכל יום.
       </p>
 
-      <a hlmBtn size="lg" class="primary-cta" href="#plans">
+      <a
+        hlmBtn
+        size="lg"
+        class="mx-auto mt-7 flex h-[var(--app-button-height)] min-w-[min(100%,18rem)] w-fit rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/90 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20 max-[760px]:min-w-[min(100%,17rem)]"
+        href="#plans"
+      >
         <span>בחירת מסלול והרשמה</span>
         <ng-icon name="lucideArrowLeft" data-icon="inline-end" />
       </a>
 
-      <div class="hero-facts" aria-label="פרטי השנה">
+      <div class="mt-7 grid max-w-[28rem] grid-cols-3" aria-label="פרטי השנה">
         @for (fact of heroFacts; track fact.label) {
-          <div class="fact">
-            <span class="fact-icon">
+          <div class="grid justify-items-center gap-1.5 border-s border-border px-3 text-center text-[0.84rem] text-foreground first:border-s-0">
+            <span class="grid h-9 w-9 place-items-center rounded-full bg-surface-sage/70 text-brand">
               <ng-icon [name]="fact.icon" />
             </span>
             <span>{{ fact.label }}</span>
@@ -39,103 +33,124 @@
     </div>
 
     <img
-      class="hero-art"
+      class="col-start-1 row-start-1 w-[min(112%,53rem)] justify-self-end rounded-[2rem] opacity-[0.98] mix-blend-multiply drop-shadow-xl [filter:saturate(0.98)_drop-shadow(0_1.25rem_1.5rem_color-mix(in_oklch,var(--brand)_8%,transparent))] [mask-composite:intersect] [mask-image:linear-gradient(90deg,transparent_0%,#000_10%,#000_88%,transparent_100%),linear-gradient(180deg,transparent_0%,#000_10%,#000_88%,transparent_100%)] max-[760px]:col-start-1 max-[760px]:row-auto max-[760px]:order-1 max-[760px]:mt-[-1rem] max-[760px]:w-full max-[760px]:justify-self-center"
       src="/assets/landing-hero-garden.png"
       alt="איור חמים של פינת גן עם בית משחק, צמחים וקוביות"
     />
   </section>
 
-  <section class="section-block">
-    <h2 class="section-title">אחר הצהריים עם לב</h2>
-    <div class="benefits">
+  <section class="mx-auto w-[min(100%_-_2rem,70rem)] py-[clamp(2.2rem,6vw,3.75rem)] text-center max-[760px]:w-[min(100%_-_1.5rem,43rem)]">
+    <h2 class="inline-flex items-center justify-center gap-4 text-[clamp(1.25rem,2.25vw,1.7rem)] font-black leading-tight text-brand max-[760px]:gap-2">
+      <img class="h-4 w-12 scale-x-[-1] object-contain opacity-85 max-[760px]:w-7" src="/assets/section-leaf-divider.png" alt="" aria-hidden="true" />
+      <span>אחר הצהריים עם לב</span>
+      <img class="h-4 w-12 object-contain opacity-85 max-[760px]:w-7" src="/assets/section-leaf-divider.png" alt="" aria-hidden="true" />
+    </h2>
+    <div class="mt-8 grid grid-cols-3 gap-[clamp(1rem,4vw,4rem)] max-[760px]:grid-cols-1">
       @for (benefit of benefits; track benefit.title) {
-        <article class="benefit">
-          <ng-icon [name]="benefit.icon" />
-          <h3>{{ benefit.title }}</h3>
-          <p>{{ benefit.description }}</p>
+        <article class="grid justify-items-center gap-2">
+          <ng-icon [name]="benefit.icon" class="text-[2.45rem] text-brand/80" />
+          <h3 class="m-0 max-w-48 text-base font-extrabold leading-tight text-foreground">{{ benefit.title }}</h3>
+          <p class="m-0 text-sm leading-relaxed text-foreground/70">{{ benefit.description }}</p>
         </article>
       }
     </div>
-    <p class="center-copy">אנחנו רואים בכל ילד עולם ומלואו - ומלווים אותו במסירות ובאהבה בכל יום.</p>
+    <p class="mt-5 text-sm leading-relaxed text-foreground/70">אנחנו רואים בכל ילד עולם ומלואו - ומלווים אותו במסירות ובאהבה בכל יום.</p>
   </section>
 
-  <section id="plans" class="section-block plans-section">
-    <h2 class="section-title">המסלולים שלנו</h2>
-    <div class="plans" aria-label="מסלולים זמינים">
+  <section id="plans" class="mx-auto max-w-[58rem] py-[clamp(2.2rem,6vw,3.75rem)] text-center">
+    <h2 class="inline-flex items-center justify-center gap-4 text-[clamp(1.25rem,2.25vw,1.7rem)] font-black leading-tight text-brand max-[760px]:gap-2">
+      <img class="h-4 w-12 scale-x-[-1] object-contain opacity-85 max-[760px]:w-7" src="/assets/section-leaf-divider.png" alt="" aria-hidden="true" />
+      <span>המסלולים שלנו</span>
+      <img class="h-4 w-12 object-contain opacity-85 max-[760px]:w-7" src="/assets/section-leaf-divider.png" alt="" aria-hidden="true" />
+    </h2>
+    <div class="mx-auto mt-7 grid w-[min(100%,46rem)] gap-4" aria-label="מסלולים זמינים">
       @for (plan of plans; track plan.name) {
-        <article class="plan">
-          <span class="plan-info">
-            <strong>{{ plan.name }}</strong>
-            <small>{{ plan.description }}</small>
+        <article class="grid min-h-[4.35rem] grid-cols-[1fr_auto] items-center gap-4 rounded-[var(--app-control-radius)] border border-border bg-card/80 p-4 text-start text-foreground max-[760px]:grid-cols-1">
+          <span class="grid gap-1">
+            <strong class="text-[clamp(0.95rem,1.7vw,1.2rem)] text-brand">{{ plan.name }}</strong>
+            <small class="text-[0.82rem] text-foreground/70">{{ plan.description }}</small>
           </span>
-          <span class="price">
-            <strong>{{ plan.price }}</strong>
-            <small>לחודש</small>
+          <span class="grid gap-1 text-start max-[760px]:col-start-2">
+            <strong class="text-[clamp(1.08rem,1.85vw,1.35rem)]">{{ plan.price }}</strong>
+            <small class="text-[0.82rem] text-foreground/70">לחודש</small>
           </span>
         </article>
       }
     </div>
 
-    <p class="insurance-note">תשלום ביטוח שנתי חד-פעמי: 200 ₪</p>
+    <p class="mt-6 text-[0.82rem] text-foreground/70">תשלום ביטוח שנתי חד-פעמי: 200 ₪</p>
 
-      <a hlmBtn size="lg" class="primary-cta mid-cta" routerLink="/registration">
+    <a
+      hlmBtn
+      size="lg"
+      class="mx-auto mt-7 h-[var(--app-button-height)] min-w-[min(100%,22rem)] rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/90 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20"
+      routerLink="/registration"
+    >
       <span>בחירה והתחלת הרשמה</span>
       <ng-icon name="lucideArrowLeft" data-icon="inline-end" />
     </a>
   </section>
 
-  <section id="register" class="section-block steps-section">
-    <h2 class="section-title">נרשמים בכמה צעדים פשוטים</h2>
-    <ol class="steps">
+  <section id="register" class="mx-auto w-[min(100%_-_2rem,70rem)] py-[clamp(2.2rem,6vw,3.75rem)] text-center max-[760px]:w-[min(100%_-_1.5rem,43rem)]">
+    <h2 class="inline-flex items-center justify-center gap-4 text-[clamp(1.25rem,2.25vw,1.7rem)] font-black leading-tight text-brand max-[760px]:gap-2">
+      <img class="h-4 w-12 scale-x-[-1] object-contain opacity-85 max-[760px]:w-7" src="/assets/section-leaf-divider.png" alt="" aria-hidden="true" />
+      <span>נרשמים בכמה צעדים פשוטים</span>
+      <img class="h-4 w-12 object-contain opacity-85 max-[760px]:w-7" src="/assets/section-leaf-divider.png" alt="" aria-hidden="true" />
+    </h2>
+    <ol class="mx-auto mt-7 grid w-fit list-none gap-4 p-0 text-start">
       @for (step of steps; track step; let index = $index) {
-        <li>
-          <span>{{ index + 1 }}</span>
+        <li class="grid grid-cols-[2.1rem_1fr] items-center gap-3 text-[clamp(1rem,1.9vw,1.22rem)]">
+          <span class="grid h-7 w-7 place-items-center rounded-full bg-surface-sage font-black text-brand">{{ index + 1 }}</span>
           <strong>{{ step }}</strong>
         </li>
       }
     </ol>
-    <p class="center-copy">את סטטוס ההרשמה תוכלו לראות בכל שלב באפליקציה.</p>
+    <p class="mt-5 text-sm leading-relaxed text-foreground/70">את סטטוס ההרשמה תוכלו לראות בכל שלב באפליקציה.</p>
   </section>
 
-  <section class="accordion-section">
-    <hlm-accordion type="single">
+  <section class="mx-auto w-[min(100%_-_2rem,54rem)] py-4 pb-8 max-[760px]:w-[min(100%_-_1.5rem,43rem)]">
+    <hlm-accordion type="single" class="border-border border-x-0 bg-transparent">
       @for (question of questions; track question.title) {
         <hlm-accordion-item [isOpened]="openedQuestionIndex === $index" (openedChange)="setQuestionOpen($index, $event)">
-          <hlm-accordion-trigger [triggerClass]="'accordion-trigger'">
+          <hlm-accordion-trigger [triggerClass]="'w-full min-h-14 px-0 text-foreground text-base no-underline [&>span]:flex-1 [&>span]:text-start [&_[data-slot=accordion-trigger-icon]]:hidden'">
             <span>{{ question.title }}</span>
-            <ng-icon class="accordion-row-icon" name="lucideChevronLeft" />
+            <ng-icon class="h-4 w-4 shrink-0 text-foreground transition-transform" name="lucideChevronLeft" />
           </hlm-accordion-trigger>
           <hlm-accordion-content>
-            <p>{{ question.content }}</p>
+            <p class="m-0 pb-4 text-start text-sm leading-relaxed text-foreground/75">{{ question.content }}</p>
           </hlm-accordion-content>
         </hlm-accordion-item>
       }
     </hlm-accordion>
   </section>
 
-  <section class="final-cta">
-    <img src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
-    <div class="final-cta-content">
-      <h2>מוכנים להצטרף אלינו?</h2>
-      <a hlmBtn size="lg" class="primary-cta" routerLink="/registration">
+  <section class="relative mt-4 grid min-h-[21rem] w-[calc(100%_+_2_*_clamp(1rem,3vw,2rem))] place-items-center overflow-hidden text-center [margin-inline:calc(-1_*_clamp(1rem,3vw,2rem))]">
+    <img class="absolute inset-x-0 bottom-0 z-0 h-full w-full object-cover" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+    <div class="relative z-[1] grid justify-items-center">
+      <h2 class="inline-flex items-center justify-center gap-4 text-[clamp(1.55rem,3.1vw,2.1rem)] font-black leading-tight text-brand max-[760px]:gap-2">
+        <img class="h-4 w-12 scale-x-[-1] object-contain opacity-85 max-[760px]:w-7" src="/assets/section-leaf-divider.png" alt="" aria-hidden="true" />
+        <span>מוכנים להצטרף אלינו?</span>
+        <img class="h-4 w-12 object-contain opacity-85 max-[760px]:w-7" src="/assets/section-leaf-divider.png" alt="" aria-hidden="true" />
+      </h2>
+      <a hlmBtn size="lg" class="mt-7 h-[var(--app-button-height)] min-w-[min(100%,18rem)] rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/90 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20" routerLink="/registration">
         <span>להתחלת הרשמה</span>
         <ng-icon name="lucideArrowLeft" data-icon="inline-end" />
       </a>
-      <a class="existing-link" routerLink="/parent-login">כבר התחלתי הרשמה</a>
+      <a class="mt-4 text-sm font-bold text-foreground underline-offset-4" routerLink="/parent-login">כבר התחלתי הרשמה</a>
     </div>
   </section>
 
-  <footer class="footer">
-    <a class="footer-brand" href="#">
-      <span class="brand-mark small">
-        <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+  <footer class="mx-auto grid w-[min(100%_-_2rem,70rem)] justify-items-center gap-3 py-7 pb-9 max-[760px]:w-[min(100%_-_1.5rem,43rem)]">
+    <a class="inline-flex items-center gap-2 text-brand no-underline font-[850]" href="#">
+      <span class="inline-flex h-7 w-9 items-center justify-center">
+        <img class="h-full w-full object-contain mix-blend-multiply" src="/assets/brand-mark.png" alt="" aria-hidden="true" />
       </span>
-      <span>הצהרון של אביב</span>
+      <span class="text-base">הצהרון של אביב</span>
     </a>
-    <nav aria-label="קישורי תחתית">
-      <a href="#">מדיניות פרטיות</a>
-      <a href="#">תנאי שימוש</a>
-      <a href="#">צור קשר</a>
+    <nav class="flex gap-6" aria-label="קישורי תחתית">
+      <a class="text-foreground no-underline" href="#">מדיניות פרטיות</a>
+      <a class="text-foreground no-underline" href="#">תנאי שימוש</a>
+      <a class="text-foreground no-underline" href="#">צור קשר</a>
     </nav>
   </footer>
 </main>

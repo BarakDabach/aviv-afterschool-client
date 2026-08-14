@@ -40,7 +40,6 @@ type Plan = {
     }),
   ],
   templateUrl: './landing-page.html',
-  styleUrl: './landing-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingPage {

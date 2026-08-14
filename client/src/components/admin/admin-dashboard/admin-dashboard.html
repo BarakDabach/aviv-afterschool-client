@@ -1,105 +1,83 @@
-<main class="admin-screen" dir="rtl">
-  <header class="admin-top">
-    <a routerLink="/" class="top-action">
-      <ng-icon name="lucideUserRound" />
-      <span>אביב</span>
-    </a>
-    <a routerLink="/" class="brand" aria-label="הצהרון של אביב">
-      <span>הצהרון של אביב</span>
-      <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
-    </a>
-  </header>
-
-  <section class="admin-intro">
-    <h1>ניהול הרשמות</h1>
-    <p>שנת תשפ״ז · הרשמה פתוחה</p>
+<main
+  class="relative min-h-[calc(100dvh-var(--app-sticky-header-height))] overflow-hidden bg-[radial-gradient(circle_at_50%_20%,color-mix(in_oklch,var(--surface-sage)_14%,transparent),transparent_18rem),linear-gradient(180deg,var(--background),var(--surface-warm)_76%,var(--background))] px-[var(--app-screen-padding)] pb-20 text-foreground lg:min-h-dvh lg:px-10 lg:pb-32"
+  dir="rtl"
+>
+  <section class="relative z-[1] mx-auto grid w-[min(100%,min(72rem,calc(100vw-8rem)))] justify-items-start gap-2 pt-5 text-right">
+    <p class="m-0 text-sm text-foreground">בית</p>
+    <h1 class="m-0 text-[clamp(1.58rem,4.8vw,2.22rem)] font-extrabold leading-tight text-brand">סקירת שנה נוכחית</h1>
+    <p class="m-0 text-sm text-foreground/80">תשפ״ז · 2026/2027 · הרשמה פתוחה</p>
   </section>
 
-  <section class="admin-stack">
-    <section class="metric-grid" aria-label="מדדי הרשמה">
-      <article class="metric-card">
-        <span class="metric-icon warning"><ng-icon name="lucideClock3" /></span>
-        <div><strong>6</strong><span>לבדיקה</span></div>
-      </article>
-      <article class="metric-card">
-        <span class="metric-icon"><ng-icon name="lucideCheck" /></span>
-        <div><strong>18</strong><span>הושלמו</span></div>
-      </article>
-      <article class="metric-card">
-        <span class="metric-icon"><ng-icon name="lucideUsersRound" /></span>
-        <div><strong>24</strong><span>ילדים</span></div>
-      </article>
+  <section class="relative z-[1] mx-auto mt-6 grid w-[min(100%,min(72rem,calc(100vw-8rem)))] gap-4 lg:gap-3">
+    <section class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:[direction:rtl]" aria-label="מדדי שנה נוכחית">
+      @for (metric of metrics; track metric.label) {
+        <article class="grid min-h-16 grid-cols-[auto_minmax(0,1fr)] items-center gap-2 rounded-[var(--app-card-radius)] border border-border bg-[radial-gradient(circle_at_18%_32%,color-mix(in_oklch,white_52%,transparent),transparent_10rem),color-mix(in_oklch,var(--card)_84%,transparent)] px-3 py-2 lg:min-h-24 lg:px-4">
+          <span
+            class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-surface-sage/70 text-brand lg:h-10 lg:w-10"
+            [ngClass]="{ 'bg-primary/20 text-primary': metric.tone === 'warning' }"
+          >
+            <ng-icon [name]="metric.icon" class="h-4 w-4" />
+          </span>
+          <div>
+            <strong class="block text-2xl font-extrabold leading-none text-brand lg:text-[1.62rem]" [class.text-primary]="metric.tone === 'warning'">{{ metric.value }}</strong>
+            <span class="mt-1 block text-sm text-foreground">{{ metric.label }}</span>
+          </div>
+        </article>
+      }
     </section>
 
-    <article class="notice-card">
-      <ng-icon name="lucideShieldCheck" />
-      <div>
-        <h2>2 הרשמות של משפחת לוי ממתינות לבדיקה</h2>
-        <p>חוזה וקבצים משותפים לשני ילדים</p>
-      </div>
-    </article>
+    <h2 class="mt-3 justify-self-start text-lg font-extrabold text-brand lg:text-[1.1rem]">הרשמות ממתינות</h2>
 
-    <label class="search-field">
-      <input hlmInput placeholder="חיפוש לפי ילד, הורה או טלפון" aria-label="חיפוש הרשמות" />
-      <ng-icon name="lucideSearch" />
-    </label>
-
-    <div class="filter-row" aria-label="סינון הרשמות">
-      <button hlmBtn variant="ghost" class="filter-pill active" type="button">הכל</button>
-      <button hlmBtn variant="ghost" class="filter-pill" type="button">לבדיקה</button>
-      <button hlmBtn variant="ghost" class="filter-pill" type="button">אחים</button>
-      <button hlmBtn variant="ghost" class="filter-pill" type="button">מסמכים משותפים</button>
-      <button hlmBtn variant="ghost" class="filter-pill" type="button">אלרגיות</button>
-    </div>
-
-    <h2 class="section-title">הרשמות לבדיקה</h2>
-
-    <article class="registration-card featured">
-      <div class="card-header">
-        <span class="card-icon"><ng-icon name="lucideUsersRound" /></span>
-        <div class="card-copy">
-          <h2>משפחת לוי</h2>
-          <p>דנה לוי · 050-123-4567</p>
+    @for (registration of registrations; track registration.title) {
+      <article class="grid gap-3 rounded-[var(--app-card-radius)] border border-border bg-[radial-gradient(circle_at_18%_32%,color-mix(in_oklch,white_52%,transparent),transparent_10rem),color-mix(in_oklch,var(--card)_84%,transparent)] p-3 lg:grid-cols-[minmax(13rem,17rem)_minmax(0,1fr)_minmax(12rem,15.5rem)] lg:items-center">
+        <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
+          <span class="inline-flex h-10 w-10 items-center justify-center text-brand">
+            <ng-icon [name]="registration.icon" class="h-8 w-8 stroke-[1.55]" />
+          </span>
+          <div class="grid justify-items-start gap-2">
+            <h2 class="m-0 text-base font-[850] leading-tight text-foreground">{{ registration.title }}</h2>
+            @if (registration.tags.length) {
+              <div class="flex flex-wrap justify-start gap-1.5">
+                @for (tag of registration.tags; track tag.label) {
+                  <span class="inline-flex min-h-5 items-center gap-1 rounded-full bg-surface-sage/70 px-2 text-xs font-bold text-brand">
+                    <ng-icon [name]="tag.icon" class="h-3.5 w-3.5" /> {{ tag.label }}
+                  </span>
+                }
+              </div>
+            }
+          </div>
         </div>
-        <span class="status-chip warning">2 ילדים</span>
-      </div>
-      <div class="tag-list">
-        <span class="tag">נועה לוי</span>
-        <span class="tag">אורי לוי</span>
-        <span class="tag"><ng-icon name="lucideCalendarDays" /> מסלול מלא</span>
-      </div>
-      <div class="status-list">
-        <span><ng-icon name="lucideCheck" /> חוזה נחתם</span>
-        <span class="warning"><ng-icon name="lucideClock3" /> הוראת קבע לבדיקה</span>
-        <span class="warning"><ng-icon name="lucideClock3" /> ביטוח לבדיקה</span>
-      </div>
-      <div class="card-actions">
-        <a hlmBtn variant="outline" class="outline-action" routerLink="/admin/documents">
-          <ng-icon name="lucideArrowLeft" />
-          <span>בדיקת אישורים</span>
+
+        <div class="grid grid-cols-4 items-start" aria-label="סיכום שלבי הרשמה">
+          @for (stage of registration.stages; track stage.label) {
+            <div class="grid min-w-0 justify-items-center gap-1.5 border-s border-border text-center text-[0.68rem] text-foreground first:border-s-0">
+              <span>{{ stage.label }}</span>
+              <span
+                class="grid h-6 w-6 place-items-center rounded-full bg-surface-sage/70 text-brand"
+                [ngClass]="{
+                  'bg-primary/15 text-primary': stage.state === 'pending',
+                  'border border-foreground/30 bg-background/70 text-foreground/40': stage.state === 'empty'
+                }"
+              >
+                @if (stage.state === 'done') {
+                  <ng-icon name="lucideCircleCheck" class="h-3.5 w-3.5" />
+                } @else if (stage.state === 'pending') {
+                  <ng-icon name="lucideClock3" class="h-3.5 w-3.5" />
+                } @else {
+                  <span class="h-0.5 w-3 rounded-full bg-current" aria-hidden="true"></span>
+                }
+              </span>
+            </div>
+          }
+        </div>
+
+        <a hlmBtn variant="outline" class="relative h-11 w-full justify-center border-brand bg-background/80 text-sm font-medium text-brand [direction:rtl] lg:h-10" routerLink="/admin/documents">
+          <ng-icon name="lucideFileText" class="absolute left-6 h-4 w-4" />
+          <span>צפייה בפרטי ההרשמה</span>
         </a>
-        <span class="tag"><ng-icon name="lucideFolderOpen" /> מסמכים משותפים</span>
-      </div>
-    </article>
-
-    <article class="registration-card">
-      <div class="card-header">
-        <span class="card-icon"><ng-icon name="lucideUserRound" /></span>
-        <div class="card-copy">
-          <h2>מיה כהן</h2>
-          <p>רוני כהן · 054-987-6543</p>
-          <p><ng-icon name="lucideCalendarDays" /> שלושה ימים</p>
-        </div>
-        <span class="status-chip"><ng-icon name="lucideCheck" /> הושלם</span>
-      </div>
-    </article>
+      </article>
+    }
   </section>
 
-  <nav class="admin-bottom-nav" aria-label="ניווט ניהול">
-    <a routerLink="/admin/settings"><ng-icon name="lucideSettings" /><span>הגדרות</span></a>
-    <a routerLink="/admin/family"><ng-icon name="lucideUserRound" /><span>ילדים</span></a>
-    <a routerLink="/admin" class="active"><ng-icon name="lucideListChecks" /><span>הרשמות</span></a>
-  </nav>
-
-  <img class="admin-foliage" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+  <img class="absolute inset-x-0 bottom-0 z-0 h-32 w-full object-cover object-bottom" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
 </main>

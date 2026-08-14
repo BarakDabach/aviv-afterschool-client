@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
+import { BrnDrawerImports } from '@spartan-ng/brain/drawer';
 import {
   lucideCalendarDays,
   lucideCalendarRange,
-  lucideChevronLeft,
   lucideHome,
   lucideMenu,
   lucideUserRound,
@@ -22,12 +23,14 @@ type HeaderNavItem = {
 
 @Component({
   selector: 'app-header',
-  imports: [NgIcon, RouterLink, HlmButtonImports],
+  host: {
+    class: 'sticky top-0 z-50 block',
+  },
+  imports: [NgClass, NgIcon, RouterLink, BrnDrawerImports, HlmButtonImports],
   providers: [
     provideIcons({
       lucideCalendarDays,
       lucideCalendarRange,
-      lucideChevronLeft,
       lucideHome,
       lucideMenu,
       lucideUserRound,
@@ -35,7 +38,6 @@ type HeaderNavItem = {
     }),
   ],
   templateUrl: './app-header.html',
-  styleUrl: './app-header.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppHeader {
@@ -59,19 +61,20 @@ export class AppHeader {
 
   protected readonly mobileItems = computed<HeaderNavItem[]>(() => {
     if (this.variant() === 'admin') return this.adminItems;
+    if (this.variant() === 'back') return this.publicItems;
 
     return [
-      { label: this.actionLabel(), route: this.actionRoute(), icon: this.variant() === 'back' ? 'lucideChevronLeft' : 'lucideUserRound' },
+      { label: this.actionLabel(), route: this.actionRoute(), icon: 'lucideUserRound' },
       ...this.publicItems.filter((item) => item.route !== this.actionRoute()),
     ];
   });
 
-  protected toggleMenu(): void {
-    this.menuOpen.update((open) => !open);
-  }
-
   protected closeMenu(): void {
     this.menuOpen.set(false);
+  }
+
+  protected onDrawerStateChanged(state: 'closed' | 'open'): void {
+    this.menuOpen.set(state === 'open');
   }
 
   protected isActive(route: string): boolean {

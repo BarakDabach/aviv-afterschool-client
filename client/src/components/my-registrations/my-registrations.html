@@ -1,66 +1,62 @@
-<main class="my-registrations-screen" dir="rtl">
-  <header class="my-registrations-top">
-    <a routerLink="/" class="back-link">
-      <ng-icon name="lucideChevronLeft" />
-      <span>יציאה</span>
-    </a>
-    <a routerLink="/" class="brand" aria-label="הצהרון של אביב">
-      <span>הצהרון של אביב</span>
-      <img src="/assets/brand-mark.png" alt="" aria-hidden="true" />
-    </a>
-  </header>
-
-  <section class="page-intro">
-    <p>ההרשמה שלי</p>
-    <h1>ההרשמות שלי</h1>
-    <p>מצאנו 2 הרשמות המשויכות למספר הטלפון שלך.</p>
+<main
+  class="relative min-h-[calc(100dvh-var(--app-sticky-header-height))] overflow-hidden bg-[radial-gradient(circle_at_50%_24%,color-mix(in_oklch,var(--surface-sage)_16%,transparent),transparent_18rem),linear-gradient(180deg,var(--background),var(--surface-warm)_74%,var(--background))] px-[var(--app-screen-padding)] pb-[18rem] text-foreground max-[540px]:pb-[15.5rem]"
+  dir="rtl"
+>
+  <section class="relative z-[1] mx-auto grid w-[min(100%,var(--app-content-width))] justify-items-center gap-2 pt-6 text-center max-[540px]:pt-5">
+    <p class="m-0 text-[0.84rem] font-medium">ההרשמה שלי</p>
+    <h1 class="m-0 text-[length:var(--app-page-title-size)] font-black leading-[1.1] text-brand">ההרשמות שלי</h1>
+    <p class="m-0 text-[clamp(var(--app-body-size),1.8vw,0.9rem)] text-foreground/80">מצאנו 2 הרשמות המשויכות למספר הטלפון שלך.</p>
   </section>
 
-  <article class="parent-card">
-    <span class="parent-icon">
-      <ng-icon name="lucideUserRound" />
+  <article class="relative z-[1] mx-auto mt-7 grid min-h-[4.35rem] w-[min(100%,var(--app-content-width))] grid-cols-[auto_1fr] items-center gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] bg-[radial-gradient(circle_at_20%_44%,color-mix(in_oklch,white_58%,transparent),transparent_10rem),color-mix(in_oklch,var(--surface-sage)_24%,var(--card))] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] max-[540px]:mt-6 max-[540px]:min-h-[4.05rem]">
+    <span class="grid h-[var(--app-icon-xl)] w-[var(--app-icon-xl)] place-items-center rounded-lg border-2 border-brand text-brand">
+      <ng-icon name="lucideUserRound" class="h-[var(--app-icon-md)] w-[var(--app-icon-md)]" />
     </span>
     <div>
-      <strong>דנה לוי</strong>
-      <span>050-123-4567</span>
+      <strong class="block text-[length:var(--app-card-title-size)] font-[850] text-brand">דנה לוי</strong>
+      <span class="mt-1 block text-[0.86rem] text-foreground/75">050-123-4567</span>
     </div>
   </article>
 
-  <section class="registration-picker" aria-label="הרשמות משויכות">
-    <h2>בחרו הרשמה לצפייה או המשך</h2>
+  <section class="relative z-[1] mx-auto mt-8 grid w-[min(100%,var(--app-content-width))] gap-[var(--app-section-gap)]" aria-label="הרשמות משויכות">
+    <h2 class="mb-1 mt-0 text-center text-[clamp(0.98rem,2.5vw,1.16rem)] font-[850] text-brand">בחרו הרשמה לצפייה או המשך</h2>
 
     @for (registration of registrations; track registration.childName) {
-      <article class="registration-card">
-        <div class="registration-card-main">
-          <span class="child-icon" [class.complete]="registration.status === 'complete'">
-            <ng-icon name="lucideUserRound" />
+      <article class="grid grid-cols-[minmax(0,1fr)_auto] gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] border border-border bg-[radial-gradient(circle_at_22%_22%,color-mix(in_oklch,white_52%,transparent),transparent_10rem),color-mix(in_oklch,var(--card)_82%,transparent)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)]">
+        <div class="col-start-1 grid grid-cols-[auto_1fr] items-center gap-[var(--app-card-gap)]">
+          <span class="grid h-[var(--app-icon-lg)] w-[var(--app-icon-lg)] place-items-center text-brand">
+            <ng-icon name="lucideUserRound" class="h-[calc(var(--app-icon-lg)*0.83)] w-[calc(var(--app-icon-lg)*0.83)]" />
           </span>
-          <div class="child-copy">
-            <h3>{{ registration.childName }}</h3>
-            <p>{{ registration.plan }}</p>
-            <p>{{ registration.year }}</p>
+          <div>
+            <h3 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-brand">{{ registration.childName }}</h3>
+            <p class="mt-1 mb-0 text-[0.8rem] text-foreground">{{ registration.plan }}</p>
+            <p class="mt-1 mb-0 text-[0.8rem] text-foreground">{{ registration.year }}</p>
           </div>
         </div>
 
-        <span class="status-chip" [class.complete]="registration.status === 'complete'">
+        <span
+          class="col-start-2 row-start-1 inline-flex min-h-[var(--app-chip-height)] items-center self-center justify-self-start gap-1.5 rounded-full bg-primary/20 px-2.5 text-[0.72rem] font-semibold text-foreground/75"
+          [class.bg-surface-sage]="registration.status === 'complete'"
+          [class.text-brand]="registration.status === 'complete'"
+        >
           @if (registration.status === 'complete') {
-            <ng-icon name="lucideCheck" />
+            <ng-icon name="lucideCheck" class="h-3.5 w-3.5" />
           } @else {
-            <ng-icon name="lucideClock3" />
+            <ng-icon name="lucideClock3" class="h-3.5 w-3.5" />
           }
           {{ registration.statusLabel }}
         </span>
 
-        <p class="registration-note">{{ registration.note }}</p>
+        <p class="col-span-full m-0 border-b border-border pb-3 text-center text-[0.8rem] text-foreground/80">{{ registration.note }}</p>
 
-        <div class="card-action-row">
+        <div class="col-span-full min-h-9">
           @if (registration.actionVariant === 'outline') {
-            <a hlmBtn variant="outline" class="status-action" routerLink="/registration">
+            <a hlmBtn variant="outline" class="h-[var(--app-secondary-button-height)] min-w-38 gap-2 border-brand text-[0.82rem] font-bold text-brand" routerLink="/registration">
               <ng-icon name="lucideArrowLeft" />
               <span>{{ registration.actionLabel }}</span>
             </a>
           } @else {
-            <a hlmBtn variant="link" class="continue-action" routerLink="/registration">
+            <a hlmBtn variant="link" class="h-[var(--app-secondary-button-height)] gap-2 p-0 text-[0.82rem] font-bold text-primary no-underline" routerLink="/registration">
               <ng-icon name="lucideArrowLeft" />
               <span>{{ registration.actionLabel }}</span>
             </a>
@@ -70,13 +66,13 @@
     }
   </section>
 
-  <section class="screen-actions">
-    <a hlmBtn class="primary-action" routerLink="/registration">
+  <section class="relative z-[1] mx-auto mt-10 grid w-[min(100%,var(--app-content-width))] justify-items-center gap-4">
+    <a hlmBtn class="h-[var(--app-button-height)] w-[min(100%,24rem)] gap-2 rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/95 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20" routerLink="/registration">
       <ng-icon name="lucideArrowLeft" />
       <span>התחלת הרשמה לילד נוסף</span>
     </a>
-    <a class="lookup-link" routerLink="/parent-login">חזרה להזנת מספר טלפון</a>
+    <a class="text-[0.82rem] font-medium text-foreground underline-offset-4" routerLink="/parent-login">חזרה להזנת מספר טלפון</a>
   </section>
 
-  <img class="my-registrations-foliage" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+  <img class="absolute inset-x-0 bottom-0 z-0 h-[17.5rem] w-full object-cover object-bottom" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
 </main>
