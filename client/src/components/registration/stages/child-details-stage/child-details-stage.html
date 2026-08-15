@@ -37,6 +37,7 @@
           <span>תאריך לידה</span>
           <hlm-date-picker
             class="block [direction:rtl] [&_[data-slot=input-group-addon][data-align=inline-end]]:pointer-events-none [&_[data-slot=input-group-addon][data-align=inline-end]]:absolute [&_[data-slot=input-group-addon][data-align=inline-end]]:inset-block-0 [&_[data-slot=input-group-addon][data-align=inline-end]]:inset-inline-end-2 [&_[data-slot=input-group-addon][data-align=inline-end]]:z-[1] [&_[data-slot=input-group-addon][data-align=inline-end]]:p-0 [&_[data-slot=input-group-addon][data-align=inline-end]_button]:pointer-events-auto [&_[data-slot=input-group-addon][data-align=inline-end]_button]:rounded-[6px] [&_[data-slot=input-group-control]]:h-[calc(var(--app-field-height)-2px)] [&_[data-slot=input-group-control]]:ps-3 [&_[data-slot=input-group-control]]:pe-[2.65rem] [&_[data-slot=input-group-control]]:text-center [&_[data-slot=input-group-control]]:[direction:rtl] [&_[data-slot=input-group]]:relative [&_[data-slot=input-group]]:h-[var(--app-field-height)] [&_[data-slot=input-group]]:overflow-hidden [&_[data-slot=input-group]]:rounded-[0.48rem] [&_[data-slot=input-group]]:border-border [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:text-foreground [&_[data-slot=input-group]]:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--border)_34%,transparent)] [&_[data-slot=popover-content]]:rounded-[8px] [&_[data-slot=popover-content]]:border-border [&_[data-slot=popover-content]]:bg-popover"
+            dir="rtl"
             captionLayout="dropdown"
             [date]="store.selectedDate(childField.birthDate().value())"
             [maxDate]="store.maxDate"
@@ -46,6 +47,7 @@
             (dateChange)="store.setBirthDate(childField, $event)"
           >
             <hlm-date-picker-input
+              dir="rtl"
               [inputId]="'child-birth-date-' + child.id"
               placeholder="בחרו תאריך לידה"
               [forceInvalid]="store.birthDateHasError(childField)"
