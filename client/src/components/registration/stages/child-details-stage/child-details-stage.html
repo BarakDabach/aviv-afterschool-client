@@ -35,13 +35,26 @@
         </label>
         <label class="grid gap-[0.3rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive" [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.birthDateHasError(childField) }">
           <span>תאריך לידה</span>
-          <app-spartan-date-picker
-            [value]="childField.birthDate().value()"
-            placeholder="בחרו תאריך לידה"
-            [ariaLabel]="'תאריך לידה של ' + store.childDisplayName(child, index)"
-            [invalid]="store.birthDateHasError(childField)"
-            (valueChange)="store.setBirthDate(childField, $event)"
-          />
+          <hlm-date-picker
+            class="block [direction:rtl] [&_[data-slot=input-group-addon][data-align=inline-end]]:pointer-events-none [&_[data-slot=input-group-addon][data-align=inline-end]]:absolute [&_[data-slot=input-group-addon][data-align=inline-end]]:inset-block-0 [&_[data-slot=input-group-addon][data-align=inline-end]]:inset-inline-end-2 [&_[data-slot=input-group-addon][data-align=inline-end]]:z-[1] [&_[data-slot=input-group-addon][data-align=inline-end]]:p-0 [&_[data-slot=input-group-addon][data-align=inline-end]_button]:pointer-events-auto [&_[data-slot=input-group-addon][data-align=inline-end]_button]:rounded-[6px] [&_[data-slot=input-group-control]]:h-[calc(var(--app-field-height)-2px)] [&_[data-slot=input-group-control]]:ps-3 [&_[data-slot=input-group-control]]:pe-[2.65rem] [&_[data-slot=input-group-control]]:text-center [&_[data-slot=input-group-control]]:[direction:rtl] [&_[data-slot=input-group]]:relative [&_[data-slot=input-group]]:h-[var(--app-field-height)] [&_[data-slot=input-group]]:overflow-hidden [&_[data-slot=input-group]]:rounded-[0.48rem] [&_[data-slot=input-group]]:border-border [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:text-foreground [&_[data-slot=input-group]]:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--border)_34%,transparent)] [&_[data-slot=popover-content]]:rounded-[8px] [&_[data-slot=popover-content]]:border-border [&_[data-slot=popover-content]]:bg-popover"
+            captionLayout="dropdown"
+            [date]="store.selectedDate(childField.birthDate().value())"
+            [maxDate]="store.maxDate"
+            [defaultFocusedDate]="store.defaultFocusedDate"
+            [formatDate]="store.formatDate"
+            [autoCloseOnSelect]="true"
+            (dateChange)="store.setBirthDate(childField, $event)"
+          >
+            <hlm-date-picker-input
+              [inputId]="'child-birth-date-' + child.id"
+              placeholder="בחרו תאריך לידה"
+              [forceInvalid]="store.birthDateHasError(childField)"
+              [calendarAriaLabel]="'תאריך לידה של ' + store.childDisplayName(child, index)"
+              clearAriaLabel="ניקוי תאריך"
+              [parseDate]="store.parseDate"
+              [formatInputDate]="store.formatInputDate"
+            />
+          </hlm-date-picker>
           <small [id]="'child-birth-date-error-' + child.id">{{ store.birthDateError(childField) }}</small>
         </label>
       </div>
