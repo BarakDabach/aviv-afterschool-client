@@ -34,6 +34,14 @@ type RegistrationFlowState = {
   registrationStatus: RegistrationStatus;
 };
 
+const createEmptyRegistrationChild = (id: number): RegistrationChildDraft => ({
+  id,
+  name: '',
+  birthDate: '',
+  allergyAnswer: AllergyAnswer.No,
+  allergyDetails: '',
+});
+
 export const RegistrationStore = signalStore(
   withState<RegistrationFlowState>({
     activeStep: 0,
@@ -41,15 +49,7 @@ export const RegistrationStore = signalStore(
       fullName: '',
       phone: '',
     },
-    children: [
-      {
-        id: 1,
-        name: '',
-        birthDate: '',
-        allergyAnswer: AllergyAnswer.No,
-        allergyDetails: '',
-      },
-    ],
+    children: [createEmptyRegistrationChild(1)],
     childDetailsValid: false,
     nextChildId: 2,
     selectedPlan: RegistrationPlanId.Full,
@@ -76,6 +76,8 @@ export const RegistrationStore = signalStore(
     const isThreePlan = computed(() => selectedPlan() === RegistrationPlanId.Three);
     const childCountLabel = computed(() => {
       const childCount = children().length;
+
+      if (childCount === 0) return 'אין ילדים';
 
       return childCount === 1 ? 'ילד אחד' : `${childCount} ילדים`;
     });
@@ -107,6 +109,8 @@ export const RegistrationStore = signalStore(
     });
     const childrenSummary = computed(() => {
       const childNames = children().map((child, index) => child.name.trim() || `ילד ${index + 1}`);
+
+      if (!childNames.length) return selectedPlanLabel();
 
       return `${childNames.join(', ')} · ${selectedPlanLabel()}`;
     });
@@ -172,13 +176,7 @@ export const RegistrationStore = signalStore(
     };
   }),
   withMethods((store) => {
-    const createEmptyChild = (id: number): RegistrationChildDraft => ({
-      id,
-      name: '',
-      birthDate: '',
-      allergyAnswer: AllergyAnswer.No,
-      allergyDetails: '',
-    });
+    const createEmptyChild = createEmptyRegistrationChild;
     const createRegistrationStatus = (kind: RegistrationStatusKind, updatedAtIso: string): RegistrationStatus => ({
       kind,
       ...REGISTRATION_STATUS_PROPERTIES[kind],
@@ -207,14 +205,17 @@ export const RegistrationStore = signalStore(
 
       return Math.max(...children.map((child) => child.id)) + 1;
     };
-    const areChildrenValid = (children: RegistrationChildDraft[] | undefined): boolean =>
-      normalizeChildren(children).every((child) => {
+    const areChildrenValid = (children: RegistrationChildDraft[] | undefined): boolean => {
+      const normalizedChildren = normalizeChildren(children);
+
+      return normalizedChildren.length > 0 && normalizedChildren.every((child) => {
         const hasRequiredDetails = hasMinimumTrimmedLength(child.name, 2) && child.birthDate.trim().length > 0;
         const hasAllergyAnswer = child.allergyAnswer === AllergyAnswer.Yes || child.allergyAnswer === AllergyAnswer.No;
         const hasAllergyDetails = child.allergyAnswer !== AllergyAnswer.Yes || hasMinimumTrimmedLength(child.allergyDetails, 2);
 
         return hasRequiredDetails && hasAllergyAnswer && hasAllergyDetails;
       });
+    };
     const readSavedDraft = (): RegistrationDraftSnapshot | null => {
       if (typeof localStorage === 'undefined') return null;
 
@@ -262,7 +263,7 @@ export const RegistrationStore = signalStore(
 
     return {
       restoreSavedDraft(): void {
-        const savedDraft = readSavedDraft();
+        const savedDraft = store.globalStore.loggedIn() ? readSavedDraft() : null;
         const activeStep = savedDraft ? normalizeActiveStep(savedDraft.activeStep) : store.globalStore.loggedIn() ? 1 : 0;
 
         patchState(store, {
@@ -309,7 +310,7 @@ export const RegistrationStore = signalStore(
       removeChild(childId: number): void {
         const nextChildren = store.children().filter((child) => child.id !== childId);
 
-        if (nextChildren.length > 0) {
+        if (nextChildren.length) {
           patchState(store, { children: nextChildren });
           return;
         }
