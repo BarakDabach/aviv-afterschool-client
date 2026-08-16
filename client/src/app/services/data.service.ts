@@ -1,8 +1,3 @@
-import { Injectable } from '@angular/core';
-
-@Injectable({ providedIn: 'root' })
-export class DataService {
-  async getAuthOtpResendTimeoutSeconds(): Promise<number> {
-    return 10;
-  }
+export abstract class DataService {
+  abstract getAuthOtpResendTimeoutSeconds(): Promise<number>;
 }

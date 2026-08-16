@@ -2,7 +2,10 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { AuthFacade } from '../../app/facades/auth.facade';
+import { MockAuthFacade } from '../../app/facades/mock-auth.facade';
 import { DataService } from '../../app/services/data.service';
+import { MockDataService } from '../../app/services/mock-data.service';
 import { ParentLogin } from './parent-login';
 
 @Component({
@@ -25,7 +28,14 @@ describe('ParentLogin', () => {
     await TestBed.configureTestingModule({
       imports: [ParentLogin],
       providers: [
-        DataService,
+        {
+          provide: AuthFacade,
+          useClass: MockAuthFacade,
+        },
+        {
+          provide: DataService,
+          useClass: MockDataService,
+        },
         provideRouter([
           { path: 'my-registrations', component: EmptyRouteComponent },
           { path: 'admin', component: EmptyRouteComponent },

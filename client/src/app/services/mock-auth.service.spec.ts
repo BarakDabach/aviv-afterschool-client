@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { DataService } from './data.service';
+import { MockDataService } from './mock-data.service';
 import { MockAuthService } from './mock-auth.service';
 
 describe('MockAuthService', () => {
@@ -10,7 +11,13 @@ describe('MockAuthService', () => {
     localStorage.clear();
 
     TestBed.configureTestingModule({
-      providers: [MockAuthService, DataService],
+      providers: [
+        MockAuthService,
+        {
+          provide: DataService,
+          useClass: MockDataService,
+        },
+      ],
     });
 
     service = TestBed.inject(MockAuthService);
