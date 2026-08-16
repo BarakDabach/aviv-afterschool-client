@@ -6,52 +6,101 @@
     <section class="grid justify-items-center gap-2 text-center">
       <h1 class="m-0 text-[length:var(--app-page-title-size)] font-black leading-[1.1] text-brand">ההרשמה שלי</h1>
       <p class="m-0 max-w-96 text-[clamp(var(--app-body-size),1.8vw,0.9rem)] leading-relaxed text-foreground">
-        הזינו את מספר הטלפון ששימש להרשמה ונאתר עבורכם את התהליך.
+        הזינו כתובת אימייל ונשלח קוד חד-פעמי להתחברות מאובטחת.
       </p>
     </section>
 
     <article class="mt-7 grid min-h-[4.35rem] grid-cols-[auto_minmax(0,1fr)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] bg-[radial-gradient(circle_at_18%_35%,color-mix(in_oklch,white_55%,transparent),transparent_9rem),color-mix(in_oklch,var(--surface-sage)_22%,var(--card))] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] max-[540px]:mt-6 max-[540px]:min-h-[4.05rem]">
       <span class="grid h-[var(--app-icon-xl)] w-[var(--app-icon-xl)] place-items-center rounded-lg border-2 border-brand text-brand">
-        <ng-icon name="lucideUserRound" class="h-[var(--app-icon-md)] w-[var(--app-icon-md)]" />
+        <ng-icon name="lucideKeyRound" class="h-[var(--app-icon-md)] w-[var(--app-icon-md)]" />
       </span>
       <div>
         <h2 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-brand">אין צורך בסיסמה</h2>
-        <p class="mt-1.5 mb-0 text-[length:var(--app-body-size)] leading-relaxed text-foreground">מספר הטלפון הוא אמצעי הזיהוי שלכם במערכת.</p>
+        <p class="mt-1.5 mb-0 text-[length:var(--app-body-size)] leading-relaxed text-foreground">האימות מתבצע באמצעות קוד שנשלח לאימייל המוכר במערכת.</p>
       </div>
     </article>
 
-    <section class="mt-8 grid justify-items-center gap-4 text-center" aria-label="איתור הרשמה">
-      <label class="grid w-full gap-2 text-end text-[length:var(--app-card-title-size)] font-[850] text-brand">
-        <span>מספר טלפון נייד</span>
-        <input
-          hlmInput
-          class="h-[var(--app-field-height)] w-full rounded-[var(--app-control-radius)] border-[1.5px] border-brand bg-background/80 text-center text-[length:var(--app-body-size)] font-medium text-foreground placeholder:text-foreground/40"
-          inputmode="tel"
-          placeholder="05X-XXX-XXXX"
-          aria-label="מספר טלפון נייד"
-        />
-      </label>
+    <section class="mt-8 grid justify-items-center gap-4 text-center" aria-label="התחברות באימייל">
+      @if (store.step() === 'email') {
+        <label
+          class="grid w-full gap-[0.3rem] text-start [direction:rtl] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive"
+          [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.emailHasError() }"
+        >
+          <span>כתובת אימייל</span>
+          <input
+            hlmInput
+            inputmode="email"
+            autocomplete="email"
+            placeholder="name@example.com"
+            aria-label="כתובת אימייל"
+            [attr.aria-invalid]="store.emailHasError()"
+            [attr.aria-describedby]="store.emailHasError() ? 'login-email-error' : null"
+            [value]="store.email()"
+            (input)="store.updateEmail($any($event.target).value)"
+            (blur)="store.markEmailTouched()"
+          />
+          <small id="login-email-error">{{ store.emailError() }}</small>
+        </label>
+      } @else {
+        <div class="grid w-full gap-3">
+          <label
+            class="grid w-full gap-[0.3rem] text-start [direction:rtl] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive"
+            [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.otpHasError() }"
+          >
+            <span>קוד אימות</span>
+            <input
+              hlmInput
+              class="tracking-[0.28em]"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="6"
+              placeholder="123456"
+              aria-label="קוד אימות"
+              [attr.aria-invalid]="store.otpHasError()"
+              [attr.aria-describedby]="store.otpHasError() ? 'login-otp-error' : null"
+              [value]="store.otp()"
+              (input)="store.updateOtp($any($event.target).value)"
+              (blur)="store.markOtpTouched()"
+            />
+            <small id="login-otp-error">{{ store.otpError() }}</small>
+          </label>
+        </div>
+      }
 
-      <p class="m-0 text-[length:var(--app-body-size)] leading-relaxed text-foreground">נשלח אתכם ישירות לסטטוס ההרשמה או להמשך התהליך.</p>
+      @if (store.error()) {
+        <p class="m-0 rounded-[var(--app-control-radius)] bg-red-50 px-3 py-2 text-[0.74rem] font-medium leading-relaxed text-destructive" role="alert">{{ store.error() }}</p>
+      }
 
-      <a
-        hlmBtn
-        class="mt-3 h-[var(--app-button-height)] w-[min(100%,24rem)] gap-2 rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/95 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20"
-        routerLink="/my-registrations"
-      >
-        <span>איתור ההרשמה</span>
-        <ng-icon name="lucideArrowLeft" />
-      </a>
+      @if (store.step() === 'email') {
+        <button
+          hlmBtn
+          type="button"
+          class="mt-3 h-[var(--app-button-height)] w-[min(100%,24rem)] gap-2 rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/95 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20 disabled:bg-none disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
+          [disabled]="!store.canRequestOtp()"
+          (click)="store.requestOtp()"
+        >
+          <span>{{ store.loading() ? 'שולחים קוד...' : 'שליחת קוד אימות' }}</span>
+          <ng-icon name="lucideArrowLeft" />
+        </button>
+      } @else {
+        <button
+          hlmBtn
+          type="button"
+          class="mt-3 h-[var(--app-button-height)] w-[min(100%,24rem)] gap-2 rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/95 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20 disabled:bg-none disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
+          [disabled]="!store.canVerifyOtp()"
+          (click)="store.verifyOtp()"
+        >
+          <span>{{ store.loading() ? 'מאמתים...' : 'כניסה למערכת' }}</span>
+          <ng-icon name="lucideArrowLeft" />
+        </button>
+
+        <button type="button" class="text-[0.82rem] font-medium text-brand underline underline-offset-4 disabled:text-muted-foreground disabled:no-underline" [disabled]="!store.canResendOtp()" (click)="store.resendOtp()">
+          {{ store.canResendOtp() ? 'שליחת קוד מחדש' : 'שליחה מחדש בעוד ' + store.resendCountdownLabel() }}
+        </button>
+      }
 
       <a class="text-[0.82rem] font-medium text-brand underline-offset-4" routerLink="/registration">התחלת הרשמה חדשה</a>
     </section>
-
-    <article class="mt-8 grid min-h-16 grid-cols-[auto_minmax(0,1fr)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] bg-[radial-gradient(circle_at_18%_35%,color-mix(in_oklch,white_55%,transparent),transparent_9rem),color-mix(in_oklch,var(--surface-sage)_22%,var(--card))] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] text-[length:var(--app-body-size)] leading-relaxed text-foreground">
-      <span class="text-brand">
-        <ng-icon name="lucideShieldCheck" class="h-[var(--app-icon-lg)] w-[var(--app-icon-lg)]" />
-      </span>
-      <p class="m-0">המידע מוצג רק לפי מספר הטלפון שהוזן בהרשמה.</p>
-    </article>
   </section>
 
   <img class="absolute inset-x-0 bottom-0 z-0 h-[18.2rem] w-full object-cover object-bottom max-[540px]:h-[19.8rem]" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />

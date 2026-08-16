@@ -55,7 +55,7 @@ export class AppHeader {
   ];
 
   private readonly publicItems: HeaderNavItem[] = [
-    { label: 'התחברות', route: '/parent-login', icon: 'lucideUserRound' },
+    { label: 'התחברות', route: '/login', icon: 'lucideUserRound' },
     { label: 'הרשמה', route: '/registration', icon: 'lucideCalendarDays' },
   ];
 

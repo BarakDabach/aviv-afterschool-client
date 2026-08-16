@@ -1,15 +1,25 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideCheck, lucideChevronLeft, lucideShieldCheck, lucideUserRound } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideKeyRound } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
+import { LoginStore } from '../../features/auth/login.store';
 
 @Component({
   selector: 'app-parent-login',
-  imports: [NgIcon, RouterLink, HlmButtonImports, HlmInputImports],
-  providers: [provideIcons({ lucideArrowLeft, lucideCheck, lucideChevronLeft, lucideShieldCheck, lucideUserRound })],
+  imports: [NgClass, NgIcon, RouterLink, HlmButtonImports, HlmInputImports],
+  providers: [
+    LoginStore,
+    provideIcons({
+      lucideArrowLeft,
+      lucideKeyRound,
+    }),
+  ],
   templateUrl: './parent-login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ParentLogin {}
+export class ParentLogin {
+  protected readonly store = inject(LoginStore);
+}

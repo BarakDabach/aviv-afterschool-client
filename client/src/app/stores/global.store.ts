@@ -15,12 +15,12 @@ export const GlobalStore = signalStore(
   withState(initialGlobalStoreState),
   withComputed(({ user }) => ({
     fullName: computed(() => user()?.fullName ?? ''),
+    email: computed(() => user()?.email ?? ''),
     phoneNumber: computed(() => user()?.phoneNumber ?? ''),
-    loggedIn: computed(() => {
-      const currentUser = user();
-
-      return currentUser !== null && currentUser.fullName.trim().length > 0 && currentUser.phoneNumber.trim().length > 0;
-    }),
+    role: computed(() => user()?.role ?? null),
+    loggedIn: computed(() => user() !== null),
+    isParent: computed(() => user()?.role === 'parent'),
+    isAdmin: computed(() => user()?.role === 'admin'),
   })),
   withMethods((store) => ({
     setUser(user: User): void {

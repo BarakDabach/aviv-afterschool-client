@@ -10,7 +10,7 @@ import { Registration } from '../components/registration/registration';
 
 export const routes: Routes = [
   { path: '', component: LandingPage },
-  { path: 'parent-login', component: ParentLogin },
+  { path: 'login', component: ParentLogin },
   { path: 'registration', component: Registration },
   { path: 'my-registrations', component: MyRegistrations },
   { path: 'admin', component: AdminDashboard },
