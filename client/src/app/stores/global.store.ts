@@ -1,9 +1,9 @@
 import { computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import type { User } from '../types/user.type';
+import type { AuthenticatedUser } from '../types/auth.type';
 
 type GlobalStoreState = {
-  user: User | null;
+  user: AuthenticatedUser | null;
 };
 
 const initialGlobalStoreState: GlobalStoreState = {
@@ -15,15 +15,15 @@ export const GlobalStore = signalStore(
   withState(initialGlobalStoreState),
   withComputed(({ user }) => ({
     fullName: computed(() => user()?.fullName ?? ''),
+    email: computed(() => user()?.email ?? ''),
     phoneNumber: computed(() => user()?.phoneNumber ?? ''),
-    loggedIn: computed(() => {
-      const currentUser = user();
-
-      return currentUser !== null && currentUser.fullName.trim().length > 0 && currentUser.phoneNumber.trim().length > 0;
-    }),
+    role: computed(() => user()?.role ?? null),
+    loggedIn: computed(() => user() !== null),
+    isParent: computed(() => user()?.role === 'parent'),
+    isAdmin: computed(() => user()?.role === 'admin'),
   })),
   withMethods((store) => ({
-    setUser(user: User): void {
+    setUser(user: AuthenticatedUser): void {
       patchState(store, { user });
     },
     clearUser(): void {

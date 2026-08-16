@@ -28,7 +28,7 @@ export class App {
 
   protected readonly headerActionRoute = computed(() => {
     const path = this.currentPath();
-    if (path === '/') return '/parent-login';
+    if (path === '/') return '/login';
     if (path === '/my-registrations') return '/';
     return '';
   });
