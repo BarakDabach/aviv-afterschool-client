@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { AuthFacade } from '../../app/facades/auth.facade';
+import { MockAuthFacade } from '../../app/facades/mock-auth.facade';
 import { DataService } from '../../app/services/data.service';
 import { GlobalStore } from '../../app/stores/global.store';
 import { LoginStore } from './login.store';
@@ -22,6 +24,10 @@ describe('LoginStore', () => {
     TestBed.configureTestingModule({
       providers: [
         LoginStore,
+        {
+          provide: AuthFacade,
+          useClass: MockAuthFacade,
+        },
         {
           provide: DataService,
           useValue: {
@@ -106,6 +112,10 @@ describe('LoginStore', () => {
     TestBed.configureTestingModule({
       providers: [
         LoginStore,
+        {
+          provide: AuthFacade,
+          useClass: MockAuthFacade,
+        },
         {
           provide: DataService,
           useValue: {

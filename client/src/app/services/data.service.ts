@@ -1,8 +1,16 @@
-import { Injectable } from '@angular/core';
+import type {
+  AvailableYearPlan,
+  RegistrationState,
+  SubmitRegistrationRequest,
+  Year,
+} from '../types/registration-status.type';
 
-@Injectable({ providedIn: 'root' })
-export class DataService {
-  async getAuthOtpResendTimeoutSeconds(): Promise<number> {
-    return 10;
-  }
+export abstract class DataService {
+  abstract getAuthOtpResendTimeoutSeconds(): Promise<number>;
+
+  abstract getActiveRegistrationYear(): Promise<Year>;
+
+  abstract getAvailableYearPlans(): Promise<AvailableYearPlan[]>;
+
+  abstract submitRegistration(request: SubmitRegistrationRequest): Promise<RegistrationState>;
 }

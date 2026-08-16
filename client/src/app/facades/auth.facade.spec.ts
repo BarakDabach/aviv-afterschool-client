@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MockAuthService } from '../services/mock-auth.service';
 import { AuthFacade } from './auth.facade';
+import { MockAuthFacade } from './mock-auth.facade';
 
 describe('AuthFacade', () => {
   const authService = {
@@ -18,7 +19,10 @@ describe('AuthFacade', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        AuthFacade,
+        {
+          provide: AuthFacade,
+          useClass: MockAuthFacade,
+        },
         {
           provide: MockAuthService,
           useValue: authService,

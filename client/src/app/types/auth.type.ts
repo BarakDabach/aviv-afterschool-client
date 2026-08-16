@@ -5,6 +5,7 @@ export type AuthenticatedUser = {
   fullName: string;
   email: string;
   role: AuthRole;
+  phoneNumber?: string;
 };
 
 export type OtpRequest = {
