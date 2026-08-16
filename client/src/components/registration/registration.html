@@ -1,36 +1,34 @@
 <main class="relative min-h-[calc(100dvh-var(--app-sticky-header-height))] overflow-hidden bg-[radial-gradient(circle_at_50%_34%,color-mix(in_oklch,var(--surface-sage)_22%,transparent),transparent_22rem),linear-gradient(180deg,var(--background),var(--surface-warm)_76%,var(--background))] px-[var(--app-screen-padding)] pb-[13.5rem] text-foreground" dir="rtl">
-  <section class="relative z-[1] mx-auto grid w-[min(100%,var(--app-header-width))] gap-[0.9rem] pt-[1.2rem] text-center" aria-label="שלבי הרשמה">
-    <p class="m-0 text-[0.84rem] font-medium text-[color-mix(in_oklch,var(--foreground)_82%,white)]">הרשמה לשנת תשפ״ז</p>
-    <ol class="m-0 grid list-none p-0" [style.grid-template-columns]="'repeat(' + store.visibleSteps().length + ', minmax(0, 1fr))'">
-      @for (step of store.visibleSteps(); track step.label; let index = $index) {
-        <li class="relative grid justify-items-center gap-[0.36rem] text-[0.78rem] font-semibold text-foreground before:absolute before:right-[-50%] before:top-[0.88rem] before:z-0 before:h-px before:w-full before:bg-border first:before:hidden max-[540px]:text-[0.68rem]" [ngClass]="{ 'before:bg-brand': store.activeStep() >= step.index }">
-          <span class="relative z-[1] grid h-[1.8rem] w-[1.8rem] place-items-center rounded-full border border-border bg-[color-mix(in_oklch,var(--background)_84%,white)] text-[0.78rem] font-bold text-foreground max-[540px]:h-[1.62rem] max-[540px]:w-[1.62rem]" [ngClass]="{ 'border-brand bg-brand text-white shadow-[0_0_0_0.18rem_color-mix(in_oklch,var(--surface-sage)_75%,transparent)]': store.activeStep() >= step.index }" [attr.aria-current]="store.activeStep() === step.index ? 'step' : null">
-            @if (store.activeStep() > step.index) {
-              <ng-icon name="lucideCheck" class="h-[0.82rem] w-[0.82rem]" />
-            } @else {
-              {{ index + 1 }}
-            }
-          </span>
-          <span class="text-foreground">{{ step.label }}</span>
-        </li>
-      }
-    </ol>
-  </section>
+  @if (store.activeStep() !== store.steps.length - 1) {
+    <section class="relative z-[1] mx-auto grid w-[min(100%,var(--app-header-width))] gap-[0.9rem] pt-[1.2rem] text-center" aria-label="שלבי הרשמה">
+      <p class="m-0 text-[0.84rem] font-medium text-[color-mix(in_oklch,var(--foreground)_82%,white)]">הרשמה לשנת תשפ״ז</p>
+      <ol class="m-0 grid list-none p-0" [style.grid-template-columns]="'repeat(' + store.visibleSteps().length + ', minmax(0, 1fr))'">
+        @for (step of store.visibleSteps(); track step.label; let index = $index) {
+          <li class="relative grid justify-items-center gap-[0.36rem] text-[0.78rem] font-semibold text-foreground before:absolute before:right-[-50%] before:top-[0.88rem] before:z-0 before:h-px before:w-full before:bg-border first:before:hidden max-[540px]:text-[0.68rem]" [ngClass]="{ 'before:bg-brand': store.activeStep() >= step.index }">
+            <span class="relative z-[1] grid h-[1.8rem] w-[1.8rem] place-items-center rounded-full border border-border bg-[color-mix(in_oklch,var(--background)_84%,white)] text-[0.78rem] font-bold text-foreground max-[540px]:h-[1.62rem] max-[540px]:w-[1.62rem]" [ngClass]="{ 'border-brand bg-brand text-white shadow-[0_0_0_0.18rem_color-mix(in_oklch,var(--surface-sage)_75%,transparent)]': store.activeStep() >= step.index }" [attr.aria-current]="store.activeStep() === step.index ? 'step' : null">
+              @if (store.activeStep() > step.index) {
+                <ng-icon name="lucideCheck" class="h-[0.82rem] w-[0.82rem]" />
+              } @else {
+                {{ index + 1 }}
+              }
+            </span>
+            <span class="text-foreground">{{ step.label }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+  }
 
   <section class="relative z-[1] mx-auto grid w-[min(100%,var(--app-header-width))] justify-items-center gap-[0.45rem] pt-5 text-center" [ngClass]="{ 'pt-[1.35rem]': store.activeStep() === store.steps.length - 1 }">
     @if (store.activeStep() === store.steps.length - 1) {
-      <img class="h-[3.8rem] w-[5.1rem] object-contain" src="/assets/brand-mark.png" alt="" aria-hidden="true" />
-      <span class="inline-flex min-h-8 items-center rounded-full px-[1.05rem] text-[0.92rem] font-semibold" [ngClass]="{
-        'bg-[color-mix(in_oklch,var(--primary)_20%,white)] text-[color-mix(in_oklch,var(--foreground)_74%,var(--primary))]': store.registrationStatus().tone === registrationStatusTone.Warning,
-        'bg-surface-sage text-brand': store.registrationStatus().tone === registrationStatusTone.Success,
-        'bg-[color-mix(in_oklch,var(--destructive)_12%,white)] text-destructive': store.registrationStatus().tone === registrationStatusTone.Danger,
-        'bg-muted text-muted-foreground': store.registrationStatus().tone === registrationStatusTone.Neutral
-      }">{{ store.registrationStatus().label }}</span>
+      <p class="m-0 text-[0.74rem] font-medium text-foreground/70">סיכום ההרשמה</p>
     } @else {
       <p class="m-0 text-[0.84rem] font-medium text-brand">שלב {{ store.visibleStepNumber() }} מתוך {{ store.visibleSteps().length }}</p>
     }
     <h1 class="m-0 text-[length:var(--app-page-title-size)] font-black leading-[1.1] text-brand">{{ store.stepTitle() }}</h1>
-    <p class="m-0 max-w-[34rem] text-[clamp(var(--app-body-size),1.9vw,0.9rem)] leading-[1.55] text-[color-mix(in_oklch,var(--foreground)_84%,white)]">{{ store.stepDescription() }}</p>
+    @if (store.activeStep() !== store.steps.length - 1) {
+      <p class="m-0 max-w-[34rem] text-[clamp(var(--app-body-size),1.9vw,0.9rem)] leading-[1.55] text-[color-mix(in_oklch,var(--foreground)_84%,white)]">{{ store.stepDescription() }}</p>
+    }
   </section>
 
   @switch (store.activeStep()) {
@@ -41,8 +39,6 @@
       <app-child-details-stage />
     }
     @case (2) {
-      <app-plan-stage />
-      <app-agreements-stage />
       <app-documents-stage />
     }
     @case (3) {
@@ -56,6 +52,9 @@
         <span>{{ store.primaryLabel() }}</span>
         <ng-icon name="lucideArrowLeft" />
       </button>
+      @if (store.hasError()) {
+        <p class="m-0 text-center text-[0.78rem] font-semibold text-destructive">{{ store.error() }}</p>
+      }
       @if (store.activeVisibleStepIndex() <= 0) {
         <button hlmBtn variant="ghost" class="h-auto min-h-0 w-auto gap-[0.45rem] border-0 bg-transparent px-0 py-0 text-[0.82rem] font-bold text-foreground [border-radius:0] hover:bg-transparent hover:underline hover:underline-offset-4" type="button" routerLink="/">
           <ng-icon name="lucideChevronRight" class="h-4 w-4" />
@@ -70,10 +69,9 @@
       <button hlmBtn variant="link" class="text-[0.78rem] font-semibold text-brand underline underline-offset-4" type="button" (click)="store.saveAndContinueLater()">שמירה והמשך מאוחר יותר</button>
     } @else {
       <button hlmBtn class="h-[var(--app-button-height)] w-[min(100%,24rem)] rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/95 to-primary px-[1.6rem] text-[length:var(--app-button-size)] font-bold text-primary-foreground disabled:bg-[color-mix(in_oklch,var(--muted)_75%,#aaa)] disabled:shadow-none" type="button" routerLink="/">
-        <span>{{ store.primaryLabel() }}</span>
+        <span>חזרה לעמוד הראשי</span>
+        <ng-icon name="lucideArrowLeft" />
       </button>
-      <button hlmBtn variant="outline" class="h-[var(--app-secondary-button-height)] w-[min(100%,18rem)] border-brand px-[1.1rem] text-[0.82rem] font-bold text-brand" type="button">הורדת פרטי ההרשמה</button>
-      <button hlmBtn variant="link" class="text-[0.78rem] font-semibold text-brand underline underline-offset-4" type="button" routerLink="/my-registrations">צפייה בהרשמות שלי</button>
     }
   </section>
 

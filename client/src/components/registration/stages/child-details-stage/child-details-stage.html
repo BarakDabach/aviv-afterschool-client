@@ -1,45 +1,40 @@
 <section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[var(--app-section-gap)]">
-  <app-details-card iconName="lucideUserRound" title="פרטי הילדים" description="אפשר לרשום ילד אחד או להוסיף ילד נוסף לאותה הרשמה." />
-
   <section class="grid gap-[0.55rem]" aria-label="ילדים בהרשמה">
     @for (child of store.children(); track child.id; let index = $index) {
-      <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid min-h-[3.1rem] grid-cols-[auto_1fr_auto] items-center gap-[0.65rem] px-[0.75rem] py-[0.58rem] max-[540px]:grid-cols-1 [&>ng-icon]:h-[1.45rem] [&>ng-icon]:w-[1.45rem] [&>ng-icon]:text-brand [&_strong]:block [&_strong]:text-[0.82rem] [&_strong]:text-brand [&_small]:mt-[0.08rem] [&_small]:block [&_small]:text-[0.68rem] [&_small]:text-muted-foreground" [ngClass]="{ 'border-[color-mix(in_oklch,var(--brand)_65%,transparent)] bg-[color-mix(in_oklch,var(--surface-sage)_34%,white)]': index === 0 }">
-        <ng-icon name="lucideUserRound" />
-        <span>
-          <strong>{{ store.childDisplayName(child, index) }}</strong>
-          <small>פרטים חדשים למילוי</small>
-        </span>
-        @if (store.children().length > 1) {
-          <button hlmBtn variant="ghost" type="button" class="h-8 w-8 min-w-0 p-0 text-brand [&_ng-icon]:h-4 [&_ng-icon]:w-4" [attr.aria-label]="'הסרת ' + store.childDisplayName(child, index)" (click)="store.removeChild(child.id)">
-            <ng-icon name="lucideTrash2" />
-          </button>
-        }
-      </article>
+      <app-details-card
+        iconName="lucideUserRound"
+        [title]="store.childDisplayName(child, index)"
+        description="פרטים חדשים למילוי"
+        actionIconName="lucideTrash2"
+        [showAction]="store.children().length > 1"
+        [actionAriaLabel]="'הסרת ' + store.childDisplayName(child, index)"
+        (actionClicked)="store.removeChild(child.id)"
+      />
     }
 
-    <button hlmBtn variant="outline" type="button" class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] min-h-[3.1rem] justify-center gap-[0.4rem] text-[0.82rem] font-bold text-brand [&_ng-icon]:h-4 [&_ng-icon]:w-4" (click)="store.addChild()">
+    <button hlmBtn type="button" class="h-[var(--app-button-height)] justify-center gap-2 rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/95 to-primary px-[1.1rem] text-[0.82rem] font-bold text-primary-foreground shadow-xl shadow-primary/20 [&_ng-icon]:h-4 [&_ng-icon]:w-4" (click)="store.addChild()">
       <ng-icon name="lucidePlus" />
       <span>הוספת ילד נוסף</span>
     </button>
   </section>
 
   @for (child of store.children(); track child.id; let index = $index) {
-    <section class="grid gap-[0.55rem] text-start [direction:rtl]" [ngClass]="{ 'border-t border-border pt-[0.35rem]': index > 0 }">
+    <section class="mt-5 grid gap-[0.7rem] rounded-[var(--app-card-radius)] border border-border p-6 text-start [direction:rtl] first:mt-0 max-[540px]:p-4">
       @let childField = store.childField(index);
       <h2 class="inline-flex items-center justify-self-start gap-[0.55rem] text-start text-[length:var(--app-section-title-size)] font-extrabold text-brand after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']">פרטים אישיים - {{ store.childDisplayName(child, index) }}</h2>
       <div class="grid grid-cols-2 gap-[0.65rem] max-[540px]:grid-cols-1">
         <label class="grid gap-[0.3rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive" [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.childNameHasError(childField) }">
           <span>שם מלא של הילד</span>
-          <input hlmInput [formField]="childField.name" [placeholder]="index === 0 ? 'לדוגמה: אורי לוי' : 'שם מלא'" [attr.aria-label]="'שם מלא של ' + store.childDisplayName(child, index)" [attr.aria-invalid]="store.childNameHasError(childField)" [attr.aria-describedby]="store.childNameHasError(childField) ? 'child-name-error-' + child.id : null" />
+          <input hlmInput [formField]="childField.fullName" [placeholder]="index === 0 ? 'לדוגמה: אורי לוי' : 'שם מלא'" [attr.aria-label]="'שם מלא של ' + store.childDisplayName(child, index)" [attr.aria-invalid]="store.childNameHasError(childField)" [attr.aria-describedby]="store.childNameHasError(childField) ? 'child-name-error-' + child.id : null" />
           <small [id]="'child-name-error-' + child.id">{{ store.childNameError(childField) }}</small>
         </label>
         <label class="grid gap-[0.3rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive" [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.birthDateHasError(childField) }">
           <span>תאריך לידה</span>
           <hlm-date-picker
-            class="block [direction:rtl] [&_[data-slot=input-group-addon][data-align=inline-end]]:pointer-events-none [&_[data-slot=input-group-addon][data-align=inline-end]]:absolute [&_[data-slot=input-group-addon][data-align=inline-end]]:inset-block-0 [&_[data-slot=input-group-addon][data-align=inline-end]]:inset-inline-end-2 [&_[data-slot=input-group-addon][data-align=inline-end]]:z-[1] [&_[data-slot=input-group-addon][data-align=inline-end]]:p-0 [&_[data-slot=input-group-addon][data-align=inline-end]_button]:mr-1.5 [&_[data-slot=input-group-addon][data-align=inline-end]_button]:pointer-events-auto [&_[data-slot=input-group-addon][data-align=inline-end]_button]:rounded-[6px] [&_[data-slot=input-group-control]]:h-[calc(var(--app-field-height)-2px)] [&_[data-slot=input-group-control]]:ps-3 [&_[data-slot=input-group-control]]:pe-[2.65rem] [&_[data-slot=input-group-control]]:text-center [&_[data-slot=input-group-control]]:[direction:rtl] [&_[data-slot=input-group]]:relative [&_[data-slot=input-group]]:h-[var(--app-field-height)] [&_[data-slot=input-group]]:overflow-hidden [&_[data-slot=input-group]]:rounded-[0.48rem] [&_[data-slot=input-group]]:border-border [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:text-foreground [&_[data-slot=input-group]]:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--border)_34%,transparent)] [&_[data-slot=popover-content]]:rounded-[8px] [&_[data-slot=popover-content]]:border-border [&_[data-slot=popover-content]]:bg-popover"
+            class="block [direction:rtl] [&_[data-slot=input-group-addon][data-align=inline-end]]:pointer-events-none [&_[data-slot=input-group-addon][data-align=inline-end]]:absolute [&_[data-slot=input-group-addon][data-align=inline-end]]:inset-block-0 [&_[data-slot=input-group-addon][data-align=inline-end]]:inset-inline-end-2 [&_[data-slot=input-group-addon][data-align=inline-end]]:z-[1] [&_[data-slot=input-group-addon][data-align=inline-end]]:p-0 [&_[data-slot=input-group-addon][data-align=inline-end]_button]:mr-1.5 [&_[data-slot=input-group-addon][data-align=inline-end]_button]:pointer-events-auto [&_[data-slot=input-group-addon][data-align=inline-end]_button]:rounded-[6px] [&_[data-slot=input-group-control]]:h-[calc(var(--app-field-height)-2px)] [&_[data-slot=input-group-control]]:ps-3 [&_[data-slot=input-group-control]]:pe-[2.65rem] [&_[data-slot=input-group-control]]:text-center [&_[data-slot=input-group-control]]:[direction:rtl] [&_[data-slot=input-group]]:relative [&_[data-slot=input-group]]:h-[var(--app-field-height)] [&_[data-slot=input-group]]:overflow-hidden [&_[data-slot=input-group]]:rounded-[0.48rem] [&_[data-slot=input-group]]:border-border [&_[data-slot=input-group]]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_[data-slot=input-group]]:text-foreground [&_[data-slot=input-group]]:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--border)_34%,transparent)] [&_[data-slot=popover-content]]:rounded-[8px] [&_[data-slot=popover-content]]:border-border [&_[data-slot=popover-content]]:bg-popover"
             dir="rtl"
             captionLayout="dropdown"
-            [date]="store.selectedDate(childField.birthDate().value())"
+            [date]="store.selectedDate(childField.dateOfBirth().value())"
             [maxDate]="store.maxDate"
             [defaultFocusedDate]="store.defaultFocusedDate"
             [formatDate]="store.formatDate"
@@ -50,6 +45,7 @@
               dir="rtl"
               [inputId]="'child-birth-date-' + child.id"
               placeholder="בחרו תאריך לידה"
+              [openOnClick]="true"
               [forceInvalid]="store.birthDateHasError(childField)"
               [calendarAriaLabel]="'תאריך לידה של ' + store.childDisplayName(child, index)"
               clearAriaLabel="ניקוי תאריך"
@@ -62,16 +58,28 @@
       </div>
 
       <section class="mt-[0.45rem] grid gap-2 border-t border-[color-mix(in_oklch,var(--border)_72%,transparent)] pt-[0.65rem] [&_h3]:m-0 [&_h3]:text-[0.84rem] [&_h3]:font-extrabold [&_h3]:text-brand [&_p]:m-0 [&_p]:text-[0.78rem] [&_p]:text-foreground">
+        <h3>מגדר - {{ store.childDisplayName(child, index) }}</h3>
+        <brn-toggle-group type="single" [nullable]="false" class="grid grid-cols-2 gap-[0.35rem]" [value]="childField.gender().value()" [attr.aria-label]="'מגדר עבור ' + store.childDisplayName(child, index)" (valueChange)="store.setGender(childField, $event)">
+          <button brnToggleGroupItem type="button" class="flex min-h-[2.35rem] cursor-pointer items-center justify-center rounded-[0.48rem] border bg-[color-mix(in_oklch,var(--background)_78%,white)] px-3 text-[0.78rem] font-bold text-foreground transition-[border-color,background-color,color] duration-150" [ngClass]="{ 'border-brand bg-surface-sage text-brand': childField.gender().value() === gender.Female, 'border-border': childField.gender().value() !== gender.Female }" [value]="gender.Female" (click)="store.setGender(childField, gender.Female)">
+            <span>בת</span>
+          </button>
+          <button brnToggleGroupItem type="button" class="flex min-h-[2.35rem] cursor-pointer items-center justify-center rounded-[0.48rem] border bg-[color-mix(in_oklch,var(--background)_78%,white)] px-3 text-[0.78rem] font-bold text-foreground transition-[border-color,background-color,color] duration-150" [ngClass]="{ 'border-brand bg-surface-sage text-brand': childField.gender().value() === gender.Male, 'border-border': childField.gender().value() !== gender.Male }" [value]="gender.Male" (click)="store.setGender(childField, gender.Male)">
+            <span>בן</span>
+          </button>
+        </brn-toggle-group>
+      </section>
+
+      <section class="mt-[0.45rem] grid gap-2 border-t border-[color-mix(in_oklch,var(--border)_72%,transparent)] pt-[0.65rem] [&_h3]:m-0 [&_h3]:text-[0.84rem] [&_h3]:font-extrabold [&_h3]:text-brand [&_p]:m-0 [&_p]:text-[0.78rem] [&_p]:text-foreground">
         <h3>אלרגיות ורגישויות - {{ store.childDisplayName(child, index) }}</h3>
         <p>האם לילד יש אלרגיות או רגישויות?</p>
-        <hlm-radio-group class="grid grid-cols-2 gap-[0.35rem] [&_hlm-radio]:flex [&_hlm-radio]:min-h-[2.35rem] [&_hlm-radio]:cursor-pointer [&_hlm-radio]:items-center [&_hlm-radio]:justify-center [&_hlm-radio]:rounded-[0.48rem] [&_hlm-radio]:border [&_hlm-radio]:border-border [&_hlm-radio]:bg-[color-mix(in_oklch,var(--background)_78%,white)] [&_hlm-radio]:text-[0.78rem]" [value]="childField.allergyAnswer().value()" [attr.aria-label]="'אלרגיות ורגישויות עבור ' + store.childDisplayName(child, index)" (valueChange)="store.setAllergyAnswer(childField, $event)">
-          <hlm-radio [value]="allergyAnswer.Yes" [ngClass]="{ '!border-brand': childField.allergyAnswer().value() === allergyAnswer.Yes }" (click)="store.setAllergyAnswer(childField, allergyAnswer.Yes)">
+        <brn-toggle-group type="single" [nullable]="false" class="grid grid-cols-2 gap-[0.35rem]" [value]="childField.allergyAnswer().value()" [attr.aria-label]="'אלרגיות ורגישויות עבור ' + store.childDisplayName(child, index)" (valueChange)="store.setAllergyAnswer(childField, $event)">
+          <button brnToggleGroupItem type="button" class="flex min-h-[2.35rem] cursor-pointer items-center justify-center rounded-[0.48rem] border bg-[color-mix(in_oklch,var(--background)_78%,white)] px-3 text-[0.78rem] font-bold text-foreground transition-[border-color,background-color,color] duration-150" [ngClass]="{ 'border-brand bg-surface-sage text-brand': childField.allergyAnswer().value() === allergyAnswer.Yes, 'border-border': childField.allergyAnswer().value() !== allergyAnswer.Yes }" [value]="allergyAnswer.Yes" (click)="store.setAllergyAnswer(childField, allergyAnswer.Yes)">
             <span>כן</span>
-          </hlm-radio>
-          <hlm-radio [value]="allergyAnswer.No" [ngClass]="{ '!border-brand': childField.allergyAnswer().value() === allergyAnswer.No }" (click)="store.setAllergyAnswer(childField, allergyAnswer.No)">
+          </button>
+          <button brnToggleGroupItem type="button" class="flex min-h-[2.35rem] cursor-pointer items-center justify-center rounded-[0.48rem] border bg-[color-mix(in_oklch,var(--background)_78%,white)] px-3 text-[0.78rem] font-bold text-foreground transition-[border-color,background-color,color] duration-150" [ngClass]="{ 'border-brand bg-surface-sage text-brand': childField.allergyAnswer().value() === allergyAnswer.No, 'border-border': childField.allergyAnswer().value() !== allergyAnswer.No }" [value]="allergyAnswer.No" (click)="store.setAllergyAnswer(childField, allergyAnswer.No)">
             <span>לא</span>
-          </hlm-radio>
-        </hlm-radio-group>
+          </button>
+        </brn-toggle-group>
 
         @if (childField.allergyAnswer().value() === allergyAnswer.Yes) {
           <label class="grid gap-[0.3rem] pt-[0.2rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive" animate.enter="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-1 motion-safe:duration-200 motion-safe:ease-out" animate.leave="motion-safe:animate-out motion-safe:fade-out motion-safe:slide-out-to-top-1 motion-safe:duration-150 motion-safe:ease-in" [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.allergyDetailsHasError(childField) }">
@@ -81,6 +89,37 @@
           </label>
         }
       </section>
+
+      <section class="mt-[0.45rem] grid gap-3 border-t border-[color-mix(in_oklch,var(--border)_72%,transparent)] pt-[0.85rem] [&_h3]:m-0 [&_h3]:text-[0.84rem] [&_h3]:font-extrabold [&_h3]:text-brand [&_p]:m-0 [&_p]:text-[0.78rem] [&_p]:text-foreground">
+        <header class="grid gap-1">
+          <h3>בחירת מסלול - {{ store.childDisplayName(child, index) }}</h3>
+          @if (store.getChildDiscountPercent(index) > 0) {
+            <p class="font-bold text-primary">לילד השני מוצגת הנחת 10% על המסלול הנבחר.</p>
+          }
+        </header>
+
+        <div class="mx-auto grid w-full gap-2" role="radiogroup" [attr.aria-label]="'בחירת מסלול עבור ' + store.childDisplayName(child, index)">
+          @for (yearPlan of store.availableYearPlans(); track yearPlan.yearPlanId) {
+            <app-selection-card
+              [title]="yearPlan.plan.name"
+              [description]="yearPlan.plan.hours"
+              [price]="yearPlan.plan.price"
+              priceMeta="לחודש"
+              [selected]="child.selectedYearPlanId === yearPlan.yearPlanId"
+              [ariaLabel]="yearPlan.plan.name + ' עבור ' + store.childDisplayName(child, index)"
+              (selectedChange)="store.setChildPlan(child.id, yearPlan.yearPlanId)"
+            />
+          }
+        </div>
+      </section>
     </section>
   }
+
+  <article class="grid min-h-[3.4rem] grid-cols-[1fr_auto] items-center gap-4 rounded-[var(--app-card-radius)] border border-border bg-card/80 px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] text-start max-[540px]:grid-cols-1">
+    <span class="grid gap-1">
+      <strong class="text-brand">סיכום ביניים</strong>
+      <small class="text-[0.78rem] text-foreground/70">לפני בדיקת הצוות ואישור סופי</small>
+    </span>
+    <strong class="text-[1.08rem] text-brand">{{ store.formattedSubtotal() }}</strong>
+  </article>
 </section>

@@ -1,19 +1,23 @@
 import { computed, effect, inject, signal, untracked } from '@angular/core';
 import { applyEach, applyWhen, form, schema, validate, type FieldTree } from '@angular/forms/signals';
 import { signalStore, withComputed, withHooks, withMethods, withProps } from '@ngrx/signals';
-import { AllergyAnswer, type RegistrationChildDraft } from '../../../../app/types/registration-status.type';
+import { AllergyAnswer, Gender, type RegistrationChildDraft } from '../../../../app/types/registration-status.type';
 import { RegistrationStore } from '../../registration.store';
 
 type ChildDetailsFormModel = RegistrationChildDraft[];
 type ChildDetailsField = FieldTree<RegistrationChildDraft, number>;
 
 const childDetailsSchema = schema<RegistrationChildDraft>((child) => {
-  validate(child.name, ({ value }) => {
+  validate(child.fullName, ({ value }) => {
     return value().trim().length > 1 ? undefined : { kind: 'child-name', message: 'הזינו שם מלא של הילד' };
   });
 
-  validate(child.birthDate, ({ value }) => {
+  validate(child.dateOfBirth, ({ value }) => {
     return value().trim().length > 0 ? undefined : { kind: 'child-birth-date', message: 'הזינו תאריך לידה' };
+  });
+
+  validate(child.gender, ({ value }) => {
+    return value() === Gender.Female || value() === Gender.Male ? undefined : { kind: 'child-gender', message: 'בחרו מגדר' };
   });
 
   validate(child.allergyAnswer, ({ value }) => {
@@ -32,8 +36,9 @@ const childDetailsSchema = schema<RegistrationChildDraft>((child) => {
 export const ChildDetailsStageStore = signalStore(
   withProps(() => {
     const registrationStore = inject(RegistrationStore);
+    const defaultPlanId = registrationStore.availableYearPlans()[0]?.yearPlanId ?? null;
     const childrenModel = signal<ChildDetailsFormModel>(
-      registrationStore.children().map((child) => normalizeChildDraft(child)),
+      registrationStore.children().map((child) => normalizeChildDraft(child, defaultPlanId)),
     );
     const childrenForm = form(childrenModel, (children) => {
       applyEach(children, childDetailsSchema);
@@ -50,13 +55,20 @@ export const ChildDetailsStageStore = signalStore(
       registrationStore,
     };
   }),
-  withComputed(({ childrenForm, childrenModel }) => {
+  withComputed(({ childrenForm, childrenModel, registrationStore }) => {
     const children = computed(() => childrenModel());
     const valid = computed(() => children().length > 0 && childrenForm().valid());
+    const subtotal = computed(() => {
+      return registrationStore.children().reduce((total, child, index) => total + registrationStore.getChildFinalPrice(child, index), 0);
+    });
+    const formattedSubtotal = computed(() => formatCurrency(subtotal()));
 
     return {
       children,
       valid,
+      availableYearPlans: computed(() => registrationStore.availableYearPlans()),
+      subtotal,
+      formattedSubtotal,
     };
   }),
   withMethods(({ childrenForm, childrenModel, registrationStore }) => ({
@@ -66,24 +78,30 @@ export const ChildDetailsStageStore = signalStore(
     addChild(): void {
       childrenModel.update((children) => [
         ...children,
-        createEmptyChild(registrationStore.reserveChildId()),
+        createEmptyChild(registrationStore.reserveChildId(), registrationStore.availableYearPlans()[0]?.yearPlanId ?? null),
       ]);
     },
     removeChild(childId: number): void {
       childrenModel.update((children) => {
         const nextChildren = children.filter((child) => child.id !== childId);
 
-        return nextChildren.length ? nextChildren : [createEmptyChild(registrationStore.reserveChildId())];
+        return nextChildren.length ? nextChildren : [createEmptyChild(registrationStore.reserveChildId(), registrationStore.availableYearPlans()[0]?.yearPlanId ?? null)];
       });
     },
     selectedDate(value: string): Date | undefined {
       return parseIsoDate(value);
     },
     setBirthDate(childField: ChildDetailsField, birthDate: Date | null): void {
-      childField.birthDate().value.set(birthDate ? formatIsoDate(birthDate) : '');
-      childField.birthDate().markAsTouched();
+      childField.dateOfBirth().value.set(birthDate ? formatIsoDate(birthDate) : '');
+      childField.dateOfBirth().markAsTouched();
     },
-    setAllergyAnswer(childField: ChildDetailsField, allergyAnswer: string): void {
+    setGender(childField: ChildDetailsField, gender: unknown): void {
+      if (gender !== Gender.Female && gender !== Gender.Male) return;
+
+      childField.gender().value.set(gender);
+      childField.gender().markAsTouched();
+    },
+    setAllergyAnswer(childField: ChildDetailsField, allergyAnswer: unknown): void {
       if (allergyAnswer !== AllergyAnswer.Yes && allergyAnswer !== AllergyAnswer.No) return;
 
       childField.allergyAnswer().value.set(allergyAnswer);
@@ -95,37 +113,60 @@ export const ChildDetailsStageStore = signalStore(
       }
     },
     childDisplayName(child: RegistrationChildDraft, index: number): string {
-      return child.name.trim() || `ילד ${index + 1}`;
+      return child.fullName.trim() || `ילד ${index + 1}`;
     },
     childNameHasError(childField: ChildDetailsField): boolean {
-      return childField.name().touched() && childField.name().invalid();
+      return childField.fullName().touched() && childField.fullName().invalid();
     },
     birthDateHasError(childField: ChildDetailsField): boolean {
-      return childField.birthDate().touched() && childField.birthDate().invalid();
+      return childField.dateOfBirth().touched() && childField.dateOfBirth().invalid();
     },
     allergyDetailsHasError(childField: ChildDetailsField): boolean {
       return childField.allergyDetails().touched() && childField.allergyDetails().invalid();
     },
     childNameError(childField: ChildDetailsField): string {
-      return this.childNameHasError(childField) ? childField.name().errors()[0]?.message || 'הזינו שם מלא של הילד' : '';
+      return this.childNameHasError(childField) ? childField.fullName().errors()[0]?.message || 'הזינו שם מלא של הילד' : '';
     },
     birthDateError(childField: ChildDetailsField): string {
-      return this.birthDateHasError(childField) ? childField.birthDate().errors()[0]?.message || 'הזינו תאריך לידה' : '';
+      return this.birthDateHasError(childField) ? childField.dateOfBirth().errors()[0]?.message || 'הזינו תאריך לידה' : '';
     },
     allergyDetailsError(childField: ChildDetailsField): string {
       return this.allergyDetailsHasError(childField)
         ? childField.allergyDetails().errors()[0]?.message || 'פרטו את האלרגיות או הרגישויות'
         : '';
     },
+    setChildPlan(childId: number, selectedYearPlanId: string | number | null): void {
+      registrationStore.setChildPlan(childId, selectedYearPlanId);
+
+      const yearPlanId = selectedYearPlanId === null ? null : Number(selectedYearPlanId);
+
+      if (yearPlanId === null || !registrationStore.availableYearPlans().some((yearPlan) => yearPlan.yearPlanId === yearPlanId)) return;
+
+      childrenModel.update((children) => {
+        return children.map((child) => (child.id === childId ? { ...child, selectedYearPlanId: yearPlanId } : child));
+      });
+    },
+    getPlanLabel(selectedYearPlanId: number | null): string {
+      return registrationStore.getPlanLabel(selectedYearPlanId);
+    },
+    getChildFinalPrice(child: RegistrationChildDraft, index: number): number {
+      return registrationStore.getChildFinalPrice(child, index);
+    },
+    getChildDiscountPercent(index: number): number {
+      return registrationStore.getChildDiscountPercent(index);
+    },
     syncChildren(children: RegistrationChildDraft[], valid: boolean): void {
-      registrationStore.setChildren(children.map((child) => normalizeChildDraft(child)));
+      const defaultPlanId = registrationStore.availableYearPlans()[0]?.yearPlanId ?? null;
+
+      registrationStore.setChildren(children.map((child) => normalizeChildDraft(child, defaultPlanId)));
       registrationStore.setChildDetailsValid(valid);
     },
   })),
-  withHooks(({ childrenModel, syncChildren, valid }) => ({
+  withHooks(({ childrenModel, registrationStore, syncChildren, valid }) => ({
     onInit(): void {
       effect(() => {
-        const children = childrenModel().map((child) => normalizeChildDraft(child));
+        const defaultPlanId = registrationStore.availableYearPlans()[0]?.yearPlanId ?? null;
+        const children = childrenModel().map((child) => normalizeChildDraft(child, defaultPlanId));
         const formValid = valid();
 
         untracked(() => {
@@ -136,21 +177,27 @@ export const ChildDetailsStageStore = signalStore(
   })),
 );
 
-function createEmptyChild(id: number): RegistrationChildDraft {
+function createEmptyChild(id: number, selectedYearPlanId: number | null): RegistrationChildDraft {
   return {
     id,
-    name: '',
-    birthDate: '',
+    fullName: '',
+    dateOfBirth: '',
+    gender: Gender.Female,
     allergyAnswer: AllergyAnswer.No,
     allergyDetails: '',
+    selectedYearPlanId,
   };
 }
 
-function normalizeChildDraft(child: RegistrationChildDraft): RegistrationChildDraft {
+function normalizeChildDraft(child: RegistrationChildDraft, defaultPlanId: number | null): RegistrationChildDraft {
   return {
     ...child,
+    fullName: child.fullName ?? '',
+    dateOfBirth: child.dateOfBirth ?? '',
+    gender: child.gender === Gender.Male ? Gender.Male : Gender.Female,
     allergyAnswer: child.allergyAnswer === AllergyAnswer.Yes ? AllergyAnswer.Yes : AllergyAnswer.No,
     allergyDetails: child.allergyDetails ?? '',
+    selectedYearPlanId: child.selectedYearPlanId ?? defaultPlanId,
   };
 }
 
@@ -188,6 +235,10 @@ function formatDisplayDate(date: Date): string {
   const year = date.getFullYear();
 
   return `${day}.${month}.${year}`;
+}
+
+function formatCurrency(amount: number): string {
+  return `₪${new Intl.NumberFormat('he-IL').format(amount)}`;
 }
 
 function isSameDateParts(date: Date, year: number, month: number, day: number): boolean {

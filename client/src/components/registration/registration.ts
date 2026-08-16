@@ -6,11 +6,9 @@ import { lucideArrowLeft, lucideCheck, lucideChevronRight } from '@ng-icons/luci
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { RegistrationStatusTone } from '../../app/types/registration-status.type';
 import { RegistrationStore } from './registration.store';
-import { AgreementsStage } from './stages/agreements-stage/agreements-stage';
 import { ChildDetailsStage } from './stages/child-details-stage/child-details-stage';
 import { DocumentsStage } from './stages/documents-stage/documents-stage';
 import { ParentDetailsStage } from './stages/parent-details-stage/parent-details-stage';
-import { PlanStage } from './stages/plan-stage/plan-stage';
 import { SummaryStage } from './stages/summary-stage/summary-stage';
 
 @Component({
@@ -22,8 +20,6 @@ import { SummaryStage } from './stages/summary-stage/summary-stage';
     HlmButtonImports,
     ParentDetailsStage,
     ChildDetailsStage,
-    PlanStage,
-    AgreementsStage,
     DocumentsStage,
     SummaryStage,
   ],
