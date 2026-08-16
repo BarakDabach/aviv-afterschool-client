@@ -1,0 +1,60 @@
+@if (selectable) {
+  <button
+    type="button"
+    role="radio"
+    dir="rtl"
+    class="grid min-h-[3.25rem] w-full grid-cols-[auto_minmax(0,1fr)_minmax(4.7rem,auto)] items-center gap-3 rounded-[0.42rem] border px-3 py-2 text-start text-foreground transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out"
+    [ngClass]="cardStateClasses"
+    [attr.aria-checked]="selected"
+    [attr.aria-label]="ariaLabel || title"
+    (click)="select()"
+  >
+    <span
+      class="grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-[border-color,box-shadow] duration-200"
+      aria-hidden="true"
+      [ngClass]="{
+        'border-brand shadow-[0_0_0_1px_color-mix(in_oklch,var(--brand)_12%,transparent)]': selected,
+        'border-foreground/35': !selected
+      }"
+    >
+      @if (selected) {
+        <span class="h-2 w-2 rounded-full bg-brand motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:duration-150"></span>
+      }
+    </span>
+
+    <span class="grid min-w-0 justify-items-start gap-[0.08rem] text-start">
+      <strong class="text-[0.82rem] font-extrabold leading-tight text-brand">{{ title }}</strong>
+      @if (description) {
+        <small class="text-[0.62rem] leading-[1.25] text-foreground/70">{{ description }}</small>
+      }
+    </span>
+
+    <span class="grid justify-items-end gap-[0.08rem] text-end">
+      <strong class="text-[0.82rem] font-extrabold leading-tight text-brand">{{ displayPrice }}</strong>
+      @if (priceMeta) {
+        <small class="text-[0.62rem] leading-[1.25] text-foreground/70">{{ priceMeta }}</small>
+      }
+    </span>
+  </button>
+} @else {
+  <article
+    dir="rtl"
+    class="grid min-h-[3.25rem] w-full grid-cols-[minmax(0,1fr)_minmax(4.7rem,auto)] items-center gap-3 rounded-[0.42rem] border px-3 py-2 text-start text-foreground transition-[border-color,background-color,box-shadow] duration-200 ease-out"
+    [ngClass]="cardStateClasses"
+    [attr.aria-label]="ariaLabel || title"
+  >
+    <span class="grid min-w-0 justify-items-start gap-[0.08rem] text-start">
+      <strong class="text-[0.82rem] font-extrabold leading-tight text-brand">{{ title }}</strong>
+      @if (description) {
+        <small class="text-[0.62rem] leading-[1.25] text-foreground/70">{{ description }}</small>
+      }
+    </span>
+
+    <span class="grid justify-items-end gap-[0.08rem] text-end">
+      <strong class="text-[0.82rem] font-extrabold leading-tight text-brand">{{ displayPrice }}</strong>
+      @if (priceMeta) {
+        <small class="text-[0.62rem] leading-[1.25] text-foreground/70">{{ priceMeta }}</small>
+      }
+    </span>
+  </article>
+}

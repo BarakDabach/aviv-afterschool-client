@@ -1,66 +1,152 @@
-<section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[var(--app-section-gap)]">
-  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid grid-cols-[auto_1fr_auto] items-center gap-[var(--app-card-gap)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] max-[540px]:grid-cols-1 [&>ng-icon]:h-[var(--app-icon-xl)] [&>ng-icon]:w-[var(--app-icon-xl)] [&>ng-icon]:text-brand [&_h2]:m-0 [&_h2]:mb-[0.45rem] [&_h2]:text-[length:var(--app-card-title-size)] [&_h2]:font-extrabold [&_h2]:text-brand [&_p]:m-0 [&_p]:mt-1 [&_span]:mt-1 [&_span]:block [&_span]:w-fit [&_span]:rounded-[0.45rem] [&_span]:border [&_span]:border-border [&_span]:px-[0.65rem] [&_span]:py-[0.18rem] [&>strong]:self-start [&>strong]:rounded-full [&>strong]:bg-surface-sage [&>strong]:px-[0.8rem] [&>strong]:py-[0.3rem] [&>strong]:text-brand">
-    <ng-icon name="lucideUsersRound" />
-    <div>
-      <h2>{{ store.familyTitle() }}</h2>
-      <p>{{ store.parentDetails().fullName || 'פרטי ההורה נשמרו' }} · {{ store.parentDetails().phone || 'מספר הטלפון נשמר' }}</p>
-      <span>{{ store.childrenSummary() }}</span>
-    </div>
-    <strong>{{ store.childCountLabel() }}</strong>
-  </article>
+<section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[1rem]">
+  @if (store.submittedRegistration(); as registration) {
+    <section class="grid gap-[0.65rem]" aria-label="ילדים ומסלולים">
+      @for (childState of registration.children; track childState.id) {
+        <article class="grid min-h-[5.4rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[0.65rem] border border-border bg-[color-mix(in_oklch,var(--surface-warm)_44%,white)] px-4 py-3 text-start shadow-[0_0.45rem_1.15rem_color-mix(in_oklch,var(--brand)_5%,transparent)] max-[320px]:gap-2 max-[320px]:px-3">
+          <span class="grid h-[3.9rem] w-[3.9rem] place-items-center rounded-full bg-surface-sage text-brand max-[320px]:h-[3.55rem] max-[320px]:w-[3.55rem]">
+            <ng-icon name="lucideUserRound" class="h-9 w-9 max-[320px]:h-8 max-[320px]:w-8" />
+          </span>
 
-  <article class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] border px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] text-start" [ngClass]="{
-    'border-primary/35 bg-[color-mix(in_oklch,var(--primary)_14%,white)]': store.registrationStatus().tone === registrationStatusTone.Warning,
-    'border-brand/35 bg-surface-sage/60': store.registrationStatus().tone === registrationStatusTone.Success,
-    'border-destructive/35 bg-[color-mix(in_oklch,var(--destructive)_10%,white)]': store.registrationStatus().tone === registrationStatusTone.Danger,
-    'border-border bg-muted/55': store.registrationStatus().tone === registrationStatusTone.Neutral
-  }">
-    <span class="grid h-[var(--app-icon-lg)] w-[var(--app-icon-lg)] place-items-center rounded-full" [ngClass]="{
-      'bg-primary/20 text-[color-mix(in_oklch,var(--foreground)_74%,var(--primary))]': store.registrationStatus().tone === registrationStatusTone.Warning,
-      'bg-brand/12 text-brand': store.registrationStatus().tone === registrationStatusTone.Success,
-      'bg-destructive/10 text-destructive': store.registrationStatus().tone === registrationStatusTone.Danger,
-      'bg-background/70 text-muted-foreground': store.registrationStatus().tone === registrationStatusTone.Neutral
-    }">
-      @if (store.registrationStatus().kind === registrationStatusKind.Approved) {
-        <ng-icon name="lucideCheck" class="h-[var(--app-icon-sm)] w-[var(--app-icon-sm)]" />
-      } @else {
-        <ng-icon name="lucideClock" class="h-[var(--app-icon-sm)] w-[var(--app-icon-sm)]" />
+          <span class="grid min-w-0 gap-[0.18rem]">
+            <strong class="truncate text-[0.95rem] font-extrabold text-brand">{{ childState.child.fullName }}</strong>
+            <small class="text-[0.74rem] font-semibold text-foreground/75">{{ childState.selectedPlan?.plan?.name || 'לא נבחר מסלול' }}</small>
+            <small class="text-[0.72rem] text-foreground/70">{{ childState.selectedPlan?.plan?.hours || '' }}</small>
+          </span>
+
+          <span class="w-fit whitespace-nowrap rounded-full border border-primary/25 bg-[color-mix(in_oklch,var(--primary)_12%,white)] px-3 py-1 text-[0.72rem] font-bold text-[color-mix(in_oklch,var(--foreground)_72%,var(--primary))] max-[320px]:px-2 max-[320px]:text-[0.68rem]">
+            @if (registration.missingDocuments.length) {
+              ממתינה למסמכים
+            } @else {
+              ממתינה לאישור
+            }
+          </span>
+        </article>
       }
-    </span>
-    <div class="grid gap-1">
-      <h2 class="m-0 text-[length:var(--app-card-title-size)] font-extrabold text-brand">{{ store.registrationStatus().label }}</h2>
-      <p class="m-0 text-[length:var(--app-body-size)] leading-[1.55] text-foreground/80">{{ store.registrationStatus().description }}</p>
-    </div>
-  </article>
+    </section>
 
-  <section class="grid [&_h2]:m-0 [&_h2]:mb-[0.7rem] [&_h2]:text-center [&_h2]:text-brand [&_article]:grid [&_article]:grid-cols-2 [&_article]:gap-[0.6rem] [&_article]:border-b [&_article]:border-border [&_article]:px-1 [&_article]:py-[0.62rem] max-[540px]:[&_article]:grid-cols-1 [&_span]:flex [&_span]:items-center [&_span]:gap-[0.45rem] [&_ng-icon]:h-[1.12rem] [&_ng-icon]:w-[1.12rem] [&_ng-icon]:text-brand [&_em]:col-start-1 [&_em]:w-fit [&_em]:rounded-full [&_em]:bg-[color-mix(in_oklch,var(--primary)_18%,white)] [&_em]:px-[0.6rem] [&_em]:py-[0.18rem] [&_em]:text-[0.68rem] [&_em]:not-italic [&_em]:text-[color-mix(in_oklch,var(--foreground)_78%,var(--primary))]">
-    <h2>מצב ההרשמות</h2>
-    <article>
-      <span><ng-icon name="lucideCheck" /> הושלם</span>
-      <strong>פרטי הילדים וההורה</strong>
-    </article>
-    <article>
-      <span><ng-icon name="lucideCheck" /> נבחר</span>
-      <strong>מסלול מלא</strong>
-    </article>
-    <article>
-      <span><ng-icon name="lucideClock" /> ממתין לבדיקה ידנית</span>
-      <strong>חוזה משותף</strong>
-    </article>
-    <article>
-      <span><ng-icon name="lucideClock" /> ממתין לבדיקה ידנית</span>
-      <strong>אישור הוראת קבע</strong>
-      <em>קובץ משותף</em>
-    </article>
-    <article>
-      <span><ng-icon name="lucideClock" /> ממתין לבדיקה ידנית</span>
-      <strong>תשלום ביטוח שנתי · 200 ₪</strong>
-      <em>אסמכתה</em>
-    </article>
-  </section>
+    <section class="grid gap-[0.55rem] pt-1" aria-label="סטטוס הרשמה">
+      <h2 class="m-0 text-center text-[0.92rem] font-extrabold text-brand">מצב ההרשמה</h2>
 
-  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] flex min-h-[2.8rem] items-center gap-[0.65rem] bg-[color-mix(in_oklch,var(--surface-sage)_26%,white)] px-[0.8rem] py-[0.65rem] text-[0.76rem] leading-[1.55] text-foreground [&_ng-icon]:h-[var(--app-icon-md)] [&_ng-icon]:w-[var(--app-icon-md)] [&_ng-icon]:flex-none [&_ng-icon]:text-brand">
-    <ng-icon name="lucideShieldCheck" />
-    <span>פרטי ההורה, הילד, המסלול והמסמכים ייבדקו ידנית, ולאחר מכן סטטוס ההרשמה יתעדכן באפליקציה.</span>
-  </article>
+      <article class="grid gap-0 rounded-[0.65rem] text-start">
+        <div class="grid min-h-[2.65rem] grid-cols-[minmax(7.2rem,auto)_minmax(0,1fr)_auto] items-center gap-3 border-b border-border/80 px-1 py-2">
+          <strong class="text-[0.78rem] text-foreground/85">פרטי הילד וההורה</strong>
+          <span class="text-[0.74rem] text-foreground/70">הושלם</span>
+          <span class="grid h-5 w-5 place-items-center rounded-full bg-brand text-brand-foreground">
+            <ng-icon name="lucideCheck" class="h-3.5 w-3.5" />
+          </span>
+        </div>
+
+        <div class="grid min-h-[2.65rem] grid-cols-[minmax(7.2rem,auto)_minmax(0,1fr)_auto] items-center gap-3 border-b border-border/80 px-1 py-2">
+          <strong class="text-[0.78rem] text-foreground/85">חוזה וחתימה</strong>
+          <span class="text-[0.74rem] text-foreground/70">{{ documentStatusText(registration, documentType.SignedContract) }}</span>
+          <span class="grid h-5 w-5 place-items-center rounded-full" [ngClass]="{
+            'bg-brand text-brand-foreground': !hasMissingDocument(registration, documentType.SignedContract),
+            'border border-primary text-primary': hasMissingDocument(registration, documentType.SignedContract)
+          }">
+            @if (hasMissingDocument(registration, documentType.SignedContract)) {
+              <ng-icon name="lucideClock" class="h-3.5 w-3.5" />
+            } @else {
+              <ng-icon name="lucideCheck" class="h-3.5 w-3.5" />
+            }
+          </span>
+        </div>
+
+        <div class="grid min-h-[2.65rem] grid-cols-[minmax(7.2rem,auto)_minmax(0,1fr)_auto] items-center gap-3 border-b border-border/80 px-1 py-2">
+          <strong class="text-[0.78rem] text-foreground/85">אישור הוראת קבע</strong>
+          <span class="text-[0.74rem] text-foreground/70">{{ documentStatusText(registration, documentType.StandingOrderApproval) }}</span>
+          <span class="grid h-5 w-5 place-items-center rounded-full" [ngClass]="{
+            'bg-brand text-brand-foreground': !hasMissingDocument(registration, documentType.StandingOrderApproval),
+            'border border-primary text-primary': hasMissingDocument(registration, documentType.StandingOrderApproval)
+          }">
+            @if (hasMissingDocument(registration, documentType.StandingOrderApproval)) {
+              <ng-icon name="lucideClock" class="h-3.5 w-3.5" />
+            } @else {
+              <ng-icon name="lucideCheck" class="h-3.5 w-3.5" />
+            }
+          </span>
+        </div>
+
+        <div class="grid min-h-[2.65rem] grid-cols-[minmax(7.2rem,auto)_minmax(0,1fr)_auto] items-center gap-3 px-1 py-2">
+          <strong class="text-[0.78rem] text-foreground/85">סה״כ חודשי</strong>
+          <span class="text-[0.74rem] font-bold text-brand">{{ store.formattedSubmittedSubtotal() }}</span>
+          <span class="grid h-5 w-5 place-items-center rounded-full bg-brand text-brand-foreground">
+            <ng-icon name="lucideCheck" class="h-3.5 w-3.5" />
+          </span>
+        </div>
+      </article>
+    </section>
+
+    <article class="grid min-h-[4rem] grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-[0.65rem] border px-4 py-3 text-start" [ngClass]="{
+      'border-brand/30 bg-surface-sage/60': store.submittedDocumentsComplete(),
+      'border-primary/30 bg-[color-mix(in_oklch,var(--surface-warm)_52%,white)]': !store.submittedDocumentsComplete()
+    }">
+      <span class="grid h-10 w-10 place-items-center rounded-full text-brand" [ngClass]="{
+        'bg-brand/12': store.submittedDocumentsComplete(),
+        'bg-primary/15': !store.submittedDocumentsComplete()
+      }">
+        @if (store.submittedDocumentsComplete()) {
+          <ng-icon name="lucideShieldCheck" class="h-6 w-6" />
+        } @else {
+          <ng-icon name="lucideInfo" class="h-6 w-6" />
+        }
+      </span>
+      @if (store.submittedDocumentsComplete()) {
+        <p class="m-0 text-[0.82rem] leading-[1.55] text-foreground/80">כל המסמכים התקבלו. ההרשמה ממתינה לאישור צוות הצהרון.</p>
+      } @else {
+        <p class="m-0 text-[0.82rem] leading-[1.55] text-foreground/80">ההרשמה ממתינה להשלמת המסמכים החסרים. לאחר העלאת כולם היא תישלח לאישור הצוות.</p>
+      }
+    </article>
+
+    <section class="grid gap-[0.55rem]" aria-label="סטטוס מסמכים">
+      <h2 class="m-0 text-center text-[0.92rem] font-extrabold text-brand">סטטוס מסמכים</h2>
+
+      @if (registration.documents.length) {
+        <section class="grid gap-[0.35rem]">
+          <h3 class="m-0 text-[0.82rem] font-extrabold text-brand">מסמכים שהועלו</h3>
+          @for (document of registration.documents; track document.id) {
+            <article class="grid min-h-[2.45rem] grid-cols-[auto_minmax(0,1fr)] items-center gap-2 rounded-[0.5rem] border border-brand/20 bg-surface-sage/45 px-3 py-2 text-start">
+              <span class="grid h-5 w-5 place-items-center rounded-full bg-brand text-brand-foreground">
+                <ng-icon name="lucideCheck" class="h-3.5 w-3.5" />
+              </span>
+              <span class="grid min-w-0 gap-[0.08rem]">
+                <strong class="text-[0.76rem] text-foreground/85">{{ documentTypeLabel(document.documentType) }} · {{ documentScopeLabel(registration, document) }}</strong>
+                <small class="truncate text-[0.7rem] text-foreground/65">{{ document.fileName }}</small>
+              </span>
+            </article>
+          }
+        </section>
+      }
+
+      @if (registration.missingDocuments.length) {
+        <section class="grid gap-[0.35rem]">
+          <h3 class="m-0 text-[0.82rem] font-extrabold text-brand">מסמכים חסרים</h3>
+          @for (missingDocument of registration.missingDocuments; track missingDocument.label) {
+            <label class="grid min-h-[2.45rem] cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 rounded-[0.5rem] border border-primary/30 bg-[color-mix(in_oklch,var(--surface-warm)_55%,white)] px-3 py-2 text-start transition-[border-color,background-color] hover:border-primary/60 hover:bg-[color-mix(in_oklch,var(--surface-warm)_38%,white)]">
+              <span class="grid h-5 w-5 place-items-center rounded-full border border-primary text-primary">
+                <ng-icon name="lucideClock" class="h-3.5 w-3.5" />
+              </span>
+              <span class="grid min-w-0 gap-[0.08rem]">
+                <strong class="text-[0.76rem] text-foreground/85">{{ documentTypeLabel(missingDocument.documentType) }} · {{ documentScopeLabel(registration, missingDocument) }}</strong>
+                <small class="text-[0.7rem] text-foreground/65">
+                  @if (registration.status === registrationStatus.WaitingForDocuments) {
+                    לחצו להעלאת מסמך חסר
+                  } @else {
+                    ממתין להעלאת מסמך
+                  }
+                </small>
+              </span>
+              @if (registration.status === registrationStatus.WaitingForDocuments) {
+                <input class="sr-only" type="file" accept="application/pdf,image/*" (change)="store.uploadMissingDocument(missingDocument, $event)" />
+              }
+            </label>
+          }
+        </section>
+      }
+    </section>
+  } @else {
+    <article class="grid min-h-[4rem] grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-[0.65rem] border border-border bg-[color-mix(in_oklch,var(--surface-warm)_52%,white)] px-4 py-3 text-start">
+      <ng-icon name="lucideShieldCheck" class="h-7 w-7 text-brand" />
+      <p class="m-0 text-[0.82rem] leading-[1.55] text-foreground/80">הטיוטה נשמרה בדפדפן הזה בלבד. קבצים שנבחרו לא נשמרים לאחר סגירה או רענון.</p>
+    </article>
+  }
 </section>

@@ -14,7 +14,7 @@ type ParentRegistration = {
   childName: string;
   plan: string;
   year: string;
-  status: 'pending' | 'complete';
+  status: 'waitingForDocuments' | 'pendingApproval' | 'approved';
   statusLabel: string;
   note: string;
   actionLabel: string;
@@ -42,8 +42,8 @@ export class MyRegistrations {
       childName: 'נועה לוי',
       plan: 'מסלול מלא',
       year: 'שנת תשפ״ז',
-      status: 'pending',
-      statusLabel: 'ממתינה לבדיקה',
+      status: 'waitingForDocuments',
+      statusLabel: 'ממתינה למסמכים',
       note: 'נותר להעלות אסמכתה לתשלום הביטוח',
       actionLabel: 'המשך הרשמה',
       actionVariant: 'link',
@@ -52,9 +52,9 @@ export class MyRegistrations {
       childName: 'אורי לוי',
       plan: 'שלושה ימים',
       year: 'שנת תשפ״ז',
-      status: 'complete',
-      statusLabel: 'הושלם',
-      note: 'ההרשמה הושלמה ואושרה',
+      status: 'pendingApproval',
+      statusLabel: 'ממתינה לאישור',
+      note: 'המסמכים התקבלו וההרשמה ממתינה לאישור',
       actionLabel: 'צפייה בסטטוס',
       actionVariant: 'outline',
     },

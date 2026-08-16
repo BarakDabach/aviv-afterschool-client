@@ -15,6 +15,7 @@ import {
 } from '@ng-icons/lucide';
 import { HlmAccordionImports } from '@spartan-ng/helm/accordion';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { SelectionCard } from '../shared/selection-card/selection-card';
 
 type Plan = {
   name: string;
@@ -24,7 +25,7 @@ type Plan = {
 
 @Component({
   selector: 'app-landing-page',
-  imports: [NgIcon, RouterLink, HlmButtonImports, HlmAccordionImports],
+  imports: [NgIcon, RouterLink, HlmButtonImports, HlmAccordionImports, SelectionCard],
   providers: [
     provideIcons({
       lucideArrowLeft,

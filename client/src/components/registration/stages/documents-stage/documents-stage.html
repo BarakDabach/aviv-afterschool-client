@@ -1,57 +1,75 @@
 <section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[var(--app-section-gap)]">
-  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid min-h-[6.6rem] grid-cols-[1fr_auto_1fr] items-center gap-[var(--app-card-gap)] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] max-[540px]:grid-cols-1 [&_h2]:m-0 [&_h2]:text-base [&_h2]:font-extrabold [&_h2]:text-brand [&_p]:m-0 [&_p]:mt-1 [&_p]:text-brand">
-    <div>
-      <h2>ילד בהרשמה</h2>
-      <p>אורי לוי</p>
-    </div>
-    <span class="h-20 w-px bg-border max-[540px]:hidden"></span>
-    <div class="grid justify-items-center gap-[0.65rem] font-bold text-brand [&_ng-icon]:grid [&_ng-icon]:h-[var(--app-icon-lg)] [&_ng-icon]:w-[var(--app-icon-lg)] [&_ng-icon]:place-items-center [&_ng-icon]:rounded-full [&_ng-icon]:bg-brand [&_ng-icon]:text-brand-foreground">
-      <ng-icon name="lucideFileUp" />
-      <span>מסמכים להעלאה</span>
-    </div>
-  </article>
+  <app-details-card iconName="lucideFileUp" title="מסמכי הרשמה" description="ניתן להעלות מסמכים גם לאחר ביצוע ההרשמה" />
 
-  <section class="mt-1 grid gap-[0.72rem] [&_h2]:m-0 [&_h2]:text-[0.98rem] [&_h2]:font-extrabold [&_h2]:text-brand [&_h3]:m-0 [&_h3]:text-[0.9rem] [&_h3]:font-extrabold [&_h3]:text-brand [&_p]:m-0 [&_p]:text-[0.82rem] [&_p]:leading-[1.5] [&_p]:text-[color-mix(in_oklch,var(--foreground)_78%,white)]">
-    <h2>1. חוזה חתום</h2>
-    <p>העלו את החוזה לאחר חתימה מחוץ לאפליקציה.</p>
-    <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid justify-items-center gap-[0.42rem] border-brand border-dashed px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center [&>ng-icon]:h-[1.82rem] [&>ng-icon]:w-[1.82rem] [&>ng-icon]:text-brand [&_[data-slot=button]]:text-[0.78rem] [&_[data-slot=button]]:text-brand">
-      <ng-icon name="lucideFileUp" />
-      <h3>העלאת חוזה חתום</h3>
-      <p>בחירת תמונה או PDF</p>
-      <div class="flex h-4 justify-center gap-[0.7rem] before:inline-block before:h-[0.68rem] before:w-[1.65rem] before:scale-x-[-1] before:bg-[url(/assets/section-leaf-divider.png)] before:bg-contain before:bg-center before:bg-no-repeat before:opacity-80 before:content-[''] after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']"></div>
-      <button hlmBtn variant="link" type="button"><ng-icon name="lucideCamera" /> צילום מסמך</button>
-    </article>
+  <section class="grid gap-[0.72rem]">
+    <header class="grid gap-1 text-start">
+      <h2 class="m-0 text-[0.98rem] font-extrabold text-brand">1. חוזה חתום</h2>
+      <p class="m-0 text-[0.82rem] leading-[1.5] text-foreground/80">בחרו האם להעלות חוזה אחד לכל הילדים או חוזה נפרד לכל ילד.</p>
+      <button hlmBtn variant="outline" type="button" class="mt-2 h-[var(--app-secondary-button-height)] justify-self-start gap-2 border-brand text-brand">
+        <ng-icon name="lucideDownload" />
+        <span>הורדת חוזה לשנת {{ store.year().yearNumber }}</span>
+      </button>
+    </header>
+
+    @if (store.children().length > 1) {
+      <hlm-radio-group class="grid grid-cols-2 gap-[0.45rem] max-[540px]:grid-cols-1 [&_hlm-radio]:flex [&_hlm-radio]:min-h-[2.55rem] [&_hlm-radio]:cursor-pointer [&_hlm-radio]:items-center [&_hlm-radio]:justify-center [&_hlm-radio]:rounded-[0.48rem] [&_hlm-radio]:border [&_hlm-radio]:border-border [&_hlm-radio]:bg-card [&_hlm-radio]:text-[0.78rem]" [value]="store.contractScope()" aria-label="אופן העלאת חוזה חתום" (valueChange)="store.setDocumentScope(documentType.SignedContract, $event)">
+        <hlm-radio [value]="scopeKind.AllChildren" [ngClass]="{ '!border-brand !bg-surface-sage': store.contractScope() === scopeKind.AllChildren }" (click)="store.setDocumentScope(documentType.SignedContract, scopeKind.AllChildren)">חוזה משותף</hlm-radio>
+        <hlm-radio [value]="scopeKind.SpecificChild" [ngClass]="{ '!border-brand !bg-surface-sage': store.contractScope() === scopeKind.SpecificChild }" (click)="store.setDocumentScope(documentType.SignedContract, scopeKind.SpecificChild)">חוזה לכל ילד</hlm-radio>
+      </hlm-radio-group>
+    }
+
+    @if (store.children().length <= 1 || store.contractScope() === scopeKind.AllChildren) {
+      @let sharedScope = store.sharedScope();
+      <label class="grid cursor-pointer justify-items-center gap-[0.42rem] rounded-[var(--app-card-radius)] border border-dashed border-brand bg-[color-mix(in_oklch,var(--card)_84%,transparent)] px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center">
+        <ng-icon name="lucideFileUp" class="h-[1.82rem] w-[1.82rem] text-brand" />
+        <strong class="text-[0.9rem] text-brand">העלאת חוזה משותף</strong>
+        <span class="text-[0.78rem] text-foreground/80">{{ store.documentFileName(documentType.SignedContract, sharedScope) || 'בחירת תמונה או PDF' }}</span>
+        <input class="sr-only" type="file" accept="application/pdf,image/*" (change)="store.selectDocumentFile(documentType.SignedContract, sharedScope, $event)" />
+      </label>
+    } @else {
+      @for (child of store.children(); track child.id; let index = $index) {
+        @let childScope = store.childScope(child.id);
+        <label class="grid cursor-pointer justify-items-center gap-[0.42rem] rounded-[var(--app-card-radius)] border border-dashed border-brand bg-[color-mix(in_oklch,var(--card)_84%,transparent)] px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center">
+          <ng-icon name="lucideFileUp" class="h-[1.82rem] w-[1.82rem] text-brand" />
+          <strong class="text-[0.9rem] text-brand">חוזה חתום - {{ child.fullName || 'ילד ' + (index + 1) }}</strong>
+          <span class="text-[0.78rem] text-foreground/80">{{ store.documentFileName(documentType.SignedContract, childScope) || 'בחירת תמונה או PDF' }}</span>
+          <input class="sr-only" type="file" accept="application/pdf,image/*" (change)="store.selectDocumentFile(documentType.SignedContract, childScope, $event)" />
+        </label>
+      }
+    }
   </section>
 
-  <section class="mt-1 grid gap-[0.72rem] [&_h2]:m-0 [&_h2]:text-[0.98rem] [&_h2]:font-extrabold [&_h2]:text-brand [&_h3]:m-0 [&_h3]:text-[0.9rem] [&_h3]:font-extrabold [&_h3]:text-brand [&_p]:m-0 [&_p]:text-[0.82rem] [&_p]:leading-[1.5] [&_p]:text-[color-mix(in_oklch,var(--foreground)_78%,white)]">
-    <h2>2. אישור הוראת קבע</h2>
-    <p>העלו אישור מהבנק על הקמת הוראת הקבע.</p>
-    <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid justify-items-center gap-[0.42rem] border-brand border-dashed px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center [&>ng-icon]:h-[1.82rem] [&>ng-icon]:w-[1.82rem] [&>ng-icon]:text-brand [&_[data-slot=button]]:text-[0.78rem] [&_[data-slot=button]]:text-brand">
-      <ng-icon name="lucideFileUp" />
-      <h3>העלאת אישור הוראת קבע</h3>
-      <p>בחירת תמונה או PDF</p>
-      <div class="flex h-4 justify-center gap-[0.7rem] before:inline-block before:h-[0.68rem] before:w-[1.65rem] before:scale-x-[-1] before:bg-[url(/assets/section-leaf-divider.png)] before:bg-contain before:bg-center before:bg-no-repeat before:opacity-80 before:content-[''] after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']"></div>
-      <button hlmBtn variant="link" type="button"><ng-icon name="lucideCamera" /> צילום מסמך</button>
-    </article>
+  <section class="grid gap-[0.72rem]">
+    <header class="grid gap-1 text-start">
+      <h2 class="m-0 text-[0.98rem] font-extrabold text-brand">2. אישור הוראת קבע</h2>
+      <p class="m-0 text-[0.82rem] leading-[1.5] text-foreground/80">נדרש רק עבור ילדים במסלול שמצריך הוראת קבע. אפשר להשלים אחרי השליחה.</p>
+    </header>
+
+    @if (store.children().length > 1) {
+      <hlm-radio-group class="grid grid-cols-2 gap-[0.45rem] max-[540px]:grid-cols-1 [&_hlm-radio]:flex [&_hlm-radio]:min-h-[2.55rem] [&_hlm-radio]:cursor-pointer [&_hlm-radio]:items-center [&_hlm-radio]:justify-center [&_hlm-radio]:rounded-[0.48rem] [&_hlm-radio]:border [&_hlm-radio]:border-border [&_hlm-radio]:bg-card [&_hlm-radio]:text-[0.78rem]" [value]="store.standingOrderScope()" aria-label="אופן העלאת אישור הוראת קבע" (valueChange)="store.setDocumentScope(documentType.StandingOrderApproval, $event)">
+        <hlm-radio [value]="scopeKind.AllChildren" [ngClass]="{ '!border-brand !bg-surface-sage': store.standingOrderScope() === scopeKind.AllChildren }" (click)="store.setDocumentScope(documentType.StandingOrderApproval, scopeKind.AllChildren)">אישור משותף</hlm-radio>
+        <hlm-radio [value]="scopeKind.SpecificChild" [ngClass]="{ '!border-brand !bg-surface-sage': store.standingOrderScope() === scopeKind.SpecificChild }" (click)="store.setDocumentScope(documentType.StandingOrderApproval, scopeKind.SpecificChild)">אישור לכל ילד</hlm-radio>
+      </hlm-radio-group>
+    }
+
+    @if (store.children().length <= 1 || store.standingOrderScope() === scopeKind.AllChildren) {
+      @let sharedScope = store.sharedScope();
+      <label class="grid cursor-pointer justify-items-center gap-[0.42rem] rounded-[var(--app-card-radius)] border border-dashed border-brand bg-[color-mix(in_oklch,var(--card)_84%,transparent)] px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center">
+        <ng-icon name="lucideFileUp" class="h-[1.82rem] w-[1.82rem] text-brand" />
+        <strong class="text-[0.9rem] text-brand">העלאת אישור משותף</strong>
+        <span class="text-[0.78rem] text-foreground/80">{{ store.documentFileName(documentType.StandingOrderApproval, sharedScope) || 'בחירת תמונה או PDF' }}</span>
+        <input class="sr-only" type="file" accept="application/pdf,image/*" (change)="store.selectDocumentFile(documentType.StandingOrderApproval, sharedScope, $event)" />
+      </label>
+    } @else {
+      @for (child of store.children(); track child.id; let index = $index) {
+        @let childScope = store.childScope(child.id);
+        <label class="grid cursor-pointer justify-items-center gap-[0.42rem] rounded-[var(--app-card-radius)] border border-dashed border-brand bg-[color-mix(in_oklch,var(--card)_84%,transparent)] px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center">
+          <ng-icon name="lucideFileUp" class="h-[1.82rem] w-[1.82rem] text-brand" />
+          <strong class="text-[0.9rem] text-brand">הוראת קבע - {{ child.fullName || 'ילד ' + (index + 1) }}</strong>
+          <span class="text-[0.78rem] text-foreground/80">{{ store.documentFileName(documentType.StandingOrderApproval, childScope) || 'בחירת תמונה או PDF' }}</span>
+          <input class="sr-only" type="file" accept="application/pdf,image/*" (change)="store.selectDocumentFile(documentType.StandingOrderApproval, childScope, $event)" />
+        </label>
+      }
+    }
   </section>
-
-  <section class="mt-1 grid gap-[0.72rem] [&_h2]:m-0 [&_h2]:text-[0.98rem] [&_h2]:font-extrabold [&_h2]:text-brand [&_h3]:m-0 [&_h3]:text-[0.9rem] [&_h3]:font-extrabold [&_h3]:text-brand [&_p]:m-0 [&_p]:text-[0.82rem] [&_p]:leading-[1.5] [&_p]:text-[color-mix(in_oklch,var(--foreground)_78%,white)]">
-    <h2>3. תשלום ביטוח שנתי</h2>
-    <h3>200 ₪ לילד</h3>
-    <p>לאחר ביצוע העברה, העלו אסמכתה לתשלום הביטוח השנתי.</p>
-    <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] grid justify-items-center gap-[0.42rem] border-brand border-dashed px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center [&>ng-icon]:h-[1.82rem] [&>ng-icon]:w-[1.82rem] [&>ng-icon]:text-brand [&_[data-slot=button]]:text-[0.78rem] [&_[data-slot=button]]:text-brand">
-      <ng-icon name="lucideFileUp" />
-      <h3>העלאת אסמכתה</h3>
-      <p>בחירת תמונה או PDF</p>
-      <div class="flex h-4 justify-center gap-[0.7rem] before:inline-block before:h-[0.68rem] before:w-[1.65rem] before:scale-x-[-1] before:bg-[url(/assets/section-leaf-divider.png)] before:bg-contain before:bg-center before:bg-no-repeat before:opacity-80 before:content-[''] after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']"></div>
-      <button hlmBtn variant="link" type="button"><ng-icon name="lucideCamera" /> צילום מסמך</button>
-    </article>
-  </section>
-
-  <article class="border border-border rounded-[var(--app-card-radius)] bg-[color-mix(in_oklch,var(--card)_84%,transparent)] flex min-h-[2.8rem] items-center gap-[0.65rem] bg-[color-mix(in_oklch,var(--surface-sage)_26%,white)] px-[0.8rem] py-[0.65rem] text-[0.76rem] leading-[1.55] text-foreground [&_ng-icon]:h-[var(--app-icon-md)] [&_ng-icon]:w-[var(--app-icon-md)] [&_ng-icon]:flex-none [&_ng-icon]:text-brand">
-    <ng-icon name="lucideShieldCheck" />
-    <span>המסמכים ייבדקו ידנית, ולאחר הבדיקה סטטוס ההרשמה יתעדכן באפליקציה.</span>
-  </article>
-
-  <p class="m-0 text-center text-muted-foreground">יש להעלות את כל מסמכי האישור כדי להמשיך</p>
 </section>

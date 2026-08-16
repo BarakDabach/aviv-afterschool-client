@@ -1,21 +1,18 @@
 import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCalendarClock, lucideCheck } from '@ng-icons/lucide';
-import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { provideIcons } from '@ng-icons/core';
+import { lucideCalendarClock } from '@ng-icons/lucide';
 import { HlmRadioGroupImports } from '@spartan-ng/helm/radio-group';
-import { RegistrationPlanId } from '../../../../app/types/registration-status.type';
-import { SelectionMark } from '../../../shared/selection-mark/selection-mark';
+import { DetailsCard } from '../../../shared/details-card/details-card';
 import { RegistrationStore } from '../../registration.store';
 
 @Component({
   selector: 'app-plan-stage',
-  imports: [NgIcon, NgClass, HlmButtonImports, HlmRadioGroupImports, SelectionMark],
-  providers: [provideIcons({ lucideCalendarClock, lucideCheck })],
+  imports: [NgClass, HlmRadioGroupImports, DetailsCard],
+  providers: [provideIcons({ lucideCalendarClock })],
   templateUrl: './plan-stage.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlanStage {
   protected readonly store = inject(RegistrationStore);
-  protected readonly registrationPlanId = RegistrationPlanId;
 }

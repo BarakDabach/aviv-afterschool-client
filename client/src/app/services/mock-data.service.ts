@@ -7,14 +7,20 @@ import {
   type AvailableYearPlan,
   type MissingRegistrationDocument,
   type RegistrationDocument,
+  type RegistrationDocumentScope,
   type RegistrationState,
   type SubmitRegistrationRequest,
+  type UploadRegistrationDocumentRequest,
   type Year,
 } from '../types/registration-status.type';
 import { DataService } from './data.service';
 
 @Injectable()
 export class MockDataService extends DataService {
+  private readonly registrations = new Map<number, RegistrationState>();
+  private nextRegistrationId = 1001;
+  private nextDocumentId = 1;
+
   override async getAuthOtpResendTimeoutSeconds(): Promise<number> {
     return 10;
   }
@@ -30,22 +36,23 @@ export class MockDataService extends DataService {
   override async submitRegistration(request: SubmitRegistrationRequest): Promise<RegistrationState> {
     const uploadedAt = new Date().toISOString();
     const documents = request.selectedFiles.map<RegistrationDocument>((selectedFile, index) => ({
-      id: index + 1,
+      id: this.nextDocumentId + index,
       fileName: selectedFile.file.name,
       mimeType: selectedFile.file.type || 'application/octet-stream',
       documentType: selectedFile.documentType,
       scope: selectedFile.scope,
       uploadedAt,
     }));
+    this.nextDocumentId += documents.length;
     const children = request.draft.children.map((child, index) => {
       const selectedPlan = MOCK_AVAILABLE_YEAR_PLANS.find((yearPlan) => yearPlan.yearPlanId === child.selectedYearPlanId) ?? null;
       const discountPercent = index === 1 ? 10 : 0;
       const planPrice = selectedPlan?.plan.price ?? 0;
 
       return {
-        id: index + 1,
+        id: child.id,
         child: {
-          id: index + 1,
+          id: child.id,
           fullName: child.fullName,
           uniqueId: '',
           dateOfBirth: child.dateOfBirth,
@@ -61,8 +68,8 @@ export class MockDataService extends DataService {
     });
     const missingDocuments = getMissingDocuments(request, documents);
 
-    return {
-      id: 1001,
+    const registration = {
+      id: this.nextRegistrationId++,
       year: request.draft.year,
       status: missingDocuments.length ? RegistrationStatus.WaitingForDocuments : RegistrationStatus.PendingApproval,
       parent: request.draft.parentDetails,
@@ -70,6 +77,46 @@ export class MockDataService extends DataService {
       documents,
       missingDocuments,
     };
+
+    this.registrations.set(registration.id, registration);
+
+    return registration;
+  }
+
+  override async uploadRegistrationDocument(request: UploadRegistrationDocumentRequest): Promise<RegistrationState> {
+    const registration = this.registrations.get(request.registrationId);
+
+    if (!registration) {
+      throw new Error('Registration was not found.');
+    }
+
+    if (registration.status !== RegistrationStatus.WaitingForDocuments) {
+      return registration;
+    }
+
+    const uploadedDocument: RegistrationDocument = {
+      id: this.nextDocumentId++,
+      fileName: request.file.name,
+      mimeType: request.file.type || 'application/octet-stream',
+      documentType: request.documentType,
+      scope: request.scope,
+      uploadedAt: new Date().toISOString(),
+    };
+    const documents = [
+      ...registration.documents.filter((document) => !isSameDocumentRequirement(document, request.documentType, request.scope)),
+      uploadedDocument,
+    ];
+    const missingDocuments = getMissingDocumentsForRegistration(registration, documents);
+    const updatedRegistration = {
+      ...registration,
+      documents,
+      missingDocuments,
+      status: missingDocuments.length ? RegistrationStatus.WaitingForDocuments : RegistrationStatus.PendingApproval,
+    };
+
+    this.registrations.set(updatedRegistration.id, updatedRegistration);
+
+    return updatedRegistration;
   }
 }
 
@@ -113,6 +160,16 @@ function getMissingDocuments(
   ];
 }
 
+function getMissingDocumentsForRegistration(
+  registration: RegistrationState,
+  uploadedDocuments: RegistrationDocument[],
+): MissingRegistrationDocument[] {
+  return [
+    ...getMissingByDocumentTypeForRegistration(registration, uploadedDocuments, DocumentType.SignedContract),
+    ...getMissingByDocumentTypeForRegistration(registration, uploadedDocuments, DocumentType.StandingOrderApproval),
+  ];
+}
+
 function getMissingByDocumentType(
   request: SubmitRegistrationRequest,
   uploadedDocuments: RegistrationDocument[],
@@ -150,4 +207,51 @@ function getMissingByDocumentType(
       },
       label: `${documentType === DocumentType.SignedContract ? 'חוזה חתום' : 'אישור הוראת קבע'} - ${child.fullName}`,
     }));
+}
+
+function getMissingByDocumentTypeForRegistration(
+  registration: RegistrationState,
+  uploadedDocuments: RegistrationDocument[],
+  documentType: DocumentType,
+): MissingRegistrationDocument[] {
+  const relevantChildren = documentType === DocumentType.StandingOrderApproval
+    ? registration.children.filter((childState) => childState.selectedPlan?.plan.requiresStandingOrder)
+    : registration.children;
+
+  if (!relevantChildren.length) return [];
+
+  const hasSharedDocument = uploadedDocuments.some((document) => {
+    return document.documentType === documentType && document.scope.kind === RegistrationDocumentScopeKind.AllChildren;
+  });
+
+  if (hasSharedDocument) return [];
+
+  return relevantChildren
+    .filter((childState) => {
+      return !uploadedDocuments.some((document) => {
+        return document.documentType === documentType
+          && document.scope.kind === RegistrationDocumentScopeKind.SpecificChild
+          && document.scope.localChildId === childState.child.id;
+      });
+    })
+    .map((childState) => ({
+      documentType,
+      scope: {
+        kind: RegistrationDocumentScopeKind.SpecificChild,
+        localChildId: childState.child.id,
+      },
+      label: `${documentType === DocumentType.SignedContract ? 'חוזה חתום' : 'אישור הוראת קבע'} - ${childState.child.fullName}`,
+    }));
+}
+
+function isSameDocumentRequirement(
+  document: RegistrationDocument,
+  documentType: DocumentType,
+  scope: RegistrationDocumentScope,
+): boolean {
+  if (document.documentType !== documentType || document.scope.kind !== scope.kind) return false;
+  if (scope.kind === RegistrationDocumentScopeKind.AllChildren) return true;
+
+  return document.scope.kind === RegistrationDocumentScopeKind.SpecificChild
+    && document.scope.localChildId === scope.localChildId;
 }

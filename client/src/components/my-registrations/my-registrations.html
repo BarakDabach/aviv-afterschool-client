@@ -36,10 +36,10 @@
 
         <span
           class="col-start-2 row-start-1 inline-flex min-h-[var(--app-chip-height)] items-center self-center justify-self-start gap-1.5 rounded-full bg-primary/20 px-2.5 text-[0.72rem] font-semibold text-foreground/75"
-          [class.bg-surface-sage]="registration.status === 'complete'"
-          [class.text-brand]="registration.status === 'complete'"
+          [class.bg-surface-sage]="registration.status === 'approved' || registration.status === 'pendingApproval'"
+          [class.text-brand]="registration.status === 'approved' || registration.status === 'pendingApproval'"
         >
-          @if (registration.status === 'complete') {
+          @if (registration.status === 'approved' || registration.status === 'pendingApproval') {
             <ng-icon name="lucideCheck" class="h-3.5 w-3.5" />
           } @else {
             <ng-icon name="lucideClock3" class="h-3.5 w-3.5" />
