@@ -18,12 +18,14 @@ const KNOWN_PARENTS: AuthenticatedUser[] = [
     fullName: 'דנה לוי',
     email: 'parent@example.com',
     role: 'parent',
+    phoneNumber: '0501234567',
   },
   {
     id: 'parent-michal-cohen',
     fullName: 'מיכל כהן',
     email: 'michal@example.com',
     role: 'parent',
+    phoneNumber: '0521234567',
   },
 ];
 
@@ -49,7 +51,7 @@ export class MockAuthService {
 
   async requestOtp(request: OtpRequest): Promise<OtpChallenge> {
     const email = this.normalizeEmail(request.email);
-    const user = this.findUser(email);
+    const user = await this.findUser(email);
 
     if (!user) {
       throw new Error('כתובת האימייל אינה מוכרת במערכת.');
@@ -60,7 +62,7 @@ export class MockAuthService {
     const now = Date.now();
     const resendTimeoutSeconds = await this.dataService.getAuthOtpResendTimeoutSeconds();
     const challenge: StoredChallenge = {
-      challengeId: crypto.randomUUID(),
+      challengeId: this.createChallengeId(),
       email,
       role: user.role,
       expiresAtIso: new Date(now + OTP_TTL_MS).toISOString(),
@@ -90,7 +92,7 @@ export class MockAuthService {
       throw new Error('קוד האימות שהוזן שגוי.');
     }
 
-    const user = this.findUser(challenge.email, challenge.role);
+    const user = await this.findUser(challenge.email, challenge.role);
 
     if (!user) {
       throw new Error('לא ניתן להשלים את ההתחברות.');
@@ -125,10 +127,13 @@ export class MockAuthService {
     this.clearSession();
   }
 
-  private findUser(email: string, role?: AuthRole): AuthenticatedUser | null {
+  private async findUser(email: string, role?: AuthRole): Promise<AuthenticatedUser | null> {
     const users = role === 'admin' ? PREDEFINED_ADMINS : role === 'parent' ? KNOWN_PARENTS : [...KNOWN_PARENTS, ...PREDEFINED_ADMINS];
+    const predefinedUser = users.find((user) => user.email === email) ?? null;
 
-    return users.find((user) => user.email === email) ?? null;
+    if (predefinedUser || role === 'admin') return predefinedUser;
+
+    return this.dataService.getRegisteredParentByEmail(email);
   }
 
   private invalidateExistingChallenges(email: string, role: AuthRole): void {
@@ -141,6 +146,14 @@ export class MockAuthService {
 
   private normalizeEmail(email: string): string {
     return email.trim().toLowerCase();
+  }
+
+  private createChallengeId(): string {
+    if (globalThis.crypto && 'randomUUID' in globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+      return globalThis.crypto.randomUUID();
+    }
+
+    return `challenge-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   }
 
   private hashOtp(otp: string): string {

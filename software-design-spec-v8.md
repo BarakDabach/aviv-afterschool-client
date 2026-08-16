@@ -678,7 +678,7 @@ After successful submission, the frontend clears the local draft from `localStor
 
 The Parent Home screen is shown after a parent successfully logs in.
 
-It combines backend account data for submitted registrations with browser-local draft information when a local draft exists.
+It displays backend account data for submitted registrations.
 
 #### P-US-004 — View Parent Home
 
@@ -689,29 +689,18 @@ so that I can quickly understand my active registration, previous registrations,
 The screen contains:
 
 ```text
-Active Year
 Active Submitted Registration, if one exists
 Registration History
 Current-Year Holiday Calendar
 ```
 
-A registration-draft shortcut may be surfaced by the UI, but the draft/resume behavior belongs to the Registration feature and is defined in `P-US-003 — Continue Local Draft`.
-
----
-
 #### P-US-005 — View Active Registration
 
-As a parent,  
-I want to see the details and status of my submitted registration for the active year,  
+As a parent,
+I want to see the details and status of my current submitted registration,
 so that I know its current state and any action still required from me.
 
-The active year is determined by the backend as:
-
-```text
-MAX(YearNumber)
-```
-
-If a submitted registration exists for that year, the Home screen may display:
+If a current submitted registration exists, the Home screen may display:
 
 ```text
 Registration status
@@ -719,8 +708,6 @@ Children
 Selected plans
 Missing documents, when applicable
 ```
-
-A browser-local draft is not considered the active backend registration.
 
 ---
 
@@ -741,8 +728,6 @@ Example:
 ```
 
 Only registrations that were explicitly submitted and persisted in the backend are part of this history.
-
-A browser-local draft does not appear in registration history.
 
 Selecting a historical registration opens its submitted registration summary.
 
@@ -778,16 +763,16 @@ PendingApproval
 
 ---
 
-#### P-US-008 — View Active-Year Holiday Calendar
+#### P-US-008 — View Current-Year Holiday Calendar
 
 As a parent,  
 I want to see the holiday/closure calendar for the active year,  
 so that I know when the daycare is closed.
 
-Only `HolidayPeriod` records belonging to the active year are displayed.
+Only `HolidayPeriod` records belonging to the current registration year are displayed.
 
 ```text
-Active Year
+Current Registration Year
     |
     +-- HolidayPeriod
     +-- HolidayPeriod
@@ -819,9 +804,7 @@ Cancelled
     -> Reopen action may be shown according to cancellation rules
 ```
 
-The backend remains authoritative for submitted registration data, registration status, active year, and holiday calendar.
-
-The frontend remains authoritative only for the unsubmitted browser-local draft.
+The backend remains authoritative for submitted registration data, registration status, current registration year, and holiday calendar.
 
 ---
 
@@ -1905,25 +1888,11 @@ The backend response contains only persisted account data:
 ```ts
 export interface ParentHome {
   parent: Parent;
-  activeYear: Year;
   activeRegistration?: RegistrationSummary | null;
   registrationHistory: RegistrationSummary[];
   holidayPeriods: HolidayPeriod[];
 }
 ```
-
-A browser-local draft is deliberately **not** part of `ParentHome`.
-
-The Parent Home feature store may combine the backend response with locally restored draft state:
-
-```ts
-export interface ParentHomeState {
-  home: ParentHome | null;
-  localDraft: RegistrationDraft | null;
-}
-```
-
-This keeps account data and browser-only draft data clearly separated.
 
 ---
 

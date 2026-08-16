@@ -24,6 +24,27 @@ describe('DataService', () => {
     await expect(service.getAuthOtpResendTimeoutSeconds()).resolves.toBe(10);
   });
 
+  it('returns submitted parent home data with active registration, history, and holidays', async () => {
+    const service = configureMockService();
+    const home = await service.getParentHome();
+
+    expect(home.parent.fullName).toBe('דנה לוי');
+    expect(home.activeRegistration?.status).toBe(RegistrationStatus.WaitingForDocuments);
+    expect(home.registrationHistory.length).toBeGreaterThan(0);
+    expect(home.holidayPeriods.map((period) => period.name)).toEqual(['ראש השנה', 'סוכות', 'חנוכה']);
+  });
+
+  it('loads a submitted registration by id for parent home drill-in', async () => {
+    const service = configureMockService();
+    const home = await service.getParentHome();
+    const registrationId = home.activeRegistration!.id;
+
+    await expect(service.getSubmittedRegistration(registrationId)).resolves.toMatchObject({
+      id: registrationId,
+      status: RegistrationStatus.WaitingForDocuments,
+    });
+  });
+
   it('returns backend-shaped registration data for the parent registration flow', async () => {
     const service = configureMockService();
     const year = await service.getActiveRegistrationYear();
@@ -269,7 +290,7 @@ describe('DataService', () => {
     expect(completed.documents.map((document) => document.fileName)).toEqual(['contract.pdf', 'standing-order.pdf']);
   });
 
-  it('does not accept missing-document uploads after a registration is already pending approval', async () => {
+  it('accepts document replacements while a registration is pending approval', async () => {
     const service = configureMockService();
     const year = await service.getActiveRegistrationYear();
     const plans = await service.getAvailableYearPlans();
@@ -291,7 +312,8 @@ describe('DataService', () => {
     });
 
     expect(afterUploadAttempt.status).toBe(RegistrationStatus.PendingApproval);
-    expect(afterUploadAttempt.documents.map((document) => document.fileName)).toEqual(['contract.pdf', 'standing-order.pdf']);
+    expect(afterUploadAttempt.missingDocuments).toHaveLength(0);
+    expect(afterUploadAttempt.documents.map((document) => document.fileName)).toEqual(['standing-order.pdf', 'replacement-contract.pdf']);
   });
 });
 

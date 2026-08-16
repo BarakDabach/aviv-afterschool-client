@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { AuthFacade } from '../../app/facades/auth.facade';
 import { ParentFacade } from '../../app/facades/parent.facade';
+import { GlobalStore } from '../../app/stores/global.store';
 import {
   AllergyAnswer,
   DocumentType,
@@ -54,6 +56,13 @@ describe('RegistrationStore', () => {
     submitRegistration: ReturnType<typeof vi.fn>;
     uploadRegistrationDocument: ReturnType<typeof vi.fn>;
   };
+  let authFacade: {
+    getMe: ReturnType<typeof vi.fn>;
+    logout: ReturnType<typeof vi.fn>;
+    requestOtp: ReturnType<typeof vi.fn>;
+    verifyOtp: ReturnType<typeof vi.fn>;
+  };
+  let globalStore: InstanceType<typeof GlobalStore>;
   let store: InstanceType<typeof RegistrationStore>;
 
   beforeEach(async () => {
@@ -65,10 +74,20 @@ describe('RegistrationStore', () => {
       submitRegistration: vi.fn(),
       uploadRegistrationDocument: vi.fn(),
     };
+    authFacade = {
+      getMe: vi.fn().mockResolvedValue(null),
+      logout: vi.fn(),
+      requestOtp: vi.fn(),
+      verifyOtp: vi.fn(),
+    };
 
     TestBed.configureTestingModule({
       providers: [
         RegistrationStore,
+        {
+          provide: AuthFacade,
+          useValue: authFacade,
+        },
         {
           provide: ParentFacade,
           useValue: facade,
@@ -76,6 +95,8 @@ describe('RegistrationStore', () => {
       ],
     });
 
+    globalStore = TestBed.inject(GlobalStore);
+    globalStore.clearUser();
     store = TestBed.inject(RegistrationStore);
     await settle();
   });
@@ -86,6 +107,61 @@ describe('RegistrationStore', () => {
     expect(store.children()).toHaveLength(1);
     expect(store.children()[0].selectedYearPlanId).toBe(availableYearPlans[0].yearPlanId);
     expect(store.submittedRegistration()).toBeNull();
+  });
+
+  it('starts at the children stage for an authenticated parent without a saved draft', async () => {
+    globalStore.setUser({
+      id: 'parent-1',
+      role: 'parent',
+      fullName: 'דנה לוי',
+      email: 'dana@example.com',
+      phoneNumber: '0501234567',
+    });
+
+    await store.initialize();
+    await settle();
+
+    expect(store.activeStep()).toBe(1);
+    expect(store.parentDetails()).toEqual(expect.objectContaining({
+      fullName: 'דנה לוי',
+      email: 'dana@example.com',
+      phoneNumber: '0501234567',
+    }));
+  });
+
+  it('restores a persisted parent session before choosing the first registration step', async () => {
+    authFacade.getMe.mockResolvedValueOnce({
+      user: {
+        id: 'parent-1',
+        role: 'parent',
+        fullName: 'דנה לוי',
+        email: 'dana@example.com',
+        phoneNumber: '0501234567',
+      },
+      expiresAtIso: new Date(Date.now() + 60_000).toISOString(),
+    });
+    globalStore.clearUser();
+
+    await store.initialize();
+    await settle();
+
+    expect(store.activeStep()).toBe(1);
+    expect(globalStore.loggedIn()).toBe(true);
+    expect(store.parentDetails().email).toBe('dana@example.com');
+  });
+
+  it('shows an error instead of silently ignoring submit when required parent details are missing', async () => {
+    enterValidParentDetails(store);
+    await store.goNext();
+    store.setChildren([createChildDraft(1, 'אורי לוי', availableYearPlans[0].yearPlanId)]);
+    store.setChildDetailsValid(true);
+    await store.goNext();
+    store.setParentPhoneNumber('');
+
+    await store.goNext();
+
+    expect(facade.submitRegistration).not.toHaveBeenCalled();
+    expect(store.error()).toContain('חסרים פרטי הורה תקינים');
   });
 
   it('stores serializable draft data in localStorage without persisting selected file contents', async () => {

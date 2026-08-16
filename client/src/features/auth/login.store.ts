@@ -104,7 +104,7 @@ export const LoginStore = signalStore(
     };
 
     const routeAfterLogin = async (user: AuthenticatedUser): Promise<void> => {
-      await store.router.navigateByUrl(user.role === 'admin' ? '/admin' : '/my-registrations');
+      await store.router.navigateByUrl(user.role === 'admin' ? '/admin' : '/home');
     };
     const sendOtp = async (notice: string): Promise<void> => {
       patchState(store, {

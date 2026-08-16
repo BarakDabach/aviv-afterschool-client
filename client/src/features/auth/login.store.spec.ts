@@ -32,10 +32,11 @@ describe('LoginStore', () => {
           provide: DataService,
           useValue: {
             getAuthOtpResendTimeoutSeconds: () => Promise.resolve(0),
+            getRegisteredParentByEmail: () => Promise.resolve(null),
           },
         },
         provideRouter([
-          { path: 'my-registrations', component: EmptyRouteComponent },
+          { path: 'home', component: EmptyRouteComponent },
           { path: 'admin', component: EmptyRouteComponent },
         ]),
       ],
@@ -120,10 +121,11 @@ describe('LoginStore', () => {
           provide: DataService,
           useValue: {
             getAuthOtpResendTimeoutSeconds: () => Promise.resolve(10),
+            getRegisteredParentByEmail: () => Promise.resolve(null),
           },
         },
         provideRouter([
-          { path: 'my-registrations', component: EmptyRouteComponent },
+          { path: 'home', component: EmptyRouteComponent },
           { path: 'admin', component: EmptyRouteComponent },
         ]),
       ],

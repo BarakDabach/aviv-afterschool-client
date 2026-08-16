@@ -6,10 +6,11 @@ import { lucideArrowLeft, lucideKeyRound } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { LoginStore } from '../../features/auth/login.store';
+import { DetailsCard } from '../shared/details-card/details-card';
 
 @Component({
   selector: 'app-parent-login',
-  imports: [NgClass, NgIcon, RouterLink, HlmButtonImports, HlmInputImports],
+  imports: [NgClass, NgIcon, RouterLink, HlmButtonImports, HlmInputImports, DetailsCard],
   providers: [
     LoginStore,
     provideIcons({

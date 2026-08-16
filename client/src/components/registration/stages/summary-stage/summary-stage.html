@@ -11,6 +11,9 @@
             <strong class="truncate text-[0.95rem] font-extrabold text-brand">{{ childState.child.fullName }}</strong>
             <small class="text-[0.74rem] font-semibold text-foreground/75">{{ childState.selectedPlan?.plan?.name || 'לא נבחר מסלול' }}</small>
             <small class="text-[0.72rem] text-foreground/70">{{ childState.selectedPlan?.plan?.hours || '' }}</small>
+            @if (allergyLabel(childState)) {
+              <small class="text-[0.72rem] font-semibold text-foreground/65">{{ allergyLabel(childState) }}</small>
+            }
           </span>
 
           <span class="w-fit whitespace-nowrap rounded-full border border-primary/25 bg-[color-mix(in_oklch,var(--primary)_12%,white)] px-3 py-1 text-[0.72rem] font-bold text-[color-mix(in_oklch,var(--foreground)_72%,var(--primary))] max-[320px]:px-2 max-[320px]:text-[0.68rem]">

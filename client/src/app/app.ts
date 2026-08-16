@@ -22,14 +22,14 @@ export class App {
   protected readonly headerActionLabel = computed(() => {
     const path = this.currentPath();
     if (path === '/') return 'התחברות';
-    if (path === '/my-registrations') return 'יציאה';
+    if (path.startsWith('/home')) return 'יציאה';
     return '';
   });
 
   protected readonly headerActionRoute = computed(() => {
     const path = this.currentPath();
     if (path === '/') return '/login';
-    if (path === '/my-registrations') return '/';
+    if (path.startsWith('/home')) return '/';
     return '';
   });
 

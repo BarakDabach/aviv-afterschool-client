@@ -1,17 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { BrnDrawerImports } from '@spartan-ng/brain/drawer';
 import {
   lucideCalendarDays,
   lucideCalendarRange,
   lucideHome,
+  lucideLogOut,
   lucideMenu,
   lucideUserRound,
   lucideX,
 } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { AuthFacade } from '../../../app/facades/auth.facade';
+import { GlobalStore } from '../../../app/stores/global.store';
 
 export type AppHeaderVariant = 'public' | 'back' | 'admin';
 
@@ -32,6 +35,7 @@ type HeaderNavItem = {
       lucideCalendarDays,
       lucideCalendarRange,
       lucideHome,
+      lucideLogOut,
       lucideMenu,
       lucideUserRound,
       lucideX,
@@ -41,6 +45,10 @@ type HeaderNavItem = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppHeader {
+  private readonly authFacade = inject(AuthFacade);
+  private readonly globalStore = inject(GlobalStore);
+  private readonly router = inject(Router);
+
   readonly variant = input<AppHeaderVariant>('public');
   readonly actionLabel = input('התחברות');
   readonly actionRoute = input('/');
@@ -59,9 +67,27 @@ export class AppHeader {
     { label: 'הרשמה', route: '/registration', icon: 'lucideCalendarDays' },
   ];
 
+  protected readonly loggedIn = computed(() => this.globalStore.loggedIn());
+
+  private readonly homeRoute = computed(() => {
+    if (this.globalStore.isAdmin()) return '/admin';
+
+    return '/home';
+  });
+
+  protected readonly parentItems = computed<HeaderNavItem[]>(() => {
+    if (!this.loggedIn()) return this.publicItems;
+
+    return [
+      { label: 'בית', route: this.homeRoute(), icon: 'lucideHome' },
+      { label: 'הרשמה', route: '/registration', icon: 'lucideCalendarDays' },
+    ];
+  });
+
   protected readonly mobileItems = computed<HeaderNavItem[]>(() => {
     if (this.variant() === 'admin') return this.adminItems;
-    if (this.variant() === 'back') return this.publicItems;
+    if (this.variant() === 'back') return this.parentItems();
+    if (this.loggedIn()) return this.parentItems();
 
     return [
       { label: this.actionLabel(), route: this.actionRoute(), icon: 'lucideUserRound' },
@@ -75,6 +101,13 @@ export class AppHeader {
 
   protected onDrawerStateChanged(state: 'closed' | 'open'): void {
     this.menuOpen.set(state === 'open');
+  }
+
+  protected async logout(): Promise<void> {
+    await this.authFacade.logout();
+    this.globalStore.clearUser();
+    this.closeMenu();
+    await this.router.navigateByUrl('/');
   }
 
   protected isActive(route: string): boolean {

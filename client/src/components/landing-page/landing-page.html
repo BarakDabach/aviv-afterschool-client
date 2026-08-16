@@ -14,7 +14,7 @@
         hlmBtn
         size="lg"
         class="mx-auto mt-7 flex h-[var(--app-button-height)] min-w-[min(100%,18rem)] w-fit rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/90 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20 max-[760px]:min-w-[min(100%,17rem)]"
-        href="#plans"
+        routerLink="/registration"
       >
         <span>בחירת מסלול והרשמה</span>
         <ng-icon name="lucideArrowLeft" data-icon="inline-end" />
@@ -68,8 +68,6 @@
         <app-selection-card [title]="plan.name" [description]="plan.description" [price]="plan.price" priceMeta="לחודש" [selectable]="false" />
       }
     </div>
-
-    <p class="mt-6 text-[0.82rem] text-foreground/70">תשלום ביטוח שנתי חד-פעמי: 200 ₪</p>
 
     <a
       hlmBtn

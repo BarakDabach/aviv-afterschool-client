@@ -10,15 +10,12 @@
       </p>
     </section>
 
-    <article class="mt-7 grid min-h-[4.35rem] grid-cols-[auto_minmax(0,1fr)] items-center gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] bg-[radial-gradient(circle_at_18%_35%,color-mix(in_oklch,white_55%,transparent),transparent_9rem),color-mix(in_oklch,var(--surface-sage)_22%,var(--card))] px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] max-[540px]:mt-6 max-[540px]:min-h-[4.05rem]">
-      <span class="grid h-[var(--app-icon-xl)] w-[var(--app-icon-xl)] place-items-center rounded-lg border-2 border-brand text-brand">
-        <ng-icon name="lucideKeyRound" class="h-[var(--app-icon-md)] w-[var(--app-icon-md)]" />
-      </span>
-      <div>
-        <h2 class="m-0 text-[length:var(--app-card-title-size)] font-[850] text-brand">אין צורך בסיסמה</h2>
-        <p class="mt-1.5 mb-0 text-[length:var(--app-body-size)] leading-relaxed text-foreground">האימות מתבצע באמצעות קוד שנשלח לאימייל המוכר במערכת.</p>
-      </div>
-    </article>
+    <app-details-card
+      class="mt-7 block max-[540px]:mt-6"
+      iconName="lucideKeyRound"
+      title="אין צורך בסיסמה"
+      description="האימות מתבצע באמצעות קוד שנשלח לאימייל המוכר במערכת."
+    />
 
     <section class="mt-8 grid justify-items-center gap-4 text-center" aria-label="התחברות באימייל">
       @if (store.step() === 'email') {

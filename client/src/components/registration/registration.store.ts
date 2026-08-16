@@ -1,5 +1,6 @@
 import { computed, effect, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withHooks, withMethods, withProps, withState } from '@ngrx/signals';
+import { AuthFacade } from '../../app/facades/auth.facade';
 import { ParentFacade } from '../../app/facades/parent.facade';
 import { GlobalStore } from '../../app/stores/global.store';
 import {
@@ -104,6 +105,7 @@ export const RegistrationStore = signalStore(
     error: null,
   }),
   withProps(() => ({
+    authFacade: inject(AuthFacade),
     globalStore: inject(GlobalStore),
     parentFacade: inject(ParentFacade),
     registrationDraftStorageKey: 'aviv-registration-draft',
@@ -344,6 +346,16 @@ export const RegistrationStore = signalStore(
       documents: store.documents(),
       updatedAt: new Date().toISOString(),
     });
+    const mergeLoggedInParentDetails = (parentDetails: ParentRegistrationDetails): ParentRegistrationDetails => {
+      if (!store.globalStore.loggedIn()) return parentDetails;
+
+      return {
+        ...parentDetails,
+        fullName: parentDetails.fullName || store.globalStore.fullName(),
+        phoneNumber: parentDetails.phoneNumber || store.globalStore.phoneNumber(),
+        email: parentDetails.email || store.globalStore.email(),
+      };
+    };
     const setActiveStep = (step: number): void => {
       const activeStep = normalizeActiveStep(step);
 
@@ -362,10 +374,25 @@ export const RegistrationStore = signalStore(
       async initialize(): Promise<void> {
         const savedDraft = readSavedDraft();
 
+        if (!store.globalStore.loggedIn()) {
+          const session = await store.authFacade.getMe();
+
+          if (session) {
+            store.globalStore.setUser(session.user);
+          }
+        }
+
+        const draftStep = savedDraft ? draftStepToStep(savedDraft.currentStep) : null;
+        const initialStep = savedDraft
+          ? store.globalStore.loggedIn() ? Math.max(draftStep ?? 0, 1) : draftStep ?? 0
+          : store.globalStore.loggedIn()
+            ? 1
+            : 0;
+
         patchState(store, {
-          activeStep: savedDraft ? draftStepToStep(savedDraft.currentStep) : 0,
+          activeStep: initialStep,
           year: savedDraft?.year ?? fallbackYear,
-          enteredParentDetails: savedDraft?.parentDetails ?? createEmptyParentDetails(),
+          enteredParentDetails: mergeLoggedInParentDetails(savedDraft?.parentDetails ?? createEmptyParentDetails()),
           children: normalizeChildren(savedDraft?.children),
           childDetailsValid: areChildrenValid(savedDraft?.children),
           nextChildId: getNextChildId(savedDraft?.children),
@@ -617,7 +644,14 @@ export const RegistrationStore = signalStore(
         scrollToTop();
       },
       async submitRegistration(): Promise<void> {
-        if (!store.canSubmit()) return;
+        if (!store.canSubmit()) {
+          patchState(store, {
+            error: !store.parentDetailsValid()
+              ? 'חסרים פרטי הורה תקינים. חזרו לשלב פרטי ההורה ועדכנו שם, טלפון ואימייל.'
+              : 'חסרים פרטי ילד או בחירת מסלול. חזרו לשלב המסלולים והשלימו את הפרטים.',
+          });
+          return;
+        }
 
         patchState(store, { loading: true, error: null });
 
@@ -643,6 +677,18 @@ export const RegistrationStore = signalStore(
         }
       },
       setActiveStep,
+      syncLoggedInParentDetails(): void {
+        const currentParent = store.enteredParentDetails();
+        const nextParent = mergeLoggedInParentDetails(currentParent);
+
+        if (
+          nextParent.fullName !== currentParent.fullName
+          || nextParent.phoneNumber !== currentParent.phoneNumber
+          || nextParent.email !== currentParent.email
+        ) {
+          patchState(store, { enteredParentDetails: nextParent });
+        }
+      },
     };
   }),
   withHooks((store) => ({
@@ -652,21 +698,7 @@ export const RegistrationStore = signalStore(
       effect(() => {
         if (!store.globalStore.loggedIn()) return;
 
-        const currentParent = store.enteredParentDetails();
-        const nextParent = {
-          ...currentParent,
-          fullName: currentParent.fullName || store.globalStore.fullName(),
-          phoneNumber: currentParent.phoneNumber || store.globalStore.phoneNumber(),
-          email: currentParent.email || store.globalStore.email(),
-        };
-
-        if (
-          nextParent.fullName !== currentParent.fullName
-          || nextParent.phoneNumber !== currentParent.phoneNumber
-          || nextParent.email !== currentParent.email
-        ) {
-          patchState(store, { enteredParentDetails: nextParent });
-        }
+        store.syncLoggedInParentDetails();
       });
     },
   })),

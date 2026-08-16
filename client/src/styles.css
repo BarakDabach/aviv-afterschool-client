@@ -175,4 +175,52 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
+
+  .app-mobile-drawer-panel {
+    background: white;
+    background-color: white;
+  }
+
+  .app-mobile-drawer-content {
+    animation-duration: 220ms;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .app-mobile-drawer-content[data-state='open'] {
+    animation-name: app-drawer-slide-in;
+  }
+
+  .app-mobile-drawer-content[data-state='closed'] {
+    animation-name: app-drawer-slide-out;
+    animation-timing-function: cubic-bezier(0.64, 0, 0.78, 0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .app-mobile-drawer-content {
+      animation: none;
+      transition: none;
+    }
+  }
+}
+
+@keyframes app-drawer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes app-drawer-slide-out {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
 }
