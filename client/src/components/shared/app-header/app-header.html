@@ -31,11 +31,6 @@
             <ng-icon name="lucideUserRound" class="h-6 w-6 lg:h-[1.58rem] lg:w-[1.58rem]" />
             <span>אביב</span>
           </span>
-        } @else if (variant() === 'public') {
-          <a class="hidden items-center gap-2 text-xs font-bold text-foreground no-underline [direction:rtl] md:inline-flex" [routerLink]="actionRoute()">
-            <ng-icon name="lucideUserRound" class="h-4 w-4" />
-            <span class="whitespace-nowrap">{{ actionLabel() }}</span>
-          </a>
         }
       </div>
 
@@ -71,10 +66,20 @@
               }
             </a>
           }
+          @if (loggedIn()) {
+            <button
+              type="button"
+              class="inline-flex min-h-[5.1rem] items-center gap-2 border-0 bg-transparent px-3 text-base font-bold text-foreground"
+              (click)="logout()"
+            >
+              <ng-icon name="lucideLogOut" class="h-4 w-4" />
+              <span>יציאה</span>
+            </button>
+          }
         </nav>
-      } @else if (loggedIn()) {
+      } @else {
         <nav class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-12 [direction:rtl] md:inline-flex" aria-label="ניווט הורה">
-          @for (item of parentItems(); track item.label) {
+          @for (item of mobileItems(); track item.label) {
             <a
               class="relative inline-flex min-h-[var(--app-sticky-header-height)] min-w-24 items-center justify-center gap-2 px-3 text-sm font-bold text-foreground no-underline"
               [class.text-brand]="isActive(item.route)"
@@ -87,14 +92,16 @@
               }
             </a>
           }
-          <button
-            type="button"
-            class="inline-flex min-h-[var(--app-sticky-header-height)] min-w-24 items-center justify-center gap-2 border-0 bg-transparent px-3 text-sm font-bold text-foreground"
-            (click)="logout()"
-          >
-            <ng-icon name="lucideLogOut" class="h-4 w-4" />
-            <span>יציאה</span>
-          </button>
+          @if (loggedIn()) {
+            <button
+              type="button"
+              class="inline-flex min-h-[var(--app-sticky-header-height)] min-w-24 items-center justify-center gap-2 border-0 bg-transparent px-3 text-sm font-bold text-foreground"
+              (click)="logout()"
+            >
+              <ng-icon name="lucideLogOut" class="h-4 w-4" />
+              <span>יציאה</span>
+            </button>
+          }
         </nav>
       }
     </div>
