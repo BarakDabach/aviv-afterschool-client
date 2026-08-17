@@ -2,11 +2,13 @@ import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withProps, withState } from '@ngrx/signals';
 import { ParentFacade } from '../../app/facades/parent.facade';
 import { GlobalStore } from '../../app/stores/global.store';
+import { NotificationService } from '../../app/services/notification.service';
 import {
   DocumentType,
   REGISTRATION_STATUS_DISPLAY,
   RegistrationDocumentScopeKind,
   RegistrationStatus,
+  RegistrationChildStatus,
   type HolidayPeriod,
   type MissingRegistrationDocument,
   type ParentHome,
@@ -27,6 +29,12 @@ type ParentHomeState = {
   error: string | null;
 };
 
+type RegistrationHistoryChildRow = {
+  key: string;
+  registration: RegistrationState;
+  child: RegistrationChildState;
+};
+
 const currencyFormatter = new Intl.NumberFormat('he-IL');
 const dateFormatter = new Intl.DateTimeFormat('he-IL', {
   day: '2-digit',
@@ -45,13 +53,14 @@ export const ParentHomeStore = signalStore(
   }),
   withProps(() => ({
     globalStore: inject(GlobalStore),
+    notifications: inject(NotificationService),
     parentFacade: inject(ParentFacade),
   })),
   withComputed(({ home, selectedMissingDocumentFiles, selectedRegistration, selectedRegistrationId, error }) => {
     const activeRegistration = computed(() => home()?.activeRegistration ?? null);
     const displayedRegistration = computed(() => selectedRegistration() ?? activeRegistration());
     const isDetailMode = computed(() => selectedRegistrationId() !== null);
-    const parentFirstName = computed(() => home()?.parent.fullName.trim().split(/\s+/)[0] || 'דנה');
+    const parentFirstName = computed(() => home()?.parent.fullName.trim().split(/\s+/)[0] ?? '');
     const activeStatus = computed<RegistrationStatusDisplay>(() => {
       const registration = activeRegistration();
 
@@ -62,6 +71,15 @@ export const ParentHomeStore = signalStore(
 
       return registration ? REGISTRATION_STATUS_DISPLAY[registration.status] : REGISTRATION_STATUS_DISPLAY[RegistrationStatus.PendingApproval];
     });
+    const historyRows = computed<RegistrationHistoryChildRow[]>(() => {
+      return (home()?.registrationHistory ?? []).flatMap((registration) => {
+        return registration.children.map((child) => ({
+          key: `${registration.id}:${child.id}`,
+          registration,
+          child,
+        }));
+      });
+    });
     const hasError = computed(() => error() !== null);
 
     return {
@@ -70,6 +88,7 @@ export const ParentHomeStore = signalStore(
       hasSelectedMissingDocumentFiles: computed(() => selectedMissingDocumentFiles().length > 0),
       displayedRegistration,
       hasError,
+      historyRows,
       isDetailMode,
       parentFirstName,
       selectedStatus,
@@ -120,6 +139,19 @@ export const ParentHomeStore = signalStore(
 
     return {
       async load(selectedRegistrationId: number | null): Promise<void> {
+        if (!store.globalStore.loggedIn()) {
+          patchState(store, {
+            loading: false,
+            error: 'יש להתחבר כדי לצפות בדף הבית.',
+            home: null,
+            selectedRegistrationId,
+            selectedRegistration: null,
+            selectedMissingDocumentFiles: [],
+          });
+
+          return;
+        }
+
         patchState(store, {
           selectedRegistrationId,
           selectedMissingDocumentFiles: [],
@@ -201,7 +233,9 @@ export const ParentHomeStore = signalStore(
           }
 
           patchState(store, { loading: false });
+          store.notifications.success('המסמכים נשמרו בהצלחה.');
         } catch (error) {
+          store.notifications.error(error instanceof Error ? error.message : 'לא הצלחנו להעלות את המסמך.');
           patchState(store, {
             loading: false,
             error: error instanceof Error ? error.message : 'לא הצלחנו להעלות את המסמך.',
@@ -242,6 +276,9 @@ export const ParentHomeStore = signalStore(
       },
       statusLabel(registration: RegistrationState): string {
         return REGISTRATION_STATUS_DISPLAY[registration.status].label;
+      },
+      childStatusLabel(childState: RegistrationChildState): string {
+        return childState.status === RegistrationChildStatus.Left ? 'עזב/ה' : 'פעיל/ה';
       },
       formatHolidayRange(period: HolidayPeriod): string {
         return `${dateFormatter.format(new Date(period.startDate))}-${dateFormatter.format(new Date(period.endDate))}`;

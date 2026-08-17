@@ -50,8 +50,8 @@ export class SummaryStage {
   protected documentScopeLabel(registration: RegistrationState, document: RegistrationDocument | MissingRegistrationDocument): string {
     const scope = document.scope;
 
-    if (scope.kind === RegistrationDocumentScopeKind.AllChildren) return 'כל הילדים';
+    if (scope.kind === RegistrationDocumentScopeKind.AllChildren) return '';
 
-    return registration.children.find((childState) => childState.child.id === scope.localChildId)?.child.fullName ?? 'ילד';
+    return registration.children.find((childState) => childState.child.id === scope.localChildId)?.child.fullName ?? '';
   }
 }

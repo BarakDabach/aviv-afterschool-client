@@ -19,10 +19,10 @@ import {
   lucideUsersRound,
 } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { ParentHomeStore } from './my-registrations.store';
+import { ParentHomeStore } from './home.store';
 
 @Component({
-  selector: 'app-my-registrations',
+  selector: 'app-home',
   imports: [NgClass, NgIcon, RouterLink, HlmButtonImports],
   providers: [
     ParentHomeStore,
@@ -42,10 +42,10 @@ import { ParentHomeStore } from './my-registrations.store';
       lucideUsersRound,
     }),
   ],
-  templateUrl: './my-registrations.html',
+  templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MyRegistrations {
+export class Home {
   protected readonly store = inject(ParentHomeStore);
   private readonly route = inject(ActivatedRoute);
 

@@ -46,13 +46,23 @@ export class MockDataService extends DataService {
 
   override async getParentHome(parentEmail?: string): Promise<ParentHome> {
     const normalizedEmail = parentEmail ? normalizeEmail(parentEmail) : '';
+
+    if (!normalizedEmail) {
+      throw new Error('חייבים להיות מחוברים כדי לצפות בדף הבית.');
+    }
+
     const registrations = [...this.registrations.values()].filter((registration) => {
-      return !normalizedEmail || normalizeEmail(registration.parent.email) === normalizedEmail;
+      return normalizeEmail(registration.parent.email) === normalizedEmail;
     });
+
+    if (!registrations.length) {
+      throw new Error('לא נמצאו הרשמות עבור כתובת האימייל הזו.');
+    }
+
     const activeRegistration = [...registrations]
       .sort((left: RegistrationState, right: RegistrationState) => right.year.yearNumber - left.year.yearNumber || right.id - left.id)
       .at(0) ?? null;
-    const parent = activeRegistration?.parent ?? registrations[0]?.parent ?? MOCK_PARENT;
+    const parent = registrations[0].parent;
 
     return clone({
       parent,
@@ -89,6 +99,7 @@ export class MockDataService extends DataService {
 
   override async submitRegistration(request: SubmitRegistrationRequest): Promise<RegistrationState> {
     const uploadedAt = new Date().toISOString();
+    const normalizedParentEmail = request.draft.parentDetails.email.trim().toLowerCase();
     const documents = request.selectedFiles.map<RegistrationDocument>((selectedFile, index) => ({
       id: this.nextDocumentId + index,
       fileName: selectedFile.file.name,
@@ -126,7 +137,10 @@ export class MockDataService extends DataService {
       id: this.nextRegistrationId++,
       year: request.draft.year,
       status: missingDocuments.length ? RegistrationStatus.WaitingForDocuments : RegistrationStatus.PendingApproval,
-      parent: request.draft.parentDetails,
+      parent: {
+        ...request.draft.parentDetails,
+        email: normalizedParentEmail,
+      },
       children,
       documents,
       missingDocuments,

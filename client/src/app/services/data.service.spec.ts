@@ -26,7 +26,7 @@ describe('DataService', () => {
 
   it('returns submitted parent home data with active registration, history, and holidays', async () => {
     const service = configureMockService();
-    const home = await service.getParentHome();
+    const home = await service.getParentHome('parent@example.com');
 
     expect(home.parent.fullName).toBe('דנה לוי');
     expect(home.activeRegistration?.status).toBe(RegistrationStatus.WaitingForDocuments);
@@ -36,7 +36,7 @@ describe('DataService', () => {
 
   it('loads a submitted registration by id for parent home drill-in', async () => {
     const service = configureMockService();
-    const home = await service.getParentHome();
+    const home = await service.getParentHome('parent@example.com');
     const registrationId = home.activeRegistration!.id;
 
     await expect(service.getSubmittedRegistration(registrationId)).resolves.toMatchObject({
@@ -87,6 +87,12 @@ describe('DataService', () => {
     expect(registration.status).toBe(RegistrationStatus.WaitingForDocuments);
     expect(registration.parent.email).toBe('parent@example.com');
     expect(registration.children[0].selectedPlan?.yearPlanId).toBe(plans[0].yearPlanId);
+  });
+
+  it('requires an authenticated parent email to return parent home data', async () => {
+    const service = configureMockService();
+
+    await expect(service.getParentHome()).rejects.toThrow('חייבים להיות מחוברים');
   });
 
   it('marks a single-child registration as pending approval when all required documents are uploaded', async () => {

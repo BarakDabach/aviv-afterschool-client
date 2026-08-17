@@ -9,7 +9,7 @@
 
           <span class="grid min-w-0 gap-[0.18rem]">
             <strong class="truncate text-[0.95rem] font-extrabold text-brand">{{ childState.child.fullName }}</strong>
-            <small class="text-[0.74rem] font-semibold text-foreground/75">{{ childState.selectedPlan?.plan?.name || 'לא נבחר מסלול' }}</small>
+            <small class="text-[0.74rem] font-semibold text-foreground/75">{{ childState.selectedPlan?.plan?.name || '' }}</small>
             <small class="text-[0.72rem] text-foreground/70">{{ childState.selectedPlan?.plan?.hours || '' }}</small>
             @if (allergyLabel(childState)) {
               <small class="text-[0.72rem] font-semibold text-foreground/65">{{ allergyLabel(childState) }}</small>

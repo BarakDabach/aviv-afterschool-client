@@ -10,24 +10,6 @@ type StoredChallenge = OtpChallenge & {
 const TEST_OTP = '123456';
 const OTP_TTL_MS = 5 * 60 * 1000;
 const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
-const SESSION_STORAGE_KEY = 'aviv-auth-session';
-
-const KNOWN_PARENTS: AuthenticatedUser[] = [
-  {
-    id: 'parent-dana-levi',
-    fullName: 'דנה לוי',
-    email: 'parent@example.com',
-    role: 'parent',
-    phoneNumber: '0501234567',
-  },
-  {
-    id: 'parent-michal-cohen',
-    fullName: 'מיכל כהן',
-    email: 'michal@example.com',
-    role: 'parent',
-    phoneNumber: '0521234567',
-  },
-];
 
 const PREDEFINED_ADMINS: AuthenticatedUser[] = [
   {
@@ -48,6 +30,7 @@ const PREDEFINED_ADMINS: AuthenticatedUser[] = [
 export class MockAuthService {
   private readonly dataService = inject(DataService);
   private readonly challenges = new Map<string, StoredChallenge>();
+  private currentSession: AuthSession | null = null;
 
   async requestOtp(request: OtpRequest): Promise<OtpChallenge> {
     const email = this.normalizeEmail(request.email);
@@ -105,18 +88,18 @@ export class MockAuthService {
       expiresAtIso: new Date(Date.now() + SESSION_TTL_MS).toISOString(),
     };
 
-    this.writeSession(session);
+    this.currentSession = session;
 
     return session;
   }
 
   async getCurrentSession(): Promise<AuthSession | null> {
-    const session = this.readSession();
+    const session = this.currentSession;
 
     if (!session) return null;
 
     if (new Date(session.expiresAtIso).getTime() <= Date.now()) {
-      this.clearSession();
+      this.currentSession = null;
       return null;
     }
 
@@ -124,16 +107,23 @@ export class MockAuthService {
   }
 
   async logout(): Promise<void> {
-    this.clearSession();
+    this.currentSession = null;
   }
 
   private async findUser(email: string, role?: AuthRole): Promise<AuthenticatedUser | null> {
-    const users = role === 'admin' ? PREDEFINED_ADMINS : role === 'parent' ? KNOWN_PARENTS : [...KNOWN_PARENTS, ...PREDEFINED_ADMINS];
-    const predefinedUser = users.find((user) => user.email === email) ?? null;
+    const normalizedEmail = this.normalizeEmail(email);
 
-    if (predefinedUser || role === 'admin') return predefinedUser;
+    if (role === 'admin') {
+      return PREDEFINED_ADMINS.find((user) => user.email === normalizedEmail) ?? null;
+    }
 
-    return this.dataService.getRegisteredParentByEmail(email);
+    const registeredParent = await this.dataService.getRegisteredParentByEmail(normalizedEmail);
+
+    if (registeredParent || role === 'parent') {
+      return registeredParent;
+    }
+
+    return PREDEFINED_ADMINS.find((user) => user.email === normalizedEmail) ?? null;
   }
 
   private invalidateExistingChallenges(email: string, role: AuthRole): void {
@@ -168,29 +158,5 @@ export class MockAuthService {
       expiresAtIso: challenge.expiresAtIso,
       resendAvailableAtIso: challenge.resendAvailableAtIso,
     };
-  }
-
-  private readSession(): AuthSession | null {
-    if (typeof localStorage === 'undefined') return null;
-
-    try {
-      const rawSession = localStorage.getItem(SESSION_STORAGE_KEY);
-
-      return rawSession ? (JSON.parse(rawSession) as AuthSession) : null;
-    } catch {
-      return null;
-    }
-  }
-
-  private writeSession(session: AuthSession): void {
-    if (typeof localStorage === 'undefined') return;
-
-    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
-  }
-
-  private clearSession(): void {
-    if (typeof localStorage === 'undefined') return;
-
-    localStorage.removeItem(SESSION_STORAGE_KEY);
   }
 }

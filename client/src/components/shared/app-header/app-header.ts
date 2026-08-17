@@ -14,6 +14,7 @@ import {
 } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { AuthFacade } from '../../../app/facades/auth.facade';
+import { NotificationService } from '../../../app/services/notification.service';
 import { GlobalStore } from '../../../app/stores/global.store';
 
 export type AppHeaderVariant = 'public' | 'back' | 'admin';
@@ -47,6 +48,7 @@ type HeaderNavItem = {
 export class AppHeader {
   private readonly authFacade = inject(AuthFacade);
   private readonly globalStore = inject(GlobalStore);
+  private readonly notifications = inject(NotificationService);
   private readonly router = inject(Router);
 
   readonly variant = input<AppHeaderVariant>('public');
@@ -104,10 +106,16 @@ export class AppHeader {
   }
 
   protected async logout(): Promise<void> {
-    await this.authFacade.logout();
-    this.globalStore.clearUser();
-    this.closeMenu();
-    await this.router.navigateByUrl('/');
+    try {
+      await this.authFacade.logout();
+      this.globalStore.clearUser();
+      this.notifications.success('התנתקתם בהצלחה.');
+      await this.router.navigateByUrl('/');
+    } catch (error) {
+      this.notifications.error(error instanceof Error ? error.message : 'לא הצלחנו להתנתק.');
+    } finally {
+      this.closeMenu();
+    }
   }
 
   protected isActive(route: string): boolean {

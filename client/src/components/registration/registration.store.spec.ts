@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthFacade } from '../../app/facades/auth.facade';
 import { ParentFacade } from '../../app/facades/parent.facade';
+import { NotificationService } from '../../app/services/notification.service';
 import { GlobalStore } from '../../app/stores/global.store';
 import {
   AllergyAnswer,
@@ -53,6 +54,7 @@ describe('RegistrationStore', () => {
   let facade: {
     getActiveRegistrationYear: ReturnType<typeof vi.fn>;
     getAvailableYearPlans: ReturnType<typeof vi.fn>;
+    getParentHome: ReturnType<typeof vi.fn>;
     submitRegistration: ReturnType<typeof vi.fn>;
     uploadRegistrationDocument: ReturnType<typeof vi.fn>;
   };
@@ -71,6 +73,17 @@ describe('RegistrationStore', () => {
     facade = {
       getActiveRegistrationYear: vi.fn().mockResolvedValue(activeYear),
       getAvailableYearPlans: vi.fn().mockResolvedValue(availableYearPlans),
+      getParentHome: vi.fn().mockResolvedValue({
+        parent: {
+          id: 1,
+          fullName: 'דנה לוי',
+          email: 'dana@example.com',
+          phoneNumber: '0501234567',
+        },
+        activeRegistration: null,
+        registrationHistory: [],
+        holidayPeriods: [],
+      }),
       submitRegistration: vi.fn(),
       uploadRegistrationDocument: vi.fn(),
     };
@@ -92,6 +105,15 @@ describe('RegistrationStore', () => {
           provide: ParentFacade,
           useValue: facade,
         },
+        {
+          provide: NotificationService,
+          useValue: {
+            success: vi.fn(),
+            info: vi.fn(),
+            warning: vi.fn(),
+            error: vi.fn(),
+          },
+        },
       ],
     });
 
@@ -109,7 +131,185 @@ describe('RegistrationStore', () => {
     expect(store.submittedRegistration()).toBeNull();
   });
 
-  it('starts at the children stage for an authenticated parent without a saved draft', async () => {
+  it('ignores saved draft data when user is not logged in', async () => {
+    localStorage.setItem(
+      'aviv-registration-draft',
+      JSON.stringify({
+        year: { id: 3, yearNumber: 2026 },
+        currentStep: RegistrationDraftStep.DocumentsUpload,
+        parentDetails: {
+          id: 1,
+          fullName: 'דוגמן מאחורי',
+          phoneNumber: '0511111111',
+          email: 'draft-parent@example.com',
+        },
+        children: [
+          {
+            id: 1,
+            fullName: 'ילד שמור',
+            dateOfBirth: '2020-01-01',
+            gender: Gender.Female,
+            allergyAnswer: AllergyAnswer.No,
+            allergyDetails: '',
+            selectedYearPlanId: availableYearPlans[0].yearPlanId,
+          },
+        ],
+        documentScopeChoices: {
+          [DocumentType.SignedContract]: RegistrationDocumentScopeKind.AllChildren,
+          [DocumentType.StandingOrderApproval]: RegistrationDocumentScopeKind.AllChildren,
+        },
+        documents: [],
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      }),
+    );
+
+    await store.initialize();
+    await settle();
+
+    expect(authFacade.getMe).toHaveBeenCalled();
+    expect(store.activeStep()).toBe(0);
+    expect(store.savedDraft()).toBeNull();
+    expect(store.parentDetails()).toEqual({
+      id: 0,
+      fullName: '',
+      phoneNumber: '',
+      email: '',
+    });
+  });
+
+  it('ignores malformed local draft data when user is not logged in', async () => {
+    localStorage.setItem('aviv-registration-draft', '{not-valid-json');
+
+    await store.initialize();
+    await settle();
+
+    expect(store.activeStep()).toBe(0);
+    expect(store.savedDraft()).toBeNull();
+    expect(store.children()).toHaveLength(1);
+    expect(store.children()[0].selectedYearPlanId).toBe(availableYearPlans[0].yearPlanId);
+    expect(store.parentDetails()).toEqual({
+      id: 0,
+      fullName: '',
+      phoneNumber: '',
+      email: '',
+    });
+  });
+
+  it('restores saved draft data for an authenticated parent at the plan stage', async () => {
+    globalStore.setUser({
+      id: 'parent-1',
+      role: 'parent',
+      fullName: 'דנה לוי',
+      email: 'dana@example.com',
+      phoneNumber: '0501234567',
+    });
+    localStorage.setItem(
+      'aviv-registration-draft',
+      JSON.stringify({
+        year: { id: 3, yearNumber: 2026 },
+        currentStep: RegistrationDraftStep.DocumentsUpload,
+        parentDetails: {
+          id: 1,
+          fullName: 'דוגמן מאחורי',
+          phoneNumber: '0511111111',
+          email: 'draft-parent@example.com',
+        },
+        children: [
+          {
+            id: 1,
+            fullName: 'ילד שמור',
+            dateOfBirth: '2020-01-01',
+            gender: Gender.Female,
+            allergyAnswer: AllergyAnswer.No,
+            allergyDetails: '',
+            selectedYearPlanId: availableYearPlans[0].yearPlanId,
+          },
+        ],
+        documentScopeChoices: {
+          [DocumentType.SignedContract]: RegistrationDocumentScopeKind.SpecificChild,
+          [DocumentType.StandingOrderApproval]: RegistrationDocumentScopeKind.SpecificChild,
+        },
+        documents: [
+          {
+            documentType: DocumentType.SignedContract,
+            fileName: 'draft-contract.pdf',
+            mimeType: 'application/pdf',
+            scope: { kind: RegistrationDocumentScopeKind.AllChildren },
+          },
+        ],
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      }),
+    );
+
+    await store.initialize();
+    await settle();
+
+    expect(store.activeStep()).toBe(1);
+    expect(store.savedDraft()?.parentDetails.fullName).toBe('דוגמן מאחורי');
+    expect(store.parentDetails()).toEqual({
+      id: 1,
+      fullName: 'דוגמן מאחורי',
+      phoneNumber: '0511111111',
+      email: 'draft-parent@example.com',
+    });
+    expect(store.children()[0].fullName).toBe('ילד שמור');
+    expect(store.documents()[0]?.fileName).toBe('draft-contract.pdf');
+    expect(store.documentScopeChoices()[DocumentType.SignedContract]).toBe(RegistrationDocumentScopeKind.SpecificChild);
+  });
+
+  it('keeps draft parent details over logged-in parent fields', async () => {
+    globalStore.setUser({
+      id: 'parent-1',
+      role: 'parent',
+      fullName: 'דנה לוי',
+      email: 'dana@example.com',
+      phoneNumber: '0501234567',
+    });
+    localStorage.setItem(
+      'aviv-registration-draft',
+      JSON.stringify({
+        year: { id: 3, yearNumber: 2026 },
+        currentStep: RegistrationDraftStep.PlanSelection,
+        parentDetails: {
+          id: 1,
+          fullName: '',
+          phoneNumber: '',
+          email: 'draft-parent@example.com',
+        },
+        children: [
+          {
+            id: 1,
+            fullName: 'ילד שמור',
+            dateOfBirth: '2020-01-01',
+            gender: Gender.Female,
+            allergyAnswer: AllergyAnswer.Yes,
+            allergyDetails: 'אלרגיה לאגוזים',
+            selectedYearPlanId: availableYearPlans[0].yearPlanId,
+          },
+        ],
+        documentScopeChoices: {
+          [DocumentType.SignedContract]: RegistrationDocumentScopeKind.AllChildren,
+          [DocumentType.StandingOrderApproval]: RegistrationDocumentScopeKind.AllChildren,
+        },
+        documents: [],
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      }),
+    );
+
+    await store.initialize();
+    await settle();
+
+    expect(store.activeStep()).toBe(1);
+    expect(store.parentDetails()).toEqual({
+      id: 1,
+      fullName: '',
+      phoneNumber: '',
+      email: 'draft-parent@example.com',
+    });
+    expect(store.children()[0].allergyAnswer).toBe(AllergyAnswer.Yes);
+  });
+
+  it('hydrates an authenticated parent at the children stage', async () => {
     globalStore.setUser({
       id: 'parent-1',
       role: 'parent',
@@ -129,7 +329,7 @@ describe('RegistrationStore', () => {
     }));
   });
 
-  it('restores a persisted parent session before choosing the first registration step', async () => {
+  it('restores a persisted parent session at the children step', async () => {
     authFacade.getMe.mockResolvedValueOnce({
       user: {
         id: 'parent-1',

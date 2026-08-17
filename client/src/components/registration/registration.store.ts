@@ -3,6 +3,7 @@ import { patchState, signalStore, withComputed, withHooks, withMethods, withProp
 import { AuthFacade } from '../../app/facades/auth.facade';
 import { ParentFacade } from '../../app/facades/parent.facade';
 import { GlobalStore } from '../../app/stores/global.store';
+import { NotificationService } from '../../app/services/notification.service';
 import {
   AllergyAnswer,
   DocumentType,
@@ -107,6 +108,7 @@ export const RegistrationStore = signalStore(
   withProps(() => ({
     authFacade: inject(AuthFacade),
     globalStore: inject(GlobalStore),
+    notifications: inject(NotificationService),
     parentFacade: inject(ParentFacade),
     registrationDraftStorageKey: 'aviv-registration-draft',
     steps: [
@@ -157,21 +159,15 @@ export const RegistrationStore = signalStore(
 
       return false;
     });
-    const familyTitle = computed(() => {
-      const parentName = parentDetails().fullName.trim();
-      const familyName = parentName.split(/\s+/).at(-1);
-
-      return familyName ? `משפחת ${familyName}` : 'פרטי משפחה';
-    });
     const childrenSummary = computed(() => {
       const childSummaries = children().map((child, index) => {
         const plan = availableYearPlans().find((yearPlan) => yearPlan.yearPlanId === child.selectedYearPlanId);
-        const childName = child.fullName.trim() || `ילד ${index + 1}`;
+        const childName = child.fullName.trim();
 
-        return `${childName} · ${plan?.plan.name ?? 'לא נבחר מסלול'}`;
+        return childName ? `${childName} · ${plan?.plan.name ?? ''}` : '';
       });
 
-      return childSummaries.join(', ');
+      return childSummaries.filter(Boolean).join(', ');
     });
     const activeVisibleStepIndex = computed(() => activeStep());
     const visibleStepNumber = computed(() => activeStep() + 1);
@@ -218,6 +214,13 @@ export const RegistrationStore = signalStore(
     });
     const contractScope = computed(() => documentScopeChoices()[DocumentType.SignedContract]);
     const standingOrderScope = computed(() => documentScopeChoices()[DocumentType.StandingOrderApproval]);
+    const requiresStandingOrderDocuments = computed(() => {
+      return children().some((child) => {
+        const plan = availableYearPlans().find((yearPlan) => yearPlan.yearPlanId === child.selectedYearPlanId);
+
+        return plan?.plan.requiresStandingOrder === true;
+      });
+    });
     const selectedFileCount = computed(() => selectedFiles().length);
     const uploadedDraftDocuments = computed(() => documents().filter((document) => document.fileName));
     const submittedSubtotal = computed(() => {
@@ -248,7 +251,6 @@ export const RegistrationStore = signalStore(
       plansSelected,
       canSubmit,
       primaryDisabled,
-      familyTitle,
       childrenSummary,
       visibleSteps: computed(() => steps),
       activeVisibleStepIndex,
@@ -260,6 +262,7 @@ export const RegistrationStore = signalStore(
       stepDescription,
       contractScope,
       standingOrderScope,
+      requiresStandingOrderDocuments,
       selectedFileCount,
       uploadedDraftDocuments,
       submittedSubtotal,
@@ -294,6 +297,23 @@ export const RegistrationStore = signalStore(
         allergyDetails: child.allergyDetails ?? '',
         selectedYearPlanId: child.selectedYearPlanId ?? store.availableYearPlans()[0]?.yearPlanId ?? null,
       }));
+    };
+    const registrationChildrenToDrafts = (registration: RegistrationState | null | undefined, defaultPlanId: number | null): RegistrationChildDraft[] | null => {
+      if (!registration?.children.length) return null;
+
+      return registration.children.map((childState) => {
+        const allergies = childState.child.allergies?.trim() ?? '';
+
+        return {
+          id: childState.child.id || childState.id,
+          fullName: childState.child.fullName,
+          dateOfBirth: childState.child.dateOfBirth,
+          gender: childState.child.gender === Gender.Male ? Gender.Male : Gender.Female,
+          allergyAnswer: allergies ? AllergyAnswer.Yes : AllergyAnswer.No,
+          allergyDetails: allergies,
+          selectedYearPlanId: childState.selectedPlan?.yearPlanId ?? defaultPlanId,
+        };
+      });
     };
     const getNextChildId = (children: RegistrationChildDraft[] | undefined): number => {
       if (!children?.length) return 2;
@@ -372,19 +392,21 @@ export const RegistrationStore = signalStore(
 
     return {
       async initialize(): Promise<void> {
-        const savedDraft = readSavedDraft();
+        let savedDraft: RegistrationDraftSnapshot | null = null;
 
         if (!store.globalStore.loggedIn()) {
           const session = await store.authFacade.getMe();
 
           if (session) {
             store.globalStore.setUser(session.user);
+            savedDraft = readSavedDraft();
           }
+        } else {
+          savedDraft = readSavedDraft();
         }
 
-        const draftStep = savedDraft ? draftStepToStep(savedDraft.currentStep) : null;
         const initialStep = savedDraft
-          ? store.globalStore.loggedIn() ? Math.max(draftStep ?? 0, 1) : draftStep ?? 0
+          ? 1
           : store.globalStore.loggedIn()
             ? 1
             : 0;
@@ -392,7 +414,7 @@ export const RegistrationStore = signalStore(
         patchState(store, {
           activeStep: initialStep,
           year: savedDraft?.year ?? fallbackYear,
-          enteredParentDetails: mergeLoggedInParentDetails(savedDraft?.parentDetails ?? createEmptyParentDetails()),
+          enteredParentDetails: savedDraft?.parentDetails ?? mergeLoggedInParentDetails(createEmptyParentDetails()),
           children: normalizeChildren(savedDraft?.children),
           childDetailsValid: areChildrenValid(savedDraft?.children),
           nextChildId: getNextChildId(savedDraft?.children),
@@ -402,19 +424,26 @@ export const RegistrationStore = signalStore(
         });
 
         try {
-          const [year, availableYearPlans] = await Promise.all([
+          const [year, availableYearPlans, parentHome] = await Promise.all([
             store.parentFacade.getActiveRegistrationYear(),
             store.parentFacade.getAvailableYearPlans(),
+            store.globalStore.loggedIn() && !savedDraft
+              ? store.parentFacade.getParentHome(store.globalStore.email()).catch(() => null)
+              : Promise.resolve(null),
           ]);
           const defaultPlanId = availableYearPlans[0]?.yearPlanId ?? null;
+          const loggedInChildren = savedDraft ? null : registrationChildrenToDrafts(parentHome?.activeRegistration, defaultPlanId);
+          const nextChildren = normalizeChildren(loggedInChildren ?? store.children()).map((child) => ({
+            ...child,
+            selectedYearPlanId: child.selectedYearPlanId ?? defaultPlanId,
+          }));
 
           patchState(store, {
             year,
             availableYearPlans,
-            children: normalizeChildren(store.children()).map((child) => ({
-              ...child,
-              selectedYearPlanId: child.selectedYearPlanId ?? defaultPlanId,
-            })),
+            children: nextChildren,
+            childDetailsValid: areChildrenValid(nextChildren),
+            nextChildId: getNextChildId(nextChildren),
           });
         } catch (error) {
           patchState(store, {
@@ -513,7 +542,7 @@ export const RegistrationStore = signalStore(
         });
       },
       getPlanLabel(selectedYearPlanId: number | null): string {
-        return store.availableYearPlans().find((yearPlan) => yearPlan.yearPlanId === selectedYearPlanId)?.plan.name ?? 'לא נבחר מסלול';
+        return store.availableYearPlans().find((yearPlan) => yearPlan.yearPlanId === selectedYearPlanId)?.plan.name ?? '';
       },
       getPlanPrice(selectedYearPlanId: number | null): number {
         return store.availableYearPlans().find((yearPlan) => yearPlan.yearPlanId === selectedYearPlanId)?.plan.price ?? 0;
@@ -668,8 +697,10 @@ export const RegistrationStore = signalStore(
             savedDraft: null,
             loading: false,
           });
+          store.notifications.success('ההרשמה נשלחה בהצלחה.');
           scrollToTop();
         } catch (error) {
+          store.notifications.error(error instanceof Error ? error.message : 'לא הצלחנו לשלוח את ההרשמה.');
           patchState(store, {
             loading: false,
             error: error instanceof Error ? error.message : 'לא הצלחנו לשלוח את ההרשמה.',
@@ -678,6 +709,8 @@ export const RegistrationStore = signalStore(
       },
       setActiveStep,
       syncLoggedInParentDetails(): void {
+        if (store.savedDraft()) return;
+
         const currentParent = store.enteredParentDetails();
         const nextParent = mergeLoggedInParentDetails(currentParent);
 

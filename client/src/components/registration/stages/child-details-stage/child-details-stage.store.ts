@@ -113,7 +113,7 @@ export const ChildDetailsStageStore = signalStore(
       }
     },
     childDisplayName(child: RegistrationChildDraft, index: number): string {
-      return child.fullName.trim() || `ילד ${index + 1}`;
+      return child.fullName.trim();
     },
     childNameHasError(childField: ChildDetailsField): boolean {
       return childField.fullName().touched() && childField.fullName().invalid();
@@ -166,6 +166,16 @@ export const ChildDetailsStageStore = signalStore(
     onInit(): void {
       effect(() => {
         const defaultPlanId = registrationStore.availableYearPlans()[0]?.yearPlanId ?? null;
+        const registrationChildren = registrationStore.children().map((child) => normalizeChildDraft(child, defaultPlanId));
+        const formChildren = untracked(() => childrenModel().map((child) => normalizeChildDraft(child, defaultPlanId)));
+
+        if (!sameChildren(registrationChildren, formChildren)) {
+          untracked(() => childrenModel.set(registrationChildren));
+        }
+      });
+
+      effect(() => {
+        const defaultPlanId = registrationStore.availableYearPlans()[0]?.yearPlanId ?? null;
         const children = childrenModel().map((child) => normalizeChildDraft(child, defaultPlanId));
         const formValid = valid();
 
@@ -187,6 +197,10 @@ function createEmptyChild(id: number, selectedYearPlanId: number | null): Regist
     allergyDetails: '',
     selectedYearPlanId,
   };
+}
+
+function sameChildren(left: RegistrationChildDraft[], right: RegistrationChildDraft[]): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
 }
 
 function normalizeChildDraft(child: RegistrationChildDraft, defaultPlanId: number | null): RegistrationChildDraft {
