@@ -2,6 +2,7 @@
 
 These client instructions extend the current `origin/home` baseline. Use `design.md` as the visual and RTL source of truth, and apply the rules below for registration-flow client work.
 
+- Create task branches from `origin/dev` as the base branch.
 - Do not run the client build command while implementing registration-flow changes.
 - Do not add or update tests unless explicitly requested.
 - Keep stateful registration logic in Signal Store stores created with `signalStore`.

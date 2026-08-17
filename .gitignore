@@ -1,6 +1,7 @@
 # Local dependencies and build output
 client/node_modules/
 client/.angular/
+.angular/
 client/dist/
 
 # Local dev server logs

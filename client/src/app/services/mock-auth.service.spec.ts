@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { DataService } from './data.service';
 import { MockDataService } from './mock-data.service';
 import { MockAuthService } from './mock-auth.service';
+import { AllergyAnswer, Gender, RegistrationDocumentScopeKind, RegistrationDraftStep } from '../types/registration-status.type';
 
 describe('MockAuthService', () => {
   let service: MockAuthService;
@@ -40,6 +41,7 @@ describe('MockAuthService', () => {
 
     expect(session.user.role).toBe('parent');
     expect(session.user.email).toBe('parent@example.com');
+    expect(session.user.phoneNumber).toBe('0501234567');
 
     await expect(service.verifyOtp({ challengeId: challenge.challengeId, otp: '123456' })).rejects.toThrow('אינו תקף');
     await expect(service.getCurrentSession()).resolves.toEqual(session);
@@ -50,5 +52,51 @@ describe('MockAuthService', () => {
     const session = await service.verifyOtp({ challengeId: challenge.challengeId, otp: '123456' });
 
     expect(session.user.role).toBe('admin');
+  });
+
+  it('resolves parent identity from submitted registration data', async () => {
+    const dataService = TestBed.inject(DataService);
+    const year = await dataService.getActiveRegistrationYear();
+    const plans = await dataService.getAvailableYearPlans();
+
+    await dataService.submitRegistration({
+      draft: {
+        year,
+        currentStep: RegistrationDraftStep.DocumentsUpload,
+        parentDetails: {
+          id: 0,
+          fullName: 'רות ישראלי',
+          phoneNumber: '0501234567',
+          email: 'ruth@example.com',
+        },
+        children: [
+          {
+            id: 1,
+            fullName: 'יעל ישראלי',
+            dateOfBirth: '2021-01-01',
+            gender: Gender.Female,
+            allergyAnswer: AllergyAnswer.No,
+            allergyDetails: '',
+            selectedYearPlanId: plans[0].yearPlanId,
+          },
+        ],
+        documentScopeChoices: {
+          SignedContract: RegistrationDocumentScopeKind.AllChildren,
+          StandingOrderApproval: RegistrationDocumentScopeKind.AllChildren,
+        },
+        documents: [],
+        updatedAt: new Date().toISOString(),
+      },
+      selectedFiles: [],
+    });
+
+    const challenge = await service.requestOtp({ email: 'ruth@example.com' });
+    const session = await service.verifyOtp({ challengeId: challenge.challengeId, otp: '123456' });
+
+    expect(session.user).toMatchObject({
+      fullName: 'רות ישראלי',
+      email: 'ruth@example.com',
+      role: 'parent',
+    });
   });
 });

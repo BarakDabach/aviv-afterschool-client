@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
   DocumentType,
+  Gender,
+  type HolidayPeriod,
+  type ParentHome,
   RegistrationChildStatus,
   RegistrationDocumentScopeKind,
   RegistrationStatus,
@@ -13,6 +16,7 @@ import {
   type UploadRegistrationDocumentRequest,
   type Year,
 } from '../types/registration-status.type';
+import type { AuthenticatedUser } from '../types/auth.type';
 import { DataService } from './data.service';
 
 @Injectable()
@@ -20,6 +24,13 @@ export class MockDataService extends DataService {
   private readonly registrations = new Map<number, RegistrationState>();
   private nextRegistrationId = 1001;
   private nextDocumentId = 1;
+
+  constructor() {
+    super();
+    MOCK_PARENT_REGISTRATIONS.forEach((registration) => this.registrations.set(registration.id, clone(registration)));
+    this.nextRegistrationId = Math.max(...MOCK_PARENT_REGISTRATIONS.map((registration) => registration.id)) + 1;
+    this.nextDocumentId = Math.max(...MOCK_PARENT_REGISTRATIONS.flatMap((registration) => registration.documents.map((document) => document.id)), 0) + 1;
+  }
 
   override async getAuthOtpResendTimeoutSeconds(): Promise<number> {
     return 10;
@@ -33,8 +44,62 @@ export class MockDataService extends DataService {
     return MOCK_AVAILABLE_YEAR_PLANS;
   }
 
+  override async getParentHome(parentEmail?: string): Promise<ParentHome> {
+    const normalizedEmail = parentEmail ? normalizeEmail(parentEmail) : '';
+
+    if (!normalizedEmail) {
+      throw new Error('חייבים להיות מחוברים כדי לצפות בדף הבית.');
+    }
+
+    const registrations = [...this.registrations.values()].filter((registration) => {
+      return normalizeEmail(registration.parent.email) === normalizedEmail;
+    });
+
+    if (!registrations.length) {
+      throw new Error('לא נמצאו הרשמות עבור כתובת האימייל הזו.');
+    }
+
+    const activeRegistration = [...registrations]
+      .sort((left: RegistrationState, right: RegistrationState) => right.year.yearNumber - left.year.yearNumber || right.id - left.id)
+      .at(0) ?? null;
+    const parent = registrations[0].parent;
+
+    return clone({
+      parent,
+      activeRegistration,
+      registrationHistory: registrations,
+      holidayPeriods: MOCK_HOLIDAY_PERIODS,
+    });
+  }
+
+  override async getSubmittedRegistration(registrationId: number): Promise<RegistrationState> {
+    const registration = this.registrations.get(registrationId);
+
+    if (!registration) {
+      throw new Error('Registration was not found.');
+    }
+
+    return clone(registration);
+  }
+
+  override async getRegisteredParentByEmail(email: string): Promise<AuthenticatedUser | null> {
+    const normalizedEmail = normalizeEmail(email);
+    const registration = [...this.registrations.values()].find((candidate) => normalizeEmail(candidate.parent.email) === normalizedEmail);
+
+    if (!registration) return null;
+
+    return {
+      id: `parent-registration-${registration.parent.id || registration.id}`,
+      fullName: registration.parent.fullName,
+      email: registration.parent.email,
+      phoneNumber: registration.parent.phoneNumber,
+      role: 'parent',
+    };
+  }
+
   override async submitRegistration(request: SubmitRegistrationRequest): Promise<RegistrationState> {
     const uploadedAt = new Date().toISOString();
+    const normalizedParentEmail = request.draft.parentDetails.email.trim().toLowerCase();
     const documents = request.selectedFiles.map<RegistrationDocument>((selectedFile, index) => ({
       id: this.nextDocumentId + index,
       fileName: selectedFile.file.name,
@@ -72,7 +137,10 @@ export class MockDataService extends DataService {
       id: this.nextRegistrationId++,
       year: request.draft.year,
       status: missingDocuments.length ? RegistrationStatus.WaitingForDocuments : RegistrationStatus.PendingApproval,
-      parent: request.draft.parentDetails,
+      parent: {
+        ...request.draft.parentDetails,
+        email: normalizedParentEmail,
+      },
       children,
       documents,
       missingDocuments,
@@ -90,7 +158,7 @@ export class MockDataService extends DataService {
       throw new Error('Registration was not found.');
     }
 
-    if (registration.status !== RegistrationStatus.WaitingForDocuments) {
+    if (registration.status !== RegistrationStatus.WaitingForDocuments && registration.status !== RegistrationStatus.PendingApproval) {
       return registration;
     }
 
@@ -125,6 +193,12 @@ const MOCK_ACTIVE_YEAR: Year = {
   yearNumber: 2027,
 };
 
+const MOCK_PARENT = {
+  id: 1,
+  fullName: 'דנה לוי',
+  phoneNumber: '0501234567',
+};
+
 const MOCK_AVAILABLE_YEAR_PLANS: AvailableYearPlan[] = [
   {
     yearPlanId: 101,
@@ -147,6 +221,187 @@ const MOCK_AVAILABLE_YEAR_PLANS: AvailableYearPlan[] = [
       isActive: true,
       requiresStandingOrder: false,
     },
+  },
+];
+
+const MOCK_ACTIVE_REGISTRATION_ID = 1001;
+
+const MOCK_PARENT_REGISTRATIONS: RegistrationState[] = [
+  {
+    id: MOCK_ACTIVE_REGISTRATION_ID,
+    year: MOCK_ACTIVE_YEAR,
+    status: RegistrationStatus.WaitingForDocuments,
+    parent: {
+      ...MOCK_PARENT,
+      email: 'parent@example.com',
+    },
+    children: [
+      {
+        id: 1,
+        child: {
+          id: 1,
+          fullName: 'נועה לוי',
+          uniqueId: '',
+          dateOfBirth: '2020-03-10',
+          gender: Gender.Female,
+          allergies: null,
+        },
+        selectedPlan: MOCK_AVAILABLE_YEAR_PLANS[0],
+        status: RegistrationChildStatus.Active,
+        leaveDate: null,
+        appliedDiscountPercent: 0,
+        finalPrice: 1450,
+      },
+      {
+        id: 2,
+        child: {
+          id: 2,
+          fullName: 'אורי לוי',
+          uniqueId: '',
+          dateOfBirth: '2021-06-18',
+          gender: Gender.Male,
+          allergies: null,
+        },
+        selectedPlan: MOCK_AVAILABLE_YEAR_PLANS[0],
+        status: RegistrationChildStatus.Active,
+        leaveDate: null,
+        appliedDiscountPercent: 10,
+        finalPrice: 1305,
+      },
+    ],
+    documents: [
+      {
+        id: 1,
+        fileName: 'signed-contract-levi.pdf',
+        mimeType: 'application/pdf',
+        documentType: DocumentType.SignedContract,
+        scope: { kind: RegistrationDocumentScopeKind.AllChildren },
+        uploadedAt: '2026-08-01T09:30:00.000Z',
+      },
+    ],
+    missingDocuments: [
+      {
+        documentType: DocumentType.StandingOrderApproval,
+        scope: { kind: RegistrationDocumentScopeKind.SpecificChild, localChildId: 1 },
+        label: 'אישור הוראת קבע',
+      },
+      {
+        documentType: DocumentType.StandingOrderApproval,
+        scope: { kind: RegistrationDocumentScopeKind.SpecificChild, localChildId: 2 },
+        label: 'אסמכתת ביטוח',
+      },
+    ],
+  },
+  {
+    id: 1002,
+    year: { id: 2, yearNumber: 2026 },
+    status: RegistrationStatus.Approved,
+    parent: {
+      ...MOCK_PARENT,
+      email: 'parent@example.com',
+    },
+    children: [
+      {
+        id: 3,
+        child: {
+          id: 1,
+          fullName: 'נועה לוי',
+          uniqueId: '',
+          dateOfBirth: '2020-03-10',
+          gender: Gender.Female,
+          allergies: null,
+        },
+        selectedPlan: MOCK_AVAILABLE_YEAR_PLANS[0],
+        status: RegistrationChildStatus.Active,
+        leaveDate: null,
+        appliedDiscountPercent: 0,
+        finalPrice: 1450,
+      },
+    ],
+    documents: [],
+    missingDocuments: [],
+  },
+  {
+    id: 1003,
+    year: { id: 3, yearNumber: 2025 },
+    status: RegistrationStatus.Approved,
+    parent: {
+      ...MOCK_PARENT,
+      email: 'parent@example.com',
+    },
+    children: [
+      {
+        id: 4,
+        child: {
+          id: 1,
+          fullName: 'נועה לוי',
+          uniqueId: '',
+          dateOfBirth: '2020-03-10',
+          gender: Gender.Female,
+          allergies: null,
+        },
+        selectedPlan: MOCK_AVAILABLE_YEAR_PLANS[0],
+        status: RegistrationChildStatus.Active,
+        leaveDate: null,
+        appliedDiscountPercent: 0,
+        finalPrice: 1450,
+      },
+    ],
+    documents: [],
+    missingDocuments: [],
+  },
+  {
+    id: 1004,
+    year: { id: 4, yearNumber: 2024 },
+    status: RegistrationStatus.Approved,
+    parent: {
+      ...MOCK_PARENT,
+      email: 'parent@example.com',
+    },
+    children: [
+      {
+        id: 5,
+        child: {
+          id: 2,
+          fullName: 'אורי לוי',
+          uniqueId: '',
+          dateOfBirth: '2021-06-18',
+          gender: Gender.Male,
+          allergies: null,
+        },
+        selectedPlan: MOCK_AVAILABLE_YEAR_PLANS[0],
+        status: RegistrationChildStatus.Active,
+        leaveDate: null,
+        appliedDiscountPercent: 0,
+        finalPrice: 1450,
+      },
+    ],
+    documents: [],
+    missingDocuments: [],
+  },
+];
+
+const MOCK_HOLIDAY_PERIODS: HolidayPeriod[] = [
+  {
+    id: 1,
+    yearId: MOCK_ACTIVE_YEAR.id,
+    name: 'ראש השנה',
+    startDate: '2026-09-12',
+    endDate: '2026-09-14',
+  },
+  {
+    id: 2,
+    yearId: MOCK_ACTIVE_YEAR.id,
+    name: 'סוכות',
+    startDate: '2026-09-27',
+    endDate: '2026-10-04',
+  },
+  {
+    id: 3,
+    yearId: MOCK_ACTIVE_YEAR.id,
+    name: 'חנוכה',
+    startDate: '2026-12-08',
+    endDate: '2026-12-15',
   },
 ];
 
@@ -254,4 +509,12 @@ function isSameDocumentRequirement(
 
   return document.scope.kind === RegistrationDocumentScopeKind.SpecificChild
     && document.scope.localChildId === scope.localChildId;
+}
+
+function clone<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
 }

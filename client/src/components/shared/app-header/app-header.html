@@ -17,7 +17,7 @@
           brnDrawerTrigger
           hlmBtn
           variant="ghost"
-          class="h-[2.85rem] w-[2.85rem] border border-border bg-background/80 p-0 text-brand shadow-lg shadow-foreground/5"
+          class="h-[2.85rem] w-[2.85rem] rounded-[var(--app-control-radius)] border border-border bg-background/80 p-0 text-brand shadow-lg shadow-foreground/5"
           [ngClass]="variant() === 'admin' ? 'lg:hidden' : 'md:hidden'"
           type="button"
           aria-label="פתיחת תפריט"
@@ -31,11 +31,6 @@
             <ng-icon name="lucideUserRound" class="h-6 w-6 lg:h-[1.58rem] lg:w-[1.58rem]" />
             <span>אביב</span>
           </span>
-        } @else if (variant() === 'public') {
-          <a class="hidden items-center gap-2 text-xs font-bold text-foreground no-underline [direction:rtl] md:inline-flex" [routerLink]="actionRoute()">
-            <ng-icon name="lucideUserRound" class="h-4 w-4" />
-            <span class="whitespace-nowrap">{{ actionLabel() }}</span>
-          </a>
         }
       </div>
 
@@ -71,6 +66,42 @@
               }
             </a>
           }
+          @if (loggedIn()) {
+            <button
+              type="button"
+              class="inline-flex min-h-[5.1rem] items-center gap-2 border-0 bg-transparent px-3 text-base font-bold text-foreground"
+              (click)="logout()"
+            >
+              <ng-icon name="lucideLogOut" class="h-4 w-4" />
+              <span>יציאה</span>
+            </button>
+          }
+        </nav>
+      } @else {
+        <nav class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-12 [direction:rtl] md:inline-flex" aria-label="ניווט הורה">
+          @for (item of mobileItems(); track item.label) {
+            <a
+              class="relative inline-flex min-h-[var(--app-sticky-header-height)] min-w-24 items-center justify-center gap-2 px-3 text-sm font-bold text-foreground no-underline"
+              [class.text-brand]="isActive(item.route)"
+              [routerLink]="item.route"
+            >
+              <ng-icon [name]="item.icon" class="h-4 w-4" />
+              <span>{{ item.label }}</span>
+              @if (isActive(item.route)) {
+                <span class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-brand"></span>
+              }
+            </a>
+          }
+          @if (loggedIn()) {
+            <button
+              type="button"
+              class="inline-flex min-h-[var(--app-sticky-header-height)] min-w-24 items-center justify-center gap-2 border-0 bg-transparent px-3 text-sm font-bold text-foreground"
+              (click)="logout()"
+            >
+              <ng-icon name="lucideLogOut" class="h-4 w-4" />
+              <span>יציאה</span>
+            </button>
+          }
         </nav>
       }
     </div>
@@ -82,9 +113,14 @@
   ></ng-template>
   <ng-template
     brnDrawerContent
-    class="fixed inset-y-0 right-0 z-[61] w-[min(84vw,20rem)] translate-x-full border-s border-border bg-gradient-to-b from-surface-sage via-background to-background p-5 text-foreground shadow-2xl shadow-foreground/15 outline-none transition-transform duration-200 ease-out data-[state=open]:translate-x-0"
+    class="fixed inset-y-0 right-0 z-[61] w-[min(84vw,20rem)] translate-x-full border-s border-border bg-white p-5 text-foreground shadow-2xl shadow-foreground/15 outline-none data-[state=open]:translate-x-0"
   >
-    <aside class="grid h-full content-start gap-4" aria-label="תפריט ניווט" dir="rtl">
+    <aside
+      class="app-mobile-drawer-panel app-mobile-drawer-content box-border grid h-full w-[min(84vw,20rem)] content-start gap-4 border-s border-border bg-white p-5 text-foreground shadow-2xl shadow-foreground/15"
+      [attr.data-state]="menuOpen() ? 'open' : 'closed'"
+      aria-label="תפריט ניווט"
+      dir="rtl"
+    >
       <div class="flex items-center justify-between text-base font-[850] text-brand">
         <span>{{ variant() === 'admin' ? 'ניווט ניהול' : 'תפריט' }}</span>
         <button brnDrawerClose hlmBtn variant="ghost" class="h-11 w-11 p-0 text-brand" type="button" aria-label="סגירת תפריט">
@@ -103,6 +139,16 @@
             <ng-icon [name]="item.icon" class="h-5 w-5" />
             <span>{{ item.label }}</span>
           </a>
+        }
+        @if (loggedIn()) {
+          <button
+            type="button"
+            class="inline-flex min-h-12 items-center gap-2 rounded-[var(--app-control-radius)] px-3.5 text-sm font-bold text-muted-foreground"
+            (click)="logout()"
+          >
+            <ng-icon name="lucideLogOut" class="h-5 w-5" />
+            <span>יציאה</span>
+          </button>
         }
       </nav>
     </aside>

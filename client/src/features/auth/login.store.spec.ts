@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthFacade } from '../../app/facades/auth.facade';
 import { MockAuthFacade } from '../../app/facades/mock-auth.facade';
 import { DataService } from '../../app/services/data.service';
+import { NotificationService } from '../../app/services/notification.service';
 import { GlobalStore } from '../../app/stores/global.store';
 import { LoginStore } from './login.store';
 
@@ -14,6 +15,14 @@ import { LoginStore } from './login.store';
 class EmptyRouteComponent {}
 
 describe('LoginStore', () => {
+  const knownParent = {
+    id: 'parent-registration-1001',
+    fullName: 'דנה לוי',
+    email: 'parent@example.com',
+    phoneNumber: '0501234567',
+    role: 'parent' as const,
+  };
+
   let store: InstanceType<typeof LoginStore>;
   let globalStore: InstanceType<typeof GlobalStore>;
   let router: Router;
@@ -32,10 +41,20 @@ describe('LoginStore', () => {
           provide: DataService,
           useValue: {
             getAuthOtpResendTimeoutSeconds: () => Promise.resolve(0),
+            getRegisteredParentByEmail: (email: string) => Promise.resolve(email.trim().toLowerCase() === 'parent@example.com' ? knownParent : null),
+          },
+        },
+        {
+          provide: NotificationService,
+          useValue: {
+            success: vi.fn(),
+            info: vi.fn(),
+            warning: vi.fn(),
+            error: vi.fn(),
           },
         },
         provideRouter([
-          { path: 'my-registrations', component: EmptyRouteComponent },
+          { path: 'home', component: EmptyRouteComponent },
           { path: 'admin', component: EmptyRouteComponent },
         ]),
       ],
@@ -120,10 +139,20 @@ describe('LoginStore', () => {
           provide: DataService,
           useValue: {
             getAuthOtpResendTimeoutSeconds: () => Promise.resolve(10),
+            getRegisteredParentByEmail: (email: string) => Promise.resolve(email.trim().toLowerCase() === 'parent@example.com' ? knownParent : null),
+          },
+        },
+        {
+          provide: NotificationService,
+          useValue: {
+            success: vi.fn(),
+            info: vi.fn(),
+            warning: vi.fn(),
+            error: vi.fn(),
           },
         },
         provideRouter([
-          { path: 'my-registrations', component: EmptyRouteComponent },
+          { path: 'home', component: EmptyRouteComponent },
           { path: 'admin', component: EmptyRouteComponent },
         ]),
       ],

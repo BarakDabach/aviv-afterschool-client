@@ -4,15 +4,17 @@ import { AdminDocuments } from '../components/admin/admin-documents/admin-docume
 import { AdminFamily } from '../components/admin/admin-family/admin-family';
 import { AdminSettings } from '../components/admin/admin-settings/admin-settings';
 import { LandingPage } from '../components/landing-page/landing-page';
-import { MyRegistrations } from '../components/my-registrations/my-registrations';
+import { Home } from '../components/home/home';
 import { ParentLogin } from '../components/parent-login/parent-login';
 import { Registration } from '../components/registration/registration';
+import { guestOnlyGuard, parentAuthGuard, parentRegistrationAvailabilityGuard } from './guards/parent-route.guard';
 
 export const routes: Routes = [
   { path: '', component: LandingPage },
-  { path: 'login', component: ParentLogin },
-  { path: 'registration', component: Registration },
-  { path: 'my-registrations', component: MyRegistrations },
+  { path: 'login', component: ParentLogin, canActivate: [guestOnlyGuard] },
+  { path: 'registration', component: Registration, canActivate: [parentRegistrationAvailabilityGuard] },
+  { path: 'home/:registrationId', component: Home, canActivate: [parentAuthGuard] },
+  { path: 'home', component: Home, canActivate: [parentAuthGuard] },
   { path: 'admin', component: AdminDashboard },
   { path: 'admin/family', component: AdminFamily },
   { path: 'admin/settings', component: AdminSettings },

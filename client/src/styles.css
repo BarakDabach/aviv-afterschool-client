@@ -175,4 +175,83 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
+
+  .app-mobile-drawer-panel {
+    background: white;
+    background-color: white;
+  }
+
+  .app-mobile-drawer-content {
+    animation-duration: 220ms;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .app-mobile-drawer-content[data-state='open'] {
+    animation-name: app-drawer-slide-in;
+  }
+
+  .app-mobile-drawer-content[data-state='closed'] {
+    animation-name: app-drawer-slide-out;
+    animation-timing-function: cubic-bezier(0.64, 0, 0.78, 0);
+  }
+
+  [data-sonner-toaster][data-theme='light'],
+  [data-sonner-toaster][data-theme='dark'] {
+    --brn-sonner-toast-normal-background: #000;
+    --brn-sonner-toast-normal-border-color: var(--border);
+    --brn-sonner-toast-normal-color: white;
+    --brn-sonner-toast-success-background: #000;
+    --brn-sonner-toast-success-border: color-mix(in oklch, var(--success) 42%, var(--border));
+    --brn-sonner-toast-success-color: white;
+    --brn-sonner-toast-info-background: #000;
+    --brn-sonner-toast-info-border: color-mix(in oklch, var(--brand) 38%, var(--border));
+    --brn-sonner-toast-info-color: white;
+    --brn-sonner-toast-warning-background: #000;
+    --brn-sonner-toast-warning-border: color-mix(in oklch, var(--warning) 44%, var(--border));
+    --brn-sonner-toast-warning-color: white;
+    --brn-sonner-toast-error-background: #000;
+    --brn-sonner-toast-error-border: color-mix(in oklch, var(--destructive) 44%, var(--border));
+    --brn-sonner-toast-error-color: white;
+    --brn-sonner-toast-close-button-background: var(--card);
+    --brn-sonner-toast-close-button-color: var(--foreground);
+    --brn-sonner-toast-close-button-border: 1px solid var(--border);
+    --brn-sonner-toast-close-button-hover-background: var(--muted);
+    --brn-sonner-toast-close-button-hover-color: var(--foreground);
+    --brn-sonner-toast-close-button-hover-border-color: var(--border);
+    --brn-sonner-toast-focus-box-shadow: 0 0 0 2px color-mix(in oklch, var(--ring) 28%, transparent);
+  }
+
+  [data-sonner-toast][data-styled='true'] {
+    background: #000 !important;
+    color: white !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .app-mobile-drawer-content {
+      animation: none;
+      transition: none;
+    }
+  }
+}
+
+@keyframes app-drawer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes app-drawer-slide-out {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
 }

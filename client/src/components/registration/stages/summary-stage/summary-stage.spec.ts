@@ -50,6 +50,7 @@ describe('SummaryStage', () => {
     const missingUploadInputs = fixture.nativeElement.querySelectorAll('input[type="file"]');
 
     expect(text).toContain('נועה לוי');
+    expect(text).toContain('אלרגיות ורגישויות: רגישות לחלב');
     expect(text).toContain('ממתינה למסמכים');
     expect(text).toContain('ההרשמה ממתינה להשלמת המסמכים החסרים');
     expect(text).toContain('מסמכים שהועלו');
@@ -88,6 +89,24 @@ describe('SummaryStage', () => {
     expect(text).not.toContain('לחצו להעלאת מסמך חסר');
     expect(missingUploadInputs).toHaveLength(0);
   });
+
+  it('does not render an allergy line when the child has no allergy details', () => {
+    const registrationWithoutAllergies = createRegistration(RegistrationStatus.PendingApproval);
+    registrationWithoutAllergies.children[0] = {
+      ...registrationWithoutAllergies.children[0],
+      child: {
+        ...registrationWithoutAllergies.children[0].child,
+        allergies: null,
+      },
+    };
+    store.submittedRegistration.set(registrationWithoutAllergies);
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent as string;
+
+    expect(text).not.toContain('אלרגיות ורגישויות');
+    expect(text).not.toContain('ללא אלרגיות ורגישויות');
+  });
 });
 
 function createRegistration(status: RegistrationStatus): RegistrationState {
@@ -113,7 +132,7 @@ function createRegistration(status: RegistrationStatus): RegistrationState {
           uniqueId: '',
           dateOfBirth: '2021-03-14',
           gender: Gender.Female,
-          allergies: null,
+          allergies: 'רגישות לחלב',
         },
         selectedPlan: {
           yearPlanId: 101,

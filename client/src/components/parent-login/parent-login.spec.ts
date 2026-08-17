@@ -37,7 +37,7 @@ describe('ParentLogin', () => {
           useClass: MockDataService,
         },
         provideRouter([
-          { path: 'my-registrations', component: EmptyRouteComponent },
+          { path: 'home', component: EmptyRouteComponent },
           { path: 'admin', component: EmptyRouteComponent },
           { path: 'registration', component: EmptyRouteComponent },
         ]),
@@ -110,6 +110,6 @@ describe('ParentLogin', () => {
     verifyButton.click();
     await fixture.whenStable();
 
-    expect(router.url).toBe('/my-registrations');
+    expect(router.url).toBe('/home');
   });
 });

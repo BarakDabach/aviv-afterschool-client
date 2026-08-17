@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { patchState, signalStore, withComputed, withHooks, withMethods, withProps, withState } from '@ngrx/signals';
 import { AuthFacade } from '../../app/facades/auth.facade';
 import { GlobalStore } from '../../app/stores/global.store';
+import { NotificationService } from '../../app/services/notification.service';
 import type { AuthenticatedUser } from '../../app/types/auth.type';
 import { isValidEmail } from '../../app/utils/email.validation';
 
@@ -47,6 +48,7 @@ export const LoginStore = signalStore(
   withProps(() => ({
     authFacade: inject(AuthFacade),
     globalStore: inject(GlobalStore),
+    notifications: inject(NotificationService),
     router: inject(Router),
   })),
   withComputed(({ email, emailTouched, loading, nowMs, otp, otpTouched, resendAvailableAtIso, step, user }) => {
@@ -104,7 +106,7 @@ export const LoginStore = signalStore(
     };
 
     const routeAfterLogin = async (user: AuthenticatedUser): Promise<void> => {
-      await store.router.navigateByUrl(user.role === 'admin' ? '/admin' : '/my-registrations');
+      await store.router.navigateByUrl(user.role === 'admin' ? '/admin' : '/home');
     };
     const sendOtp = async (notice: string): Promise<void> => {
       patchState(store, {
@@ -128,6 +130,7 @@ export const LoginStore = signalStore(
           notice,
         });
       } catch (error) {
+        store.notifications.error(error instanceof Error ? error.message : 'לא הצלחנו לשלוח קוד אימות.');
         patchState(store, {
           error: error instanceof Error ? error.message : 'לא הצלחנו לשלוח קוד אימות.',
         });
@@ -180,8 +183,10 @@ export const LoginStore = signalStore(
           const session = await store.authFacade.verifyOtp(challengeId, store.otp());
 
           applySession(session.user);
+          store.notifications.success('התחברתם בהצלחה.');
           await routeAfterLogin(session.user);
         } catch (error) {
+          store.notifications.error(error instanceof Error ? error.message : 'לא הצלחנו לאמת את הקוד.');
           patchState(store, {
             error: error instanceof Error ? error.message : 'לא הצלחנו לאמת את הקוד.',
           });
@@ -213,9 +218,14 @@ export const LoginStore = signalStore(
         applySession(session.user);
       },
       async logout(): Promise<void> {
-        await store.authFacade.logout();
-        store.globalStore.clearUser();
-        patchState(store, initialLoginState);
+        try {
+          await store.authFacade.logout();
+          store.globalStore.clearUser();
+          patchState(store, initialLoginState);
+          store.notifications.success('התנתקתם בהצלחה.');
+        } catch (error) {
+          store.notifications.error(error instanceof Error ? error.message : 'לא הצלחנו להתנתק.');
+        }
       },
     };
   }),

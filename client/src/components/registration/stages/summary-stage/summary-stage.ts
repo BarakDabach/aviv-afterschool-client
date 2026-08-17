@@ -8,6 +8,7 @@ import {
   RegistrationStatus,
   RegistrationStatusTone,
   type MissingRegistrationDocument,
+  type RegistrationChildState,
   type RegistrationDocument,
   type RegistrationState,
 } from '../../../../app/types/registration-status.type';
@@ -40,11 +41,17 @@ export class SummaryStage {
     return documentType === DocumentType.SignedContract ? 'חוזה וחתימה' : 'אישור הוראת קבע';
   }
 
+  protected allergyLabel(childState: RegistrationChildState): string {
+    const allergies = childState.child.allergies?.trim();
+
+    return allergies ? `אלרגיות ורגישויות: ${allergies}` : '';
+  }
+
   protected documentScopeLabel(registration: RegistrationState, document: RegistrationDocument | MissingRegistrationDocument): string {
     const scope = document.scope;
 
-    if (scope.kind === RegistrationDocumentScopeKind.AllChildren) return 'כל הילדים';
+    if (scope.kind === RegistrationDocumentScopeKind.AllChildren) return '';
 
-    return registration.children.find((childState) => childState.child.id === scope.localChildId)?.child.fullName ?? 'ילד';
+    return registration.children.find((childState) => childState.child.id === scope.localChildId)?.child.fullName ?? '';
   }
 }

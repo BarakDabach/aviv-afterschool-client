@@ -154,7 +154,56 @@ Primary design target:
 
 - Mobile portrait.
 - Approximate mockup ratio: 9:16.
-- Main content max width on mobile: `min(100% - 32px, 720px)`.
+
+### Breakpoints
+
+Use these breakpoints consistently:
+
+| Token | Range | Intended Layout |
+|---|---:|---|
+| `mobile-sm` | `320px-374px` | Narrow phones |
+| `mobile` | `375px-479px` | Primary parent experience |
+| `mobile-lg` | `480px-767px` | Large phones / small foldables |
+| `tablet` | `768px-1023px` | Centered mobile-like flows, wider admin lists |
+| `desktop` | `1024px-1439px` | Desktop admin and centered parent flows |
+| `desktop-lg` | `1440px+` | Wide desktop with constrained content |
+
+### Page Containers
+
+| Surface | Mobile Width | Tablet Width | Desktop Width |
+|---|---:|---:|---:|
+| Parent/public page | `100%` with `24px` side padding | max `720px` centered | max `760px` centered |
+| Parent registration wizard | `100%` with `24px` side padding | max `680px` centered | max `680px` centered |
+| Parent status/list screens | `100%` with `24px` side padding | max `720px` centered | max `760px` centered |
+| Admin mobile screens | `100%` with `20px` side padding | max `840px` centered | max `1180px` centered |
+| Admin dashboard desktop | single column on mobile | two-column content where useful | `12-column` grid, max `1180px` |
+
+Use `16px` side padding only on `mobile-sm` if content would otherwise overflow.
+
+### Vertical Sizing
+
+| Element | Mobile | Tablet/Desktop |
+|---|---:|---:|
+| Header height | `80px` | `88px` |
+| Header horizontal padding | `24px` | `32px` |
+| Parent page top content gap | `32-48px` | `48-64px` |
+| Admin page top content gap | `24-32px` | `32-40px` |
+| Admin mobile nav bar | `64px` header with hamburger | desktop top navbar |
+| Admin drawer width | `min(84vw, 320px)` | not used when top navbar is visible |
+| Botanical footer reserved space | `120-180px` | `80-140px` |
+
+### Component Width Rules
+
+| Component | Mobile | Desktop |
+|---|---:|---:|
+| Primary full-width button | `100%` | max `520px` on parent screens, auto/full inside admin panels |
+| Form input | `100%` | max `520px` in simple parent forms |
+| Upload drop zone | `100%` | max `640px` in parent flow |
+| Contract preview | `100%` | max `720px` |
+| Signature pad | `100%`, min height `136px` | max `640px`, min height `160px` |
+| Status rows card | `100%` | max `720px` |
+| Admin registration card | `100%` | spans grid columns as needed |
+| Stats card | 3 across if `>=360px`, otherwise stacked | 3-4 across |
 
 ### Spacing Scale
 
@@ -176,6 +225,9 @@ Primary design target:
 - Cards are for repeated items, forms, uploads, summaries, and admin rows.
 - Do not place cards inside cards unless the inner element is a form input/upload preview with a clear purpose.
 - Footer botanicals should sit behind or below content and never reduce button legibility.
+- Parent flows should not exceed `760px` even on wide screens.
+- Admin screens may widen, but tables/cards must remain scannable and should not stretch text lines beyond `72ch`.
+- On desktop, use extra width for side-by-side panels, filters, and document previews rather than enlarging typography.
 
 ## 8. Border Radius and Elevation
 
@@ -218,10 +270,11 @@ Most surfaces should rely on border and background rather than heavy shadow.
 **Admin header**
 
 - Logo and app name on the right.
-- User indicator or back action on the left.
+- Mobile: hamburger button on the left, optional Aviv/user indicator beside it if space allows.
+- Desktop: persistent top navbar with Aviv/user indicator and section links.
 - Same divider line.
 - User label example: `אביב`.
-- Keep admin header compact and aligned with bottom navigation.
+- Keep admin header compact and aligned with navbar-based navigation.
 
 **Header action styles**
 
@@ -255,7 +308,7 @@ Examples:
 - `בחירה והתחלת הרשמה`
 - `המשך לחוזה משותף`
 - `חתימה והמשך לאישורים`
-- `שמירת החלטות`
+- `שמירה`
 - `חזרה לעמוד הראשי`
 
 Style:
@@ -293,7 +346,6 @@ Use underlined text links for low-priority actions:
 - `שמירה והמשך מאוחר יותר`
 - `התחלת הרשמה חדשה`
 - `העתקה משנה קודמת`
-- `הוספת הערה להורה`
 - `הוספת הערה פנימית`
 
 Style:
@@ -471,6 +523,26 @@ Used in admin settings for capacity.
 - Border: `1px solid --color-border`.
 - Radius: `8px`.
 
+#### Select Control
+
+Used when a filter has multiple possible values.
+
+Examples:
+
+- `לפי גיל`
+- `סטטוס הרשמה`
+
+Style:
+
+- Height: `44-48px`.
+- Border: `1px solid --color-border`.
+- Background: `--color-surface` or `--color-bg`.
+- Radius: `--radius-pill` for compact filter selects, `8px` for form selects.
+- Text color: `--color-text`.
+- Leading icon may describe the filter category.
+- Dropdown chevron appears on the left side in RTL.
+- Selected value should replace the placeholder, for example `גיל 5` or `ממתינה לבדיקה`.
+
 ### Segmented Controls
 
 Use for binary choices:
@@ -606,7 +678,17 @@ Used on admin dashboard.
 - Horizontal scroll if needed.
 - Active chip: green background, white text.
 - Inactive chip: `--color-surface`, border `--color-border`.
-- Examples: `הכל`, `לבדיקה`, `אחים`, `מסמכים משותפים`, `אלרגיות`.
+- Other admin screens may define their own filter sets only when required by the workflow.
+
+**Current Year filter bar**
+
+The Current Year screen uses mixed filter controls:
+
+- `עם אלרגיות`: chip/toggle filter.
+- `לפי גיל`: select control.
+- `סטטוס הרשמה`: select control.
+
+Do not render `לפי גיל` or `סטטוס הרשמה` as simple badges; they must visually indicate dropdown/select behavior.
 
 ### Alerts and Info Bands
 
@@ -647,23 +729,31 @@ Info bands use one icon, one bold line if needed, and concise supporting text.
 - `קובץ משותף`
 - `אסמכתה משותפת`
 
-### Admin Bottom Navigation
+### Admin Navigation
 
-Tabs:
+Admin uses navbar-based navigation.
 
-- `הרשמות`
-- `ילדים`
-- `הגדרות`
+Primary admin sections:
 
-Active tab:
+- `בית`
+- `שנים`
+- `שנה נוכחית`
 
-- Green icon and label.
-- Small underline indicator.
+#### Mobile Admin Navigation
 
-Inactive tab:
+- Use a hamburger button in the header.
+- Tapping hamburger opens a right-to-left drawer or sheet.
+- Drawer width: `min(84vw, 320px)`.
+- Drawer items use icon + text + active indicator.
+- Do not use a fixed bottom navigation for Aviv.
+- Keep the current screen title visible after the header.
 
-- Muted icon and label.
-- No filled background.
+#### Desktop Admin Navigation
+
+- Use a persistent top navbar under or inside the admin header.
+- Active nav item uses green text and a small underline.
+- Inactive items use muted text.
+- Desktop admin may also use a side nav later, but top navbar is the default.
 
 ### Footer Botanical Decoration
 
@@ -672,7 +762,7 @@ Used on most mobile screens.
 - Leaves and flowers sit at the bottom edges.
 - Parent screens may use fuller decoration.
 - Admin screens use subtler decoration.
-- Must not overlap primary actions, bottom navigation, or readable text.
+- Must not overlap primary actions, admin drawer controls, or readable text.
 
 ## 10. Parent Flow Patterns
 
@@ -801,17 +891,98 @@ Icon color should follow semantic state.
 
 ## 14. Responsive Behavior
 
-Mobile:
+### Mobile Layout
+
+Mobile is the primary design target.
+
+| Area | Sizing |
+|---|---:|
+| Viewport support | `320px` minimum width |
+| Standard side padding | `24px` |
+| Narrow-phone side padding | `16px` below `375px` |
+| Content column | `100%` |
+| Card width | `100%` |
+| Primary button width | `100%` |
+| Admin mobile navigation | hamburger in header, drawer width `min(84vw, 320px)` |
+| Parent bottom nav | not used |
+
+Mobile rules:
 
 - Single-column layout.
 - Full-width primary buttons.
-- Sticky bottom nav only in admin screens.
+- Admin screens use a hamburger menu in the header instead of bottom navigation.
+- Admin screens do not need bottom-nav safe padding.
+- Horizontal scrolling is allowed only for filter chips, never for forms or status cards.
+- Registration steppers must fit in one row from right to left; reduce connector length before reducing label size.
+- Forms should stack labels, inputs, helper text, and actions vertically.
 
-Tablet/Desktop:
+### Tablet Layout
 
-- Keep content centered with max width.
+Tablet starts at `768px`.
+
+| Area | Sizing |
+|---|---:|
+| Parent flow width | `680-720px` centered |
+| Admin content width | max `840px` centered |
+| Side padding | `32px` |
+| Primary parent button | max `520px`, centered when standalone |
+| Admin navigation | hamburger may remain, or switch to top navbar at wider tablet widths |
+
+Tablet rules:
+
+- Parent registration remains a centered single-column wizard.
+- Parent landing page may keep a single column unless a future desktop-specific landing layout is designed.
+- Admin dashboard can use two-column sections for stats and lists if it improves scanning.
+
+### Desktop Layout
+
+Desktop starts at `1024px`.
+
+| Area | Sizing |
+|---|---:|
+| Parent page container | max `760px` centered |
+| Parent wizard container | max `680px` centered |
+| Admin app container | max `1180px` centered |
+| Desktop page side padding | `40px` |
+| Admin grid | `12 columns`, `24px` gutters |
+| Admin detail main column | `minmax(0, 1fr)` |
+| Admin side panel/document panel | `360-420px` |
+| Header height | `88px` |
+
+Desktop rules:
+
+- Keep parent flows centered and calm; do not stretch form fields across the full viewport.
 - Admin lists may expand to table-like layouts.
-- Parent registration should remain wizard-like and not become too wide.
+- Admin review screens may use a two-column layout:
+  - Right/main column: family details and status.
+  - Left/secondary column: document preview and approve/reject actions.
+- Admin dashboard may place stats and filters above a wider registrations table/card list.
+- Desktop admin uses a persistent top navbar by default.
+- Botanical decoration should become subtler on admin desktop screens.
+
+### Screen-Specific Responsive Rules
+
+| Screen Family | Mobile | Desktop |
+|---|---|---|
+| Landing page | Single column, hero image/content stacked | Keep centered or use a two-column hero only if imagery remains clear and text is not carded |
+| Parent lookup | Centered form, full-width button | `480-560px` form block centered |
+| My registrations list | Stacked child cards | Cards may use two columns if more than two children |
+| Registration wizard | Single-column stepper and form | Same single-column wizard, max `680px` |
+| Contract signing | Contract preview above signature pad | Contract preview and signature can remain stacked; optional document preview side panel |
+| Upload approvals | Upload blocks stacked | Upload blocks can be side-by-side only when both remain readable |
+| Parent summary/status | Status rows stacked | Same centered summary, max `720px` |
+| Admin dashboard | Stats row, stacked cards | Stats grid + wider registration list/table |
+| Admin document review | Family card, document cards stacked | Two-column review with document preview side panel |
+| Admin family profile | Child cards stacked | Children and history may sit in adjacent panels |
+| Admin settings | Settings cards stacked | Settings and route management can use two columns |
+
+Admin desktop rules:
+
+- Every admin screen must support both the mobile and desktop layouts represented in `mockups/`.
+- Desktop layouts must use the same fields, rows, labels, actions, and statuses as the mobile screen.
+- Desktop may only change layout density, column structure, navigation style, and alignment.
+- Do not add extra information on desktop that is not available on the matching mobile screen.
+- Desktop admin uses the persistent top navbar; mobile admin uses the hamburger header.
 
 ## 15. Current Mockup References
 
@@ -822,6 +993,8 @@ Current mockups are stored in:
 Reference files:
 
 - `landing-page.png`
+- `parent-home.png`
+- `parent-home-desktop.png`
 - `parent-registration-lookup.png`
 - `parent-my-registrations-list.png`
 - `parent-my-registration-status.png`
@@ -829,10 +1002,16 @@ Reference files:
 - `registration-step-2-sibling-shared-contract.png`
 - `registration-step-3-sibling-shared-uploads.png`
 - `registration-step-4-sibling-summary.png`
-- `admin-registrations-dashboard.png`
-- `admin-shared-documents-review.png`
-- `admin-family-profile-history.png`
-- `admin-school-year-settings.png`
+- `admin-home.png`
+- `admin-home-desktop.png`
+- `admin-years.png`
+- `admin-years-desktop.png`
+- `admin-current-year.png`
+- `admin-current-year-desktop.png`
+- `admin-create-year.png`
+- `admin-create-year-desktop.png`
+- `admin-view-registration.png`
+- `admin-view-registration-desktop.png`
 
 ## 16. Component Coverage Audit
 
@@ -843,6 +1022,8 @@ This checklist verifies that every component visible in the current mockups is r
 | Mockup | Components Covered |
 |---|---|
 | `landing-page.png` | Header, logo, hero typography, botanical hero/illustration area, route cards, selected route state, primary button, informational icon blocks, process timeline, accordion rows, footer links |
+| `parent-home.png` | Parent header, greeting, active-year card, active submitted registration card, missing-documents status and action, registration-history rows, current-year holiday calendar rows, status pills, shared-document/sibling badges, primary and secondary actions, botanical footer |
+| `parent-home-desktop.png` | Desktop parent header, same greeting, same active-year card, same active submitted registration card, same missing-documents status and action, same registration-history rows, same current-year holiday calendar rows, same actions in two-column parent layout |
 | `parent-registration-lookup.png` | Header, back action, H1/subtitle, info card, phone input, primary button, text link, privacy note, botanical footer |
 | `parent-my-registrations-list.png` | Header, parent identity card, child cards, status pills, sibling/multiple-registration list, card action buttons, primary button, text link, botanical footer |
 | `parent-my-registration-status.png` | Child summary card, registration status rows, status pills, contract download link, pending states, info card, primary/secondary actions |
@@ -860,10 +1041,16 @@ This checklist verifies that every component visible in the current mockups is r
 
 | Mockup | Components Covered |
 |---|---|
-| `admin-registrations-dashboard.png` | Admin header, stats cards, alert band, search input, filter chips, admin registration card, sibling/shared badges, status row, small action button, bottom navigation |
-| `admin-shared-documents-review.png` | Admin detail header, family summary card, alert/info card, contract row, admin review file cards, PDF/image thumbnails, approve/reject buttons, sticky primary action, note link |
-| `admin-family-profile-history.png` | Family profile header, sibling alert, child cards, allergy badges, shared document rows, registration history timeline, danger outline button, admin actions, bottom navigation |
-| `admin-school-year-settings.png` | Admin settings card, toggles, number stepper, amount input row, route management cards, availability chips, edit action, add button, content management rows, save button, copy link, bottom navigation |
+| `admin-home.png` | Admin header, hamburger navigation, stats cards, simplified pending registration cards, sibling/shared badges, registration stage summary, registration-details action |
+| `admin-home-desktop.png` | Desktop admin header, persistent top navbar, same stats cards, same pending registration cards, same sibling/shared badges, same registration stage summary, same registration-details action in wider list layout |
+| `admin-years.png` | Admin header, hamburger navigation, create-year button, duplicate-year button, current-year card, year archive cards, status chips |
+| `admin-years-desktop.png` | Desktop admin header, persistent top navbar, same create-year and duplicate-year actions, same current-year card, same archive cards, same status chips in two-column layout |
+| `admin-current-year.png` | Admin header, hamburger navigation, search input, mixed filter bar (`עם אלרגיות` chip, `לפי גיל` select, `סטטוס הרשמה` select), pending registrations alert, child cards, allergy badges, child history actions, remove-from-year action |
+| `admin-current-year-desktop.png` | Desktop admin header, persistent top navbar, same search input, same mixed filter bar, same pending registrations alert, same child information and actions in wider table-like rows |
+| `admin-create-year.png` | Admin header, hamburger navigation, duplicate-year button, start/end year inputs, derived year-name display, registration-open toggle, plans/prices form rows, procedures/instructions textarea, contract upload, insurance amount input, primary publish action |
+| `admin-create-year-desktop.png` | Desktop admin header, persistent top navbar, same duplicate-year button, same year inputs, same derived year name, same registration-open toggle, same plans/prices form, same textarea, same contract upload, same insurance input, same primary publish action in two-column form layout |
+| `admin-view-registration.png` | Admin header, hamburger navigation, family and sibling summary, shared-document alert, registration stage summary, registration detail rows without school-year row, allergies/sensitivities rows with medical/allergy icon, document review cards, per-document approve buttons, single save action |
+| `admin-view-registration-desktop.png` | Desktop admin header, persistent top navbar, same family and sibling summary, same shared-document alert, same stage summary, same registration details without school-year row, same allergies section, same document review cards, same per-document approve buttons, same single save action in two-column review layout |
 
 ### Component Inventory
 
@@ -876,12 +1063,13 @@ All current mockups are covered by these component groups:
 - Cards: route, child, family, status, upload, admin registration, settings, contract, signature, timeline, stats.
 - Status pills, chips, badges, sibling markers, shared-document markers, allergy badges.
 - Registration stepper and timelines.
-- Inputs, phone input, signer input, segmented controls, checkboxes, toggles, number steppers.
+- Inputs, phone input, signer input, select controls, segmented controls, checkboxes, toggles, number steppers.
 - Upload drop zones, uploaded file cards, PDF/image thumbnails, shared upload controls, review file cards.
 - Contract preview and signature pad.
-- Search input and filter chips.
+- Search input, filter chips, and filter select controls.
+- Year creation/edit controls, date inputs, route management rows, capacity steppers.
 - Alerts, privacy notes, pending review bands, success notices.
-- Admin bottom navigation.
+- Admin hamburger navigation and desktop navbar.
 - Botanical footer decoration.
 
 ## 17. CSS Token Starter
@@ -927,8 +1115,83 @@ All current mockups are covered by these component groups:
 
   --shadow-soft: 0 8px 24px rgba(24, 63, 54, 0.06);
 
+  --breakpoint-mobile-sm: 320px;
+  --breakpoint-mobile: 375px;
+  --breakpoint-mobile-lg: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-desktop-lg: 1440px;
+
+  --page-padding-mobile-sm: 16px;
+  --page-padding-mobile: 24px;
+  --page-padding-tablet: 32px;
+  --page-padding-desktop: 40px;
+
+  --container-parent: 760px;
+  --container-parent-wizard: 680px;
+  --container-parent-form: 560px;
+  --container-admin-tablet: 840px;
+  --container-admin: 1180px;
+  --container-admin-side-panel: 400px;
+
   --header-height: 80px;
+  --header-height-desktop: 88px;
   --bottom-nav-height: 76px;
+  --bottom-nav-safe-padding: 96px;
   --touch-target: 44px;
+  --button-height: 60px;
+  --button-height-small: 44px;
+  --input-height: 60px;
+  --signature-height-mobile: 136px;
+  --signature-height-desktop: 160px;
+  --admin-grid-gutter: 24px;
+}
+```
+
+Recommended container starter:
+
+```css
+.page {
+  min-height: 100dvh;
+  padding-inline: var(--page-padding-mobile);
+}
+
+@media (max-width: 374px) {
+  .page {
+    padding-inline: var(--page-padding-mobile-sm);
+  }
+}
+
+.parent-container {
+  width: min(100%, var(--container-parent));
+  margin-inline: auto;
+}
+
+.wizard-container {
+  width: min(100%, var(--container-parent-wizard));
+  margin-inline: auto;
+}
+
+.admin-container {
+  width: min(100%, var(--container-admin));
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding-inline: var(--page-padding-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding-inline: var(--page-padding-desktop);
+  }
+
+  .admin-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--admin-grid-gutter);
+  }
 }
 ```

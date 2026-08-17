@@ -121,6 +121,14 @@ export interface Year {
   yearNumber: number;
 }
 
+export interface HolidayPeriod {
+  id: number;
+  yearId: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
 export interface AvailableYearPlan {
   yearPlanId: number;
   plan: Plan;
@@ -163,6 +171,13 @@ export interface RegistrationState {
   children: RegistrationChildState[];
   documents: RegistrationDocument[];
   missingDocuments: MissingRegistrationDocument[];
+}
+
+export interface ParentHome {
+  parent: Parent;
+  activeRegistration: RegistrationState | null;
+  registrationHistory: RegistrationState[];
+  holidayPeriods: HolidayPeriod[];
 }
 
 export interface RegistrationChildDraft {

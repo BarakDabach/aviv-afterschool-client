@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { DataService } from '../services/data.service';
 import type {
   AvailableYearPlan,
+  ParentHome,
   RegistrationState,
   SubmitRegistrationRequest,
   UploadRegistrationDocumentRequest,
@@ -18,6 +19,14 @@ export class ParentFacade {
 
   getAvailableYearPlans(): Promise<AvailableYearPlan[]> {
     return this.dataService.getAvailableYearPlans();
+  }
+
+  getParentHome(parentEmail?: string): Promise<ParentHome> {
+    return this.dataService.getParentHome(parentEmail);
+  }
+
+  getSubmittedRegistration(registrationId: number): Promise<RegistrationState> {
+    return this.dataService.getSubmittedRegistration(registrationId);
   }
 
   submitRegistration(request: SubmitRegistrationRequest): Promise<RegistrationState> {
