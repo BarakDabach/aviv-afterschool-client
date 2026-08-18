@@ -4,7 +4,6 @@ import { provideIcons } from '@ng-icons/core';
 import { lucideCalendarClock } from '@ng-icons/lucide';
 import { HlmRadioGroupImports } from '@spartan-ng/helm/radio-group';
 import { DetailsCard } from '../../../shared/details-card/details-card';
-import { PaymentMethod } from '../../../../app/types/registration-status.type';
 import { RegistrationStore } from '../../registration.store';
 
 @Component({
@@ -16,5 +15,4 @@ import { RegistrationStore } from '../../registration.store';
 })
 export class PlanStage {
   protected readonly store = inject(RegistrationStore);
-  protected readonly paymentMethod = PaymentMethod;
 }

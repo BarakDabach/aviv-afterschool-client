@@ -22,7 +22,7 @@ This is a manual and integration dry-run specification for the backend-shaped in
 1. Open the registration flow as a parent.
 2. Enter a unique parent name, phone, and email.
 3. Add at least two children with distinct names, genders, dates of birth, and allergy values.
-4. Select a plan for each child and explicitly select a payment method for each child.
+4. Select a plan for each child. Do not expose or require a parent-facing payment method choice.
 5. Upload every required document, including the correct shared or child-specific scope, using distinctive file names.
 6. Submit the registration.
 7. Verify the returned registration has repository-generated registration and document IDs, creation/submission timestamps, uploaded timestamps, `PendingReview` document state, stored payment methods, selected plans, pricing, allergies, year, parent, and children.
@@ -96,11 +96,34 @@ This is a manual and integration dry-run specification for the backend-shaped in
 ## Registration Plan Cards And Mobile Sizing
 
 1. On a mobile viewport, open the child plan-selection stage.
-2. Verify each plan card has a comfortable tap target, readable plan title, readable description, visible radio indicator, and no clipped text.
-3. Verify long Hebrew plan labels and prices wrap cleanly without overlapping the radio indicator or adjacent content.
-4. Select and unselect different plans; verify the selected visual state does not resize the card or shift nearby controls.
-5. Add multiple children and verify all child plan cards keep the same mobile sizing and spacing.
-6. Switch to tablet/desktop widths and verify the cards still match the denser layout expected on larger screens.
+2. Verify exactly four fixed programs are shown: `4-5 פעמים בשבוע`, `3 פעמים בשבוע`, `2 פעמים בשבוע`, and `חד פעמי`.
+3. Verify the fixed prices are shown exactly: ₪1350, ₪1050, ₪850, and ₪100.
+4. Verify every plan shows the same hours: `13:00-17:00`.
+5. Verify the weekly plans show monthly price metadata and the `חד פעמי` plan shows daily price metadata.
+6. Verify each plan card has a comfortable tap target, readable plan title, readable description, visible radio indicator, and no clipped text.
+7. Verify long Hebrew plan labels and prices wrap cleanly without overlapping the radio indicator or adjacent content.
+8. Select and unselect different plans; verify the selected visual state does not resize the card or shift nearby controls.
+9. Add multiple children and verify all child plan cards keep the same mobile sizing and spacing.
+10. Switch to tablet/desktop widths and verify the cards still match the denser layout expected on larger screens.
+
+## Fixed Program Catalog And Parent Payment Rules
+
+1. Load the plan catalog through `DataService`; verify it returns exactly the four daycare programs and does not include old placeholder plans.
+2. Verify `4-5 פעמים בשבוע` has price 1350, hours `13:00-17:00`, is active, and requires standing order.
+3. Verify `3 פעמים בשבוע` has price 1050, hours `13:00-17:00`, is active, and requires standing order.
+4. Verify `2 פעמים בשבוע` has price 850, hours `13:00-17:00`, is active, and requires standing order.
+5. Verify `חד פעמי` has price 100, hours `13:00-17:00`, is active, and does not require standing order.
+6. Submit a one-child registration with `4-5 פעמים בשבוע` and no standing-order file; verify the stored child payment method is `StandingOrder` and the registration is `WaitingForDocuments`.
+7. Submit a one-child registration with `3 פעמים בשבוע` and no standing-order file; verify the stored child payment method is `StandingOrder` and the registration is `WaitingForDocuments`.
+8. Submit a one-child registration with `2 פעמים בשבוע` and no standing-order file; verify the stored child payment method is `StandingOrder` and the registration is `WaitingForDocuments`.
+9. Submit a one-child registration with `חד פעמי` and no standing-order file; verify the stored child payment method is `Cash` and no standing-order document is required.
+10. In the parent registration UI, verify changing plans automatically updates the hidden stored payment type according to the selected plan and never asks the parent to choose cash or standing order.
+11. Start with `חד פעמי`, then switch to a weekly plan before submitting; verify the submitted registration uses `StandingOrder` and requires standing-order approval.
+12. Start with a weekly plan, then switch to `חד פעמי` before submitting; verify the submitted registration uses `Cash` and does not require standing-order approval.
+13. Restore a saved draft whose child payment method is stale or missing; verify submission derives the final payment method from the selected plan instead of trusting the draft value.
+14. Submit a mixed multi-child registration with one weekly child and one `חד פעמי` child; verify only the weekly child requires standing-order approval.
+15. Submit a mixed multi-child registration with all three weekly plan types; verify each child stores `StandingOrder` and standing-order requirements are satisfied by either the chosen shared document or the matching child-specific documents.
+16. Verify the landing page plan list matches the same four fixed programs, prices, and hours as the registration flow.
 
 ## Document Review And Readiness
 
@@ -117,22 +140,24 @@ This is a manual and integration dry-run specification for the backend-shaped in
 
 ## Payment Method And Required Documents
 
-1. Change a child from cash to standing order in the parent registration flow and submit.
-2. Verify the child domain record stores `StandingOrder` and the standing-order requirement is calculated for the correct scope.
-3. In admin, change the payment method and reload the dashboard.
-4. Verify the parent-visible registration reflects the new method and recalculated missing-document state.
-5. Change a child to cash and verify the child-specific standing-order requirement/document is removed or no longer required.
-6. In admin, switch a waiting-for-documents child from cash to standing order without uploading a standing-order document; verify the command succeeds and the registration remains `WaitingForDocuments`.
-7. Verify the missing requirements now include the standing-order approval requirement for the correct child or shared scope.
-8. In admin, switch the same child from standing order back to cash; verify the standing-order requirement is removed while unrelated missing documents remain.
-9. In admin, switch a pending-approval child from cash to standing order without uploading a standing-order document; verify the command succeeds, the registration recalculates to `WaitingForDocuments`, and the dashboard moves it to the waiting queue after reload.
-10. In admin, switch a pending-approval child from standing order to cash when the only missing or pending item is the standing-order approval; verify the document requirement is no longer required and the registration status recalculates from the remaining requirements.
-11. In admin, switch one child to cash in a multi-child registration where another child still requires standing order; verify the other child's requirement remains intact.
-12. In admin, switch one child to standing order in a multi-child registration where documents are scoped per child; verify only that child receives a standing-order missing requirement.
-13. In admin, switch one child to standing order when an all-children standing-order document already exists; verify no duplicate requirement is created for that child.
-14. In admin, click the already-selected payment method; verify the command is idempotent, no duplicate documents or missing requirements are created, and the dashboard remains stable.
-15. Verify payment controls use the same stored child state as the dashboard projection.
-16. Verify payment-method clicks inside an expanded registration do not collapse the registration container.
+1. Submit each weekly plan from the parent flow and verify the child domain record stores `StandingOrder`.
+2. Submit the `חד פעמי` plan from the parent flow and verify the child domain record stores `Cash`.
+3. Verify the parent flow never exposes payment controls even though the stored child state has a payment method.
+4. Verify standing-order requirements are calculated only for children whose selected plan requires standing order and whose stored payment method is `StandingOrder`.
+5. Verify no standing-order requirement is calculated for a `חד פעמי` child whose stored payment method is `Cash`.
+6. In admin, change the payment method and reload the dashboard.
+7. Verify the parent-visible registration reflects the new method and recalculated missing-document state.
+8. In admin, switch a waiting-for-documents child from cash to standing order without uploading a standing-order document; verify the command succeeds and the registration remains `WaitingForDocuments`.
+9. Verify the missing requirements now include the standing-order approval requirement for the correct child or shared scope.
+10. In admin, switch the same child from standing order back to cash; verify the standing-order requirement is removed while unrelated missing documents remain.
+11. In admin, switch a pending-approval child from cash to standing order without uploading a standing-order document; verify the command succeeds, the registration recalculates to `WaitingForDocuments`, and the dashboard moves it to the waiting queue after reload.
+12. In admin, switch a pending-approval child from standing order to cash when the only missing or pending item is the standing-order approval; verify the document requirement is no longer required and the registration status recalculates from the remaining requirements.
+13. In admin, switch one child to cash in a multi-child registration where another child still requires standing order; verify the other child's requirement remains intact.
+14. In admin, switch one child to standing order in a multi-child registration where documents are scoped per child; verify only that child receives a standing-order missing requirement.
+15. In admin, switch one child to standing order when an all-children standing-order document already exists; verify no duplicate requirement is created for that child.
+16. In admin, click the already-selected payment method; verify the command is idempotent, no duplicate documents or missing requirements are created, and the dashboard remains stable.
+17. Verify payment controls use the same stored child state as the dashboard projection.
+18. Verify payment-method clicks inside an expanded registration do not collapse the registration container.
 
 ## Registration Approval And Parent State
 

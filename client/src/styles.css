@@ -179,12 +179,14 @@
   .app-mobile-drawer-panel {
     background: white;
     background-color: white;
+    width: 65vw !important;
   }
 
   .app-mobile-drawer-content {
     animation-duration: 220ms;
     animation-fill-mode: both;
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    width: 65vw !important;
     will-change: transform;
   }
 

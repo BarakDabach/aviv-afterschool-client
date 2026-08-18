@@ -2,28 +2,35 @@
   class="min-h-[calc(100dvh-var(--app-sticky-header-height))] overflow-hidden bg-[radial-gradient(circle_at_78%_11%,color-mix(in_oklch,var(--surface-sage)_48%,transparent),transparent_20rem),linear-gradient(180deg,var(--background),var(--surface-warm)_72%,var(--background))] px-[clamp(1rem,3vw,2rem)] text-foreground"
 >
   <section
-    class="relative mx-auto grid w-[min(100%_-_2rem,70rem)] grid-cols-[minmax(23rem,1.08fr)_minmax(20rem,0.92fr)] items-center gap-4 py-[clamp(2.5rem,7vw,5rem)_2.5rem] [direction:rtl] max-[760px]:w-[min(100%_-_1.5rem,43rem)] max-[760px]:grid-cols-1 max-[760px]:pt-8"
+    class="relative mx-[calc(-1_*_clamp(1rem,3vw,2rem))] mt-[calc(-1.45_*_var(--app-sticky-header-height))] grid min-h-[100svh] content-center overflow-hidden px-[max(clamp(1rem,4vw,3rem),calc((100vw-76rem)/2+clamp(1rem,4vw,3rem)))] pb-[clamp(2rem,6vw,4.8rem)] pt-[calc(1.45*var(--app-sticky-header-height)+clamp(4rem,10vw,8rem))] [direction:rtl] max-[760px]:px-5 max-[760px]:pb-8 max-[760px]:pt-[calc(1.45*var(--app-sticky-header-height)+4rem)]"
   >
-    <div class="relative z-[1] col-start-2 row-start-1 max-w-[34rem] max-[760px]:col-start-1 max-[760px]:row-auto max-[760px]:order-2 max-[760px]:max-w-none">
-      <h1 class="m-0 text-[clamp(2rem,4vw,3.2rem)] font-black leading-[1.1] text-brand">מקום חם לגדול בו גם אחרי הגן</h1>
-      <p class="mt-5 max-w-[31rem] text-[clamp(0.92rem,1.35vw,1.1rem)] font-medium leading-[1.68] text-foreground/80">
-        אנחנו כאן כדי להעניק לילדים סביבה בטוחה, חמה ומעשירה - עם יחס אישי, פעילויות מגוונות וזמן איכות בכל יום.
+    <img
+      class="absolute inset-0 h-full w-full object-cover object-[50%_38%] opacity-80"
+      src="/assets/landing-hero-garden.png"
+      alt="איור חמים של פינת גן עם בית משחק, צמחים וקוביות"
+    />
+    <div class="absolute inset-0 bg-[linear-gradient(90deg,color-mix(in_oklch,var(--background)_76%,transparent)_0%,color-mix(in_oklch,var(--background)_54%,transparent)_34%,color-mix(in_oklch,var(--background)_12%,transparent)_68%,transparent_100%)] max-[760px]:bg-[linear-gradient(180deg,color-mix(in_oklch,var(--background)_62%,transparent)_0%,color-mix(in_oklch,var(--background)_48%,transparent)_46%,color-mix(in_oklch,var(--background)_24%,transparent)_100%)]"></div>
+
+    <div class="relative z-[1] grid max-w-[43rem] justify-items-start">
+      <h1 class="m-0 text-[clamp(2.35rem,5.4vw,4.8rem)] font-black leading-[1.02] text-brand">הבית של אביב</h1>
+      <p class="mt-5 max-w-[38rem] text-[clamp(1rem,1.7vw,1.22rem)] font-semibold leading-[1.72] text-foreground/85">
+        מקום בריאות ייחודי ופרטי שהוקם ומנוהל על ידי אביב כהן. הבית נותן לילדי גן ובית ספר מסגרת רגועה אחרי שעות הלימודים, עם פעילות ספורט, תנועה, חברות והתנהגות נעימה אחד כלפי השני.
       </p>
 
       <a
         hlmBtn
         size="lg"
-        class="mx-auto mt-7 flex h-[var(--app-button-height)] min-w-[min(100%,18rem)] w-fit rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/90 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20 max-[760px]:min-w-[min(100%,17rem)]"
+        class="mt-7 flex h-[var(--app-button-height)] min-w-[min(100%,18rem)] w-fit rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/90 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20 max-[760px]:min-w-[min(100%,17rem)]"
         routerLink="/registration"
       >
         <span>בחירת מסלול והרשמה</span>
         <ng-icon name="lucideArrowLeft" data-icon="inline-end" />
       </a>
 
-      <div class="mt-7 grid max-w-[28rem] grid-cols-3" aria-label="פרטי השנה">
+      <div class="mt-8 grid w-full max-w-[26rem] grid-cols-2 gap-3 max-[520px]:grid-cols-1" aria-label="פרטי הפעילות">
         @for (fact of heroFacts; track fact.label) {
-          <div class="grid justify-items-center gap-1.5 border-s border-border px-3 text-center text-[0.84rem] text-foreground first:border-s-0">
-            <span class="grid h-9 w-9 place-items-center rounded-full bg-surface-sage/70 text-brand">
+          <div class="grid min-h-20 content-center justify-items-center gap-1.5 border-y border-border/70 bg-background/55 px-3 py-3 text-center text-[0.9rem] font-bold text-foreground backdrop-blur-[2px] first:rounded-s-[var(--app-control-radius)] last:rounded-e-[var(--app-control-radius)] max-[520px]:min-h-0 max-[520px]:grid-cols-[auto_1fr] max-[520px]:items-center max-[520px]:justify-items-start max-[520px]:rounded-[var(--app-control-radius)] max-[520px]:text-start">
+            <span class="grid h-9 w-9 place-items-center rounded-full bg-surface-sage text-brand">
               <ng-icon [name]="fact.icon" />
             </span>
             <span>{{ fact.label }}</span>
@@ -31,12 +38,6 @@
         }
       </div>
     </div>
-
-    <img
-      class="col-start-1 row-start-1 w-[min(112%,53rem)] justify-self-end rounded-[2rem] opacity-[0.98] mix-blend-multiply drop-shadow-xl [filter:saturate(0.98)_drop-shadow(0_1.25rem_1.5rem_color-mix(in_oklch,var(--brand)_8%,transparent))] [mask-composite:intersect] [mask-image:linear-gradient(90deg,transparent_0%,#000_10%,#000_88%,transparent_100%),linear-gradient(180deg,transparent_0%,#000_10%,#000_88%,transparent_100%)] max-[760px]:col-start-1 max-[760px]:row-auto max-[760px]:order-1 max-[760px]:mt-[-1rem] max-[760px]:w-full max-[760px]:justify-self-center"
-      src="/assets/landing-hero-garden.png"
-      alt="איור חמים של פינת גן עם בית משחק, צמחים וקוביות"
-    />
   </section>
 
   <section class="mx-auto w-[min(100%_-_2rem,70rem)] py-[clamp(2.2rem,6vw,3.75rem)] text-center max-[760px]:w-[min(100%_-_1.5rem,43rem)]">
@@ -54,7 +55,7 @@
         </article>
       }
     </div>
-    <p class="mt-5 text-sm leading-relaxed text-foreground/70">אנחנו רואים בכל ילד עולם ומלואו - ומלווים אותו במסירות ובאהבה בכל יום.</p>
+    <p class="mt-5 text-sm leading-relaxed text-foreground/70">הבית פועל באווירה נעימה, עם מקום בטוח גם בימים מורכבים ועם תקשורת שוטפת מול ההורים.</p>
   </section>
 
   <section id="plans" class="mx-auto max-w-[58rem] py-[clamp(2.2rem,6vw,3.75rem)] text-center">
@@ -65,7 +66,7 @@
     </h2>
     <div class="mx-auto mt-7 grid w-[min(100%,46rem)] gap-4" aria-label="מסלולים זמינים">
       @for (plan of plans; track plan.name) {
-        <app-selection-card [title]="plan.name" [description]="plan.description" [price]="plan.price" priceMeta="לחודש" [selectable]="false" />
+        <app-selection-card [title]="plan.name" [description]="plan.description" [price]="plan.price" [priceMeta]="plan.priceMeta" [selectable]="false" />
       }
     </div>
 
@@ -94,16 +95,15 @@
         </li>
       }
     </ol>
-    <p class="mt-5 text-sm leading-relaxed text-foreground/70">את סטטוס ההרשמה תוכלו לראות בכל שלב באפליקציה.</p>
+    <p class="mt-5 text-sm leading-relaxed text-foreground/70">לאחר ההרשמה ניתן לעקוב אחרי סטטוס המסמכים והאישור באזור האישי.</p>
   </section>
 
-  <section class="mx-auto w-[min(100%_-_2rem,54rem)] py-4 pb-8 max-[760px]:w-[min(100%_-_1.5rem,43rem)]">
-    <hlm-accordion type="single" class="border-border border-x-0 bg-transparent">
+  <section class="mx-auto w-[min(100%_-_2rem,54rem)] px-1 py-4 pb-8 max-[760px]:w-[min(100%_-_1.5rem,43rem)]">
+    <hlm-accordion type="single" class="border-border bg-transparent">
       @for (question of questions; track question.title) {
         <hlm-accordion-item [isOpened]="openedQuestionIndex === $index" (openedChange)="setQuestionOpen($index, $event)">
-          <hlm-accordion-trigger [triggerClass]="'w-full min-h-14 px-0 text-foreground text-base no-underline [&>span]:flex-1 [&>span]:text-start [&_[data-slot=accordion-trigger-icon]]:hidden'">
+          <hlm-accordion-trigger [triggerClass]="'w-full min-h-14 overflow-visible px-3 text-foreground text-base no-underline **:data-[slot=accordion-trigger-icon-down]:h-5 **:data-[slot=accordion-trigger-icon-up]:h-5 **:data-[slot=accordion-trigger-icon-down]:w-5 **:data-[slot=accordion-trigger-icon-up]:w-5 [&>span]:flex-1 [&>span]:text-start'">
             <span>{{ question.title }}</span>
-            <ng-icon class="h-4 w-4 shrink-0 text-foreground transition-transform" name="lucideChevronLeft" />
           </hlm-accordion-trigger>
           <hlm-accordion-content>
             <p class="m-0 pb-4 text-start text-sm leading-relaxed text-foreground/75">{{ question.content }}</p>
@@ -134,7 +134,7 @@
       <span class="inline-flex h-7 w-9 items-center justify-center">
         <img class="h-full w-full object-contain mix-blend-multiply" src="/assets/brand-mark.png" alt="" aria-hidden="true" />
       </span>
-      <span class="text-base">הצהרון של אביב</span>
+      <span class="text-base">הבית של אביב</span>
     </a>
     <nav class="flex gap-6" aria-label="קישורי תחתית">
       <a class="text-foreground no-underline" href="#">מדיניות פרטיות</a>

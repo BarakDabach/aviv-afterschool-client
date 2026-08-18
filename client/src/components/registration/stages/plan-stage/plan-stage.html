@@ -22,7 +22,7 @@
             </span>
             <span class="grid gap-1 text-start max-[760px]:col-start-2">
               <strong class="text-[clamp(1.08rem,1.85vw,1.35rem)]">₪{{ yearPlan.plan.price }}</strong>
-              <small class="text-[0.82rem] text-foreground/70">לחודש</small>
+              <small class="text-[0.82rem] text-foreground/70">{{ yearPlan.plan.requiresStandingOrder ? 'לחודש' : 'ליום' }}</small>
             </span>
           </hlm-radio>
         }
@@ -34,13 +34,6 @@
           <strong class="text-brand">לתשלום: ₪{{ store.getChildFinalPrice(child, childIndex) }}</strong>
         </article>
 
-        <section class="grid gap-2 border-t border-border/70 pt-3 text-start">
-          <h3 class="m-0 text-[0.84rem] font-extrabold text-brand">אמצעי תשלום</h3>
-          <div class="grid grid-cols-2 gap-2" role="radiogroup" [attr.aria-label]="'אמצעי תשלום עבור ' + (child.fullName || 'ילד ' + (childIndex + 1))">
-            <button type="button" class="min-h-9 rounded-[var(--app-control-radius)] border px-3 text-[0.78rem] font-bold transition-[border-color,background-color,color] duration-150" [ngClass]="{ 'border-brand bg-surface-sage text-brand': child.paymentMethod === paymentMethod.Cash, 'border-border bg-card text-foreground': child.paymentMethod !== paymentMethod.Cash }" [attr.aria-pressed]="child.paymentMethod === paymentMethod.Cash" (click)="store.setPaymentMethod(child.id, paymentMethod.Cash)">תשלום במזומן</button>
-            <button type="button" class="min-h-9 rounded-[var(--app-control-radius)] border px-3 text-[0.78rem] font-bold transition-[border-color,background-color,color] duration-150" [ngClass]="{ 'border-brand bg-surface-sage text-brand': child.paymentMethod === paymentMethod.StandingOrder, 'border-border bg-card text-foreground': child.paymentMethod !== paymentMethod.StandingOrder }" [attr.aria-pressed]="child.paymentMethod === paymentMethod.StandingOrder" (click)="store.setPaymentMethod(child.id, paymentMethod.StandingOrder)">הוראת קבע</button>
-          </div>
-        </section>
       }
     </section>
   }

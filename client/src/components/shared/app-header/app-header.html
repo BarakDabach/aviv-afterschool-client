@@ -1,7 +1,11 @@
 <ng-container brnDrawer direction="right" [state]="menuOpen() ? 'open' : 'closed'" (stateChanged)="onDrawerStateChanged($event)">
   <header
-    class="block min-h-[var(--app-sticky-header-height)] border-b border-border bg-background/95 text-foreground backdrop-blur-xl"
-    [ngClass]="{ 'lg:min-h-[5.1rem]': variant() === 'admin' }"
+    class="block min-h-[var(--app-sticky-header-height)] text-foreground"
+    [ngClass]="{
+      'border-b border-border bg-background/95 backdrop-blur-xl': variant() !== 'public',
+      'border-b border-[color-mix(in_oklch,var(--border)_42%,white)] bg-background/45 backdrop-blur-xl': variant() === 'public',
+      'lg:min-h-[5.1rem]': variant() === 'admin'
+    }"
     [class.admin]="variant() === 'admin'"
     dir="rtl"
   >
@@ -32,10 +36,10 @@
         routerLink="/"
         class="inline-flex flex-row-reverse items-center justify-self-end gap-2 whitespace-nowrap text-brand no-underline [direction:rtl] text-[clamp(0.9rem,1.55vw,1.08rem)] font-[850] max-[420px]:gap-1.5 max-[420px]:text-[0.78rem]"
         [ngClass]="{ 'lg:absolute lg:right-[clamp(2rem,4vw,4rem)] lg:top-[1.15rem] lg:gap-2 lg:text-xl': variant() === 'admin' }"
-        aria-label="הצהרון של אביב"
+        aria-label="הבית של אביב"
         (click)="closeMenu()"
       >
-        <span>הצהרון של אביב</span>
+        <span>הבית של אביב</span>
         <img
           class="h-7 w-9 object-contain max-[420px]:h-[1.45rem] max-[420px]:w-[1.9rem]"
           [ngClass]="{ 'lg:h-[2.3rem] lg:w-12': variant() === 'admin' }"
@@ -107,16 +111,19 @@
   ></ng-template>
   <ng-template
     brnDrawerContent
-    class="fixed inset-y-0 right-0 z-[61] w-[min(84vw,20rem)] translate-x-full border-s border-border bg-white p-5 text-foreground shadow-2xl shadow-foreground/15 outline-none data-[state=open]:translate-x-0"
+    class="fixed inset-y-0 right-0 z-[61] w-[65vw] translate-x-full border-s border-border bg-white p-5 text-foreground shadow-2xl shadow-foreground/15 outline-none data-[state=open]:translate-x-0"
   >
     <aside
-      class="app-mobile-drawer-panel app-mobile-drawer-content box-border grid h-full w-[min(84vw,20rem)] content-start gap-4 border-s border-border bg-white p-5 text-foreground shadow-2xl shadow-foreground/15"
+      class="app-mobile-drawer-panel app-mobile-drawer-content box-border grid h-full content-start gap-4 border-s border-border bg-white p-5 text-foreground shadow-2xl shadow-foreground/15"
       [attr.data-state]="menuOpen() ? 'open' : 'closed'"
       aria-label="תפריט ניווט"
       dir="rtl"
     >
       <div class="flex items-center justify-between text-base font-[850] text-brand">
-        <span>{{ variant() === 'admin' ? 'ניווט ניהול' : 'תפריט' }}</span>
+        <span class="inline-flex items-center gap-2">
+          <img class="h-6 w-8 object-contain mix-blend-multiply" src="/assets/brand-mark.png" alt="" aria-hidden="true" />
+          <span>{{ variant() === 'admin' ? 'ניווט ניהול' : 'תפריט' }}</span>
+        </span>
         <button brnDrawerClose hlmBtn variant="ghost" class="h-11 w-11 p-0 text-brand" type="button" aria-label="סגירת תפריט">
           <ng-icon name="lucideX" class="h-5 w-5" />
         </button>

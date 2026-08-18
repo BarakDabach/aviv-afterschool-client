@@ -110,7 +110,7 @@
               [title]="yearPlan.plan.name"
               [description]="yearPlan.plan.hours"
               [price]="yearPlan.plan.price"
-              priceMeta="לחודש"
+              [priceMeta]="store.getPlanPriceMeta(yearPlan.yearPlanId)"
               [selected]="child.selectedYearPlanId === yearPlan.yearPlanId"
               [ariaLabel]="yearPlan.plan.name + ' עבור ' + store.childDisplayName(child, index)"
               (selectedChange)="store.setChildPlan(child.id, yearPlan.yearPlanId)"

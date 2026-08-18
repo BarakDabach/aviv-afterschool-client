@@ -78,7 +78,7 @@ const createEmptyRegistrationChild = (id: number, selectedYearPlanId: number | n
   allergyAnswer: AllergyAnswer.No,
   allergyDetails: '',
   selectedYearPlanId,
-  paymentMethod: PaymentMethod.Cash,
+  paymentMethod: PaymentMethod.StandingOrder,
 });
 
 const createEmptyParentDetails = (): ParentRegistrationDetails => ({
@@ -300,7 +300,7 @@ export const RegistrationStore = signalStore(
         allergyAnswer: child.allergyAnswer === AllergyAnswer.Yes ? AllergyAnswer.Yes : AllergyAnswer.No,
         allergyDetails: child.allergyDetails ?? '',
         selectedYearPlanId: child.selectedYearPlanId ?? store.availableYearPlans()[0]?.yearPlanId ?? null,
-        paymentMethod: child.paymentMethod === PaymentMethod.StandingOrder ? PaymentMethod.StandingOrder : PaymentMethod.Cash,
+        paymentMethod: PaymentMethod.StandingOrder,
       }));
     };
     const registrationChildrenToDrafts = (registration: RegistrationState | null | undefined, defaultPlanId: number | null): RegistrationChildDraft[] | null => {
@@ -405,6 +405,11 @@ export const RegistrationStore = signalStore(
     const selectedFileKey = (selectedFile: RegistrationSelectedFile): string => {
       return documentRequirementKey(selectedFile.documentType, selectedFile.scope);
     };
+    const paymentMethodForPlan = (selectedYearPlanId: number | null): PaymentMethod => {
+      const selectedPlan = store.availableYearPlans().find((yearPlan) => yearPlan.yearPlanId === selectedYearPlanId);
+
+      return selectedPlan?.plan.requiresStandingOrder === false ? PaymentMethod.Cash : PaymentMethod.StandingOrder;
+    };
 
     return {
       async initialize(): Promise<void> {
@@ -452,6 +457,7 @@ export const RegistrationStore = signalStore(
           const nextChildren = normalizeChildren(loggedInChildren ?? store.children()).map((child) => ({
             ...child,
             selectedYearPlanId: child.selectedYearPlanId ?? defaultPlanId,
+            paymentMethod: paymentMethodForPlan(child.selectedYearPlanId ?? defaultPlanId),
           }));
 
           patchState(store, {
@@ -493,11 +499,14 @@ export const RegistrationStore = signalStore(
       },
       addChild(): void {
         const nextChildId = store.nextChildId();
+        const selectedYearPlanId = store.availableYearPlans()[0]?.yearPlanId ?? null;
 
         patchState(store, {
           children: [
             ...store.children(),
-            createEmptyRegistrationChild(nextChildId, store.availableYearPlans()[0]?.yearPlanId ?? null),
+            {
+              ...createEmptyRegistrationChild(nextChildId, selectedYearPlanId),
+            },
           ],
           nextChildId: nextChildId + 1,
         });
@@ -528,10 +537,12 @@ export const RegistrationStore = signalStore(
         patchState(store, {
           children: normalizeChildren(children).map((child) => {
             const existingChild = existingChildren.find((existing) => existing.id === child.id);
+            const selectedYearPlanId = child.selectedYearPlanId ?? existingChild?.selectedYearPlanId ?? store.availableYearPlans()[0]?.yearPlanId ?? null;
 
             return {
               ...child,
-              selectedYearPlanId: child.selectedYearPlanId ?? existingChild?.selectedYearPlanId ?? store.availableYearPlans()[0]?.yearPlanId ?? null,
+              selectedYearPlanId,
+              paymentMethod: paymentMethodForPlan(selectedYearPlanId),
             };
           }),
         });
@@ -550,11 +561,12 @@ export const RegistrationStore = signalStore(
         if (selectedYearPlanId === null) return;
 
         const yearPlanId = Number(selectedYearPlanId);
+        const selectedPlan = store.availableYearPlans().find((yearPlan) => yearPlan.yearPlanId === yearPlanId);
 
-        if (!store.availableYearPlans().some((yearPlan) => yearPlan.yearPlanId === yearPlanId)) return;
+        if (!selectedPlan) return;
 
         patchState(store, {
-          children: store.children().map((child) => (child.id === childId ? { ...child, selectedYearPlanId: yearPlanId } : child)),
+          children: store.children().map((child) => (child.id === childId ? { ...child, selectedYearPlanId: yearPlanId, paymentMethod: paymentMethodForPlan(yearPlanId) } : child)),
         });
       },
       setPaymentMethod(childId: number, paymentMethod: PaymentMethod): void {

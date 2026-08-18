@@ -125,7 +125,7 @@ export class MockDataService extends DataService {
         },
         selectedPlan,
         status: RegistrationChildStatus.Active,
-        paymentMethod: child.paymentMethod ?? (selectedPlan?.plan.requiresStandingOrder ? PaymentMethod.StandingOrder : PaymentMethod.Cash),
+        paymentMethod: selectedPlan?.plan.requiresStandingOrder === false ? PaymentMethod.Cash : PaymentMethod.StandingOrder,
         leaveDate: null,
         appliedDiscountPercent: discountPercent,
         finalPrice: Math.round(planPrice * (1 - discountPercent / 100)),
