@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
+  DocumentReviewStatus,
   DocumentType,
   Gender,
+  PaymentMethod,
   type HolidayPeriod,
   type ParentHome,
   RegistrationChildStatus,
@@ -17,31 +19,33 @@ import {
   type Year,
 } from '../types/registration-status.type';
 import type { AuthenticatedUser } from '../types/auth.type';
+import type {
+  AdminDashboardData,
+  AdminDocument,
+  AdminDocumentActionRequest,
+  AdminPaymentMethodRequest,
+  AdminRegistrationActionRequest,
+  AdminRegistration,
+} from '../types/admin.type';
 import { DataService } from './data.service';
+import { ACTIVE_REGISTRATION_YEAR, ADMIN_CHILD_CAPACITY, AVAILABLE_YEAR_PLANS, REGISTRATION_HOLIDAY_PERIODS } from '../config/registration.config';
 
 @Injectable()
 export class MockDataService extends DataService {
   private readonly registrations = new Map<number, RegistrationState>();
-  private nextRegistrationId = 1001;
+  private nextRegistrationId = 1;
   private nextDocumentId = 1;
-
-  constructor() {
-    super();
-    MOCK_PARENT_REGISTRATIONS.forEach((registration) => this.registrations.set(registration.id, clone(registration)));
-    this.nextRegistrationId = Math.max(...MOCK_PARENT_REGISTRATIONS.map((registration) => registration.id)) + 1;
-    this.nextDocumentId = Math.max(...MOCK_PARENT_REGISTRATIONS.flatMap((registration) => registration.documents.map((document) => document.id)), 0) + 1;
-  }
 
   override async getAuthOtpResendTimeoutSeconds(): Promise<number> {
     return 10;
   }
 
   override async getActiveRegistrationYear(): Promise<Year> {
-    return MOCK_ACTIVE_YEAR;
+    return ACTIVE_REGISTRATION_YEAR;
   }
 
   override async getAvailableYearPlans(): Promise<AvailableYearPlan[]> {
-    return MOCK_AVAILABLE_YEAR_PLANS;
+    return clone(AVAILABLE_YEAR_PLANS);
   }
 
   override async getParentHome(parentEmail?: string): Promise<ParentHome> {
@@ -60,26 +64,20 @@ export class MockDataService extends DataService {
     }
 
     const activeRegistration = [...registrations]
-      .sort((left: RegistrationState, right: RegistrationState) => right.year.yearNumber - left.year.yearNumber || right.id - left.id)
+      .filter((registration) => registration.year.id === ACTIVE_REGISTRATION_YEAR.id)
+      .sort(compareRegistrations)
       .at(0) ?? null;
-    const parent = registrations[0].parent;
 
     return clone({
-      parent,
+      parent: registrations[0].parent,
       activeRegistration,
-      registrationHistory: registrations,
-      holidayPeriods: MOCK_HOLIDAY_PERIODS,
+      registrationHistory: registrations.sort(compareRegistrations),
+      holidayPeriods: REGISTRATION_HOLIDAY_PERIODS,
     });
   }
 
   override async getSubmittedRegistration(registrationId: number): Promise<RegistrationState> {
-    const registration = this.registrations.get(registrationId);
-
-    if (!registration) {
-      throw new Error('Registration was not found.');
-    }
-
-    return clone(registration);
+    return clone(this.requireRegistration(registrationId));
   }
 
   override async getRegisteredParentByEmail(email: string): Promise<AuthenticatedUser | null> {
@@ -89,7 +87,7 @@ export class MockDataService extends DataService {
     if (!registration) return null;
 
     return {
-      id: `parent-registration-${registration.parent.id || registration.id}`,
+      id: `parent-${registration.parent.email}`,
       fullName: registration.parent.fullName,
       email: registration.parent.email,
       phoneNumber: registration.parent.phoneNumber,
@@ -98,20 +96,21 @@ export class MockDataService extends DataService {
   }
 
   override async submitRegistration(request: SubmitRegistrationRequest): Promise<RegistrationState> {
-    const uploadedAt = new Date().toISOString();
-    const normalizedParentEmail = request.draft.parentDetails.email.trim().toLowerCase();
-    const documents = request.selectedFiles.map<RegistrationDocument>((selectedFile, index) => ({
-      id: this.nextDocumentId + index,
+    const now = new Date().toISOString();
+    const normalizedParentEmail = normalizeEmail(request.draft.parentDetails.email);
+    const documents = request.selectedFiles.map<RegistrationDocument>((selectedFile) => ({
+      id: this.nextDocumentId++,
       fileName: selectedFile.file.name,
       mimeType: selectedFile.file.type || 'application/octet-stream',
       documentType: selectedFile.documentType,
       scope: selectedFile.scope,
-      uploadedAt,
+      uploadedAt: now,
+      reviewStatus: DocumentReviewStatus.PendingReview,
+      reviewedAt: null,
     }));
-    this.nextDocumentId += documents.length;
-    const children = request.draft.children.map((child, index) => {
-      const selectedPlan = MOCK_AVAILABLE_YEAR_PLANS.find((yearPlan) => yearPlan.yearPlanId === child.selectedYearPlanId) ?? null;
-      const discountPercent = index === 1 ? 10 : 0;
+    const children = request.draft.children.map((child) => {
+      const selectedPlan = AVAILABLE_YEAR_PLANS.find((yearPlan) => yearPlan.yearPlanId === child.selectedYearPlanId) ?? null;
+      const discountPercent = 0;
       const planPrice = selectedPlan?.plan.price ?? 0;
 
       return {
@@ -126,40 +125,38 @@ export class MockDataService extends DataService {
         },
         selectedPlan,
         status: RegistrationChildStatus.Active,
+        paymentMethod: child.paymentMethod,
         leaveDate: null,
         appliedDiscountPercent: discountPercent,
         finalPrice: Math.round(planPrice * (1 - discountPercent / 100)),
       };
     });
-    const missingDocuments = getMissingDocuments(request, documents);
-
-    const registration = {
-      id: this.nextRegistrationId++,
+    const registrationId = this.nextRegistrationId++;
+    const draftRegistration = {
+      id: registrationId,
       year: request.draft.year,
-      status: missingDocuments.length ? RegistrationStatus.WaitingForDocuments : RegistrationStatus.PendingApproval,
+      status: RegistrationStatus.PendingApproval,
       parent: {
         ...request.draft.parentDetails,
         email: normalizedParentEmail,
       },
       children,
       documents,
-      missingDocuments,
-    };
+      missingDocuments: [] as MissingRegistrationDocument[],
+      createdAt: now,
+      submittedAt: now,
+    } satisfies RegistrationState;
+    const registration = this.withCalculatedRequirements(draftRegistration);
 
     this.registrations.set(registration.id, registration);
-
-    return registration;
+    return clone(registration);
   }
 
   override async uploadRegistrationDocument(request: UploadRegistrationDocumentRequest): Promise<RegistrationState> {
-    const registration = this.registrations.get(request.registrationId);
-
-    if (!registration) {
-      throw new Error('Registration was not found.');
-    }
+    const registration = this.requireRegistration(request.registrationId);
 
     if (registration.status !== RegistrationStatus.WaitingForDocuments && registration.status !== RegistrationStatus.PendingApproval) {
-      return registration;
+      return clone(registration);
     }
 
     const uploadedDocument: RegistrationDocument = {
@@ -169,308 +166,218 @@ export class MockDataService extends DataService {
       documentType: request.documentType,
       scope: request.scope,
       uploadedAt: new Date().toISOString(),
+      reviewStatus: DocumentReviewStatus.PendingReview,
+      reviewedAt: null,
     };
-    const documents = [
-      ...registration.documents.filter((document) => !isSameDocumentRequirement(document, request.documentType, request.scope)),
-      uploadedDocument,
-    ];
-    const missingDocuments = getMissingDocumentsForRegistration(registration, documents);
-    const updatedRegistration = {
+    const updatedRegistration = this.withCalculatedRequirements({
       ...registration,
-      documents,
-      missingDocuments,
-      status: missingDocuments.length ? RegistrationStatus.WaitingForDocuments : RegistrationStatus.PendingApproval,
-    };
+      documents: [
+        ...registration.documents.filter((document) => !isSameDocumentRequirement(document, request.documentType, request.scope)),
+        uploadedDocument,
+      ],
+    });
 
     this.registrations.set(updatedRegistration.id, updatedRegistration);
-
-    return updatedRegistration;
+    return clone(updatedRegistration);
   }
-}
 
-const MOCK_ACTIVE_YEAR: Year = {
-  id: 1,
-  yearNumber: 2027,
-};
+  override async getAdminDashboard(): Promise<AdminDashboardData> {
+    const activeRegistrations = [...this.registrations.values()]
+      .filter((registration) => registration.year.id === ACTIVE_REGISTRATION_YEAR.id)
+      .sort(compareRegistrations);
+    const approvedRegistrations = activeRegistrations.filter((registration) => registration.status === RegistrationStatus.Approved);
 
-const MOCK_PARENT = {
-  id: 1,
-  fullName: 'דנה לוי',
-  phoneNumber: '0501234567',
-};
+    return clone({
+      activeYear: ACTIVE_REGISTRATION_YEAR.yearNumber,
+      totalRegistrations: activeRegistrations.length,
+      registeredChildren: approvedRegistrations.reduce((total, registration) => total + registration.children.length, 0),
+      maxChildCapacity: ADMIN_CHILD_CAPACITY,
+      registrations: activeRegistrations
+        .filter((registration) => registration.status === RegistrationStatus.WaitingForDocuments || registration.status === RegistrationStatus.PendingApproval)
+        .map((registration) => this.toAdminRegistration(registration)),
+    });
+  }
 
-const MOCK_AVAILABLE_YEAR_PLANS: AvailableYearPlan[] = [
-  {
-    yearPlanId: 101,
-    plan: {
-      id: 1,
-      name: 'מסלול חודשי מלא',
-      price: 1450,
-      hours: 'ימים א-ה עד 16:30',
-      isActive: true,
-      requiresStandingOrder: true,
-    },
-  },
-  {
-    yearPlanId: 102,
-    plan: {
-      id: 2,
-      name: 'מסלול יומי',
-      price: 1050,
-      hours: 'שלושה ימים לבחירה עד 16:30',
-      isActive: true,
-      requiresStandingOrder: false,
-    },
-  },
-];
+  override async setAdminPaymentMethod(request: AdminPaymentMethodRequest): Promise<RegistrationState> {
+    const registration = this.requireRegistration(request.registrationId);
+    const child = registration.children.find((candidate) => candidate.id === request.childId);
+    if (!child) throw new Error('הילד לא נמצא בהרשמה.');
 
-const MOCK_ACTIVE_REGISTRATION_ID = 1001;
+    const nextPaymentMethod = request.isCashOnly ? PaymentMethod.Cash : PaymentMethod.StandingOrder;
+    if (child.paymentMethod === nextPaymentMethod) return clone(registration);
 
-const MOCK_PARENT_REGISTRATIONS: RegistrationState[] = [
-  {
-    id: MOCK_ACTIVE_REGISTRATION_ID,
-    year: MOCK_ACTIVE_YEAR,
-    status: RegistrationStatus.WaitingForDocuments,
-    parent: {
-      ...MOCK_PARENT,
-      email: 'parent@example.com',
-    },
-    children: [
-      {
-        id: 1,
-        child: {
-          id: 1,
-          fullName: 'נועה לוי',
-          uniqueId: '',
-          dateOfBirth: '2020-03-10',
-          gender: Gender.Female,
-          allergies: null,
-        },
-        selectedPlan: MOCK_AVAILABLE_YEAR_PLANS[0],
-        status: RegistrationChildStatus.Active,
-        leaveDate: null,
-        appliedDiscountPercent: 0,
-        finalPrice: 1450,
-      },
-      {
-        id: 2,
-        child: {
-          id: 2,
-          fullName: 'אורי לוי',
-          uniqueId: '',
-          dateOfBirth: '2021-06-18',
-          gender: Gender.Male,
-          allergies: null,
-        },
-        selectedPlan: MOCK_AVAILABLE_YEAR_PLANS[0],
-        status: RegistrationChildStatus.Active,
-        leaveDate: null,
-        appliedDiscountPercent: 10,
-        finalPrice: 1305,
-      },
-    ],
-    documents: [
-      {
-        id: 1,
-        fileName: 'signed-contract-levi.pdf',
-        mimeType: 'application/pdf',
-        documentType: DocumentType.SignedContract,
-        scope: { kind: RegistrationDocumentScopeKind.AllChildren },
-        uploadedAt: '2026-08-01T09:30:00.000Z',
-      },
-    ],
-    missingDocuments: [
-      {
-        documentType: DocumentType.StandingOrderApproval,
-        scope: { kind: RegistrationDocumentScopeKind.SpecificChild, localChildId: 1 },
-        label: 'אישור הוראת קבע',
-      },
-      {
-        documentType: DocumentType.StandingOrderApproval,
-        scope: { kind: RegistrationDocumentScopeKind.SpecificChild, localChildId: 2 },
-        label: 'אסמכתת ביטוח',
-      },
-    ],
-  },
-  {
-    id: 1002,
-    year: { id: 2, yearNumber: 2026 },
-    status: RegistrationStatus.Approved,
-    parent: {
-      ...MOCK_PARENT,
-      email: 'parent@example.com',
-    },
-    children: [
-      {
-        id: 3,
-        child: {
-          id: 1,
-          fullName: 'נועה לוי',
-          uniqueId: '',
-          dateOfBirth: '2020-03-10',
-          gender: Gender.Female,
-          allergies: null,
-        },
-        selectedPlan: MOCK_AVAILABLE_YEAR_PLANS[0],
-        status: RegistrationChildStatus.Active,
-        leaveDate: null,
-        appliedDiscountPercent: 0,
-        finalPrice: 1450,
-      },
-    ],
-    documents: [],
-    missingDocuments: [],
-  },
-  {
-    id: 1003,
-    year: { id: 3, yearNumber: 2025 },
-    status: RegistrationStatus.Approved,
-    parent: {
-      ...MOCK_PARENT,
-      email: 'parent@example.com',
-    },
-    children: [
-      {
-        id: 4,
-        child: {
-          id: 1,
-          fullName: 'נועה לוי',
-          uniqueId: '',
-          dateOfBirth: '2020-03-10',
-          gender: Gender.Female,
-          allergies: null,
-        },
-        selectedPlan: MOCK_AVAILABLE_YEAR_PLANS[0],
-        status: RegistrationChildStatus.Active,
-        leaveDate: null,
-        appliedDiscountPercent: 0,
-        finalPrice: 1450,
-      },
-    ],
-    documents: [],
-    missingDocuments: [],
-  },
-  {
-    id: 1004,
-    year: { id: 4, yearNumber: 2024 },
-    status: RegistrationStatus.Approved,
-    parent: {
-      ...MOCK_PARENT,
-      email: 'parent@example.com',
-    },
-    children: [
-      {
-        id: 5,
-        child: {
-          id: 2,
-          fullName: 'אורי לוי',
-          uniqueId: '',
-          dateOfBirth: '2021-06-18',
-          gender: Gender.Male,
-          allergies: null,
-        },
-        selectedPlan: MOCK_AVAILABLE_YEAR_PLANS[0],
-        status: RegistrationChildStatus.Active,
-        leaveDate: null,
-        appliedDiscountPercent: 0,
-        finalPrice: 1450,
-      },
-    ],
-    documents: [],
-    missingDocuments: [],
-  },
-];
+    const requiresMissingStandingOrder =
+      registration.status === RegistrationStatus.PendingApproval &&
+      nextPaymentMethod === PaymentMethod.StandingOrder &&
+      child.selectedPlan?.plan.requiresStandingOrder === true &&
+      !registration.documents.some((document) => {
+        return document.documentType === DocumentType.StandingOrderApproval
+          && document.scope.kind === RegistrationDocumentScopeKind.SpecificChild
+          && document.scope.localChildId === child.id
+          && document.fileName;
+      });
 
-const MOCK_HOLIDAY_PERIODS: HolidayPeriod[] = [
-  {
-    id: 1,
-    yearId: MOCK_ACTIVE_YEAR.id,
-    name: 'ראש השנה',
-    startDate: '2026-09-12',
-    endDate: '2026-09-14',
-  },
-  {
-    id: 2,
-    yearId: MOCK_ACTIVE_YEAR.id,
-    name: 'סוכות',
-    startDate: '2026-09-27',
-    endDate: '2026-10-04',
-  },
-  {
-    id: 3,
-    yearId: MOCK_ACTIVE_YEAR.id,
-    name: 'חנוכה',
-    startDate: '2026-12-08',
-    endDate: '2026-12-15',
-  },
-];
+    if (requiresMissingStandingOrder) {
+      throw new Error('לא ניתן לעבור להוראת קבע לאחר שההרשמה עברה לאישור ללא מסמך מתאים.');
+    }
 
-function getMissingDocuments(
-  request: SubmitRegistrationRequest,
-  uploadedDocuments: RegistrationDocument[],
-): MissingRegistrationDocument[] {
-  return [
-    ...getMissingByDocumentType(request, uploadedDocuments, DocumentType.SignedContract),
-    ...getMissingByDocumentType(request, uploadedDocuments, DocumentType.StandingOrderApproval),
-  ];
+    const documents = nextPaymentMethod === PaymentMethod.Cash
+      ? registration.documents.filter((document) => {
+          return !(document.documentType === DocumentType.StandingOrderApproval
+            && document.scope.kind === RegistrationDocumentScopeKind.SpecificChild
+            && document.scope.localChildId === child.id);
+        })
+      : registration.documents;
+    const updatedRegistration = this.withCalculatedRequirements({
+      ...registration,
+      children: registration.children.map((candidate) => candidate.id === child.id
+        ? { ...candidate, paymentMethod: nextPaymentMethod }
+        : candidate),
+      documents,
+    });
+
+    this.registrations.set(updatedRegistration.id, updatedRegistration);
+    return clone(updatedRegistration);
+  }
+
+  override async approveAdminDocument(request: AdminDocumentActionRequest): Promise<RegistrationState> {
+    const registration = this.requireRegistration(request.registrationId);
+    const document = registration.documents.find((candidate) => candidate.id === request.documentId);
+    if (!document || !document.fileName) throw new Error('לא ניתן לאשר מסמך שטרם הועלה.');
+
+    const updatedRegistration = this.withCalculatedRequirements({
+      ...registration,
+      documents: registration.documents.map((candidate) => candidate.id === request.documentId
+        ? { ...candidate, reviewStatus: DocumentReviewStatus.Approved, reviewedAt: new Date().toISOString() }
+        : candidate),
+    });
+
+    this.registrations.set(updatedRegistration.id, updatedRegistration);
+    return clone(updatedRegistration);
+  }
+
+  override async approveAdminRegistration(request: AdminRegistrationActionRequest): Promise<RegistrationState> {
+    const registration = this.requireRegistration(request.registrationId);
+    const readyRegistration = this.withCalculatedRequirements(registration);
+
+    if (readyRegistration.status !== RegistrationStatus.PendingApproval || !this.isApprovalReady(readyRegistration)) {
+      throw new Error('אפשר לאשר את ההרשמה רק לאחר אישור כל המסמכים הרלוונטיים.');
+    }
+
+    const updatedRegistration = { ...readyRegistration, status: RegistrationStatus.Approved };
+    this.registrations.set(updatedRegistration.id, updatedRegistration);
+    return clone(updatedRegistration);
+  }
+
+  override async removeAdminRegistration(request: AdminRegistrationActionRequest): Promise<void> {
+    this.requireRegistration(request.registrationId);
+    this.registrations.delete(request.registrationId);
+  }
+
+  private requireRegistration(registrationId: number): RegistrationState {
+    const registration = this.registrations.get(registrationId);
+    if (!registration) throw new Error('ההרשמה לא נמצאה.');
+    return registration;
+  }
+
+  private withCalculatedRequirements(registration: RegistrationState): RegistrationState {
+    const missingDocuments = getMissingDocumentsForRegistration(registration, registration.documents, AVAILABLE_YEAR_PLANS);
+    return {
+      ...registration,
+      missingDocuments,
+      status: registration.status === RegistrationStatus.Approved
+        ? RegistrationStatus.Approved
+        : missingDocuments.length ? RegistrationStatus.WaitingForDocuments : RegistrationStatus.PendingApproval,
+    };
+  }
+
+  private isApprovalReady(registration: RegistrationState): boolean {
+    return registration.missingDocuments.length === 0
+      && registration.documents.length > 0
+      && registration.documents.every((document) => document.reviewStatus === DocumentReviewStatus.Approved);
+  }
+
+  private toAdminRegistration(registration: RegistrationState): AdminRegistration {
+    const childDocuments = registration.children.map((child) => {
+      const documents = registration.documents
+        .filter((document) => document.scope.kind === RegistrationDocumentScopeKind.SpecificChild && document.scope.localChildId === child.id)
+        .map((document) => this.toAdminDocument(document));
+      const missingDocuments = registration.missingDocuments
+        .filter((document) => document.scope.kind === RegistrationDocumentScopeKind.SpecificChild && document.scope.localChildId === child.id)
+        .map((document, index) => this.toMissingAdminDocument(registration.id, child.id, document, index));
+
+      return {
+        registrationChildId: child.id,
+        fullName: child.child.fullName,
+        gender: child.child.gender === Gender.Male ? 'Boy' as const : 'Girl' as const,
+        planName: child.selectedPlan?.plan.name ?? '',
+        billingPeriod: child.selectedPlan?.plan.requiresStandingOrder ? 'Monthly' as const : 'Daily' as const,
+        isCashOnly: child.paymentMethod === PaymentMethod.Cash,
+        documents: [...documents, ...missingDocuments],
+      };
+    });
+    const sharedDocuments = registration.documents
+      .filter((document) => document.scope.kind === RegistrationDocumentScopeKind.AllChildren)
+      .map((document) => this.toAdminDocument(document, registration.children.map((child) => child.child.fullName)));
+    const sharedMissingDocuments = registration.missingDocuments
+      .filter((document) => document.scope.kind === RegistrationDocumentScopeKind.AllChildren)
+      .map((document, index) => this.toMissingAdminDocument(registration.id, 0, document, index));
+
+    return {
+      registrationId: registration.id,
+      status: registration.status as 'WaitingForDocuments' | 'PendingApproval',
+      parentFullName: registration.parent.fullName,
+      parentPhoneNumber: registration.parent.phoneNumber,
+      uploadComplete: registration.missingDocuments.length === 0,
+      approvalReady: this.isApprovalReady(registration),
+      expanded: false,
+      children: childDocuments,
+      sharedDocuments: [...sharedDocuments, ...sharedMissingDocuments],
+    };
+  }
+
+  private toAdminDocument(document: RegistrationDocument, coversChildren?: string[]): AdminDocument {
+    return {
+      id: document.id,
+      type: document.documentType,
+      fileName: document.fileName,
+      reviewStatus: document.reviewStatus,
+      coversChildren,
+    };
+  }
+
+  private toMissingAdminDocument(registrationId: number, childId: number, document: MissingRegistrationDocument, index: number): AdminDocument {
+    return {
+      id: -((registrationId * 1000) + (childId * 10) + index + 1),
+      type: document.documentType,
+      fileName: null,
+      reviewStatus: null,
+    };
+  }
 }
 
 function getMissingDocumentsForRegistration(
   registration: RegistrationState,
   uploadedDocuments: RegistrationDocument[],
+  availablePlans: AvailableYearPlan[],
 ): MissingRegistrationDocument[] {
   return [
-    ...getMissingByDocumentTypeForRegistration(registration, uploadedDocuments, DocumentType.SignedContract),
-    ...getMissingByDocumentTypeForRegistration(registration, uploadedDocuments, DocumentType.StandingOrderApproval),
+    ...getMissingByDocumentTypeForRegistration(registration, uploadedDocuments, availablePlans, DocumentType.SignedContract),
+    ...getMissingByDocumentTypeForRegistration(registration, uploadedDocuments, availablePlans, DocumentType.StandingOrderApproval),
   ];
-}
-
-function getMissingByDocumentType(
-  request: SubmitRegistrationRequest,
-  uploadedDocuments: RegistrationDocument[],
-  documentType: DocumentType,
-): MissingRegistrationDocument[] {
-  const relevantChildren = documentType === DocumentType.StandingOrderApproval
-    ? request.draft.children.filter((child) => {
-        const selectedPlan = MOCK_AVAILABLE_YEAR_PLANS.find((yearPlan) => yearPlan.yearPlanId === child.selectedYearPlanId);
-
-        return selectedPlan?.plan.requiresStandingOrder;
-      })
-    : request.draft.children;
-
-  if (!relevantChildren.length) return [];
-
-  const hasSharedDocument = uploadedDocuments.some((document) => {
-    return document.documentType === documentType && document.scope.kind === RegistrationDocumentScopeKind.AllChildren;
-  });
-
-  if (hasSharedDocument) return [];
-
-  return relevantChildren
-    .filter((child) => {
-      return !uploadedDocuments.some((document) => {
-        return document.documentType === documentType
-          && document.scope.kind === RegistrationDocumentScopeKind.SpecificChild
-          && document.scope.localChildId === child.id;
-      });
-    })
-    .map((child) => ({
-      documentType,
-      scope: {
-        kind: RegistrationDocumentScopeKind.SpecificChild,
-        localChildId: child.id,
-      },
-      label: `${documentType === DocumentType.SignedContract ? 'חוזה חתום' : 'אישור הוראת קבע'} - ${child.fullName}`,
-    }));
 }
 
 function getMissingByDocumentTypeForRegistration(
   registration: RegistrationState,
   uploadedDocuments: RegistrationDocument[],
+  availablePlans: AvailableYearPlan[],
   documentType: DocumentType,
 ): MissingRegistrationDocument[] {
   const relevantChildren = documentType === DocumentType.StandingOrderApproval
-    ? registration.children.filter((childState) => childState.selectedPlan?.plan.requiresStandingOrder)
+    ? registration.children.filter((childState) => {
+        const plan = availablePlans.find((yearPlan) => yearPlan.yearPlanId === childState.selectedPlan?.yearPlanId);
+        return plan?.plan.requiresStandingOrder && childState.paymentMethod === PaymentMethod.StandingOrder;
+      })
     : registration.children;
 
   if (!relevantChildren.length) return [];
@@ -478,37 +385,29 @@ function getMissingByDocumentTypeForRegistration(
   const hasSharedDocument = uploadedDocuments.some((document) => {
     return document.documentType === documentType && document.scope.kind === RegistrationDocumentScopeKind.AllChildren;
   });
-
   if (hasSharedDocument) return [];
 
   return relevantChildren
-    .filter((childState) => {
-      return !uploadedDocuments.some((document) => {
-        return document.documentType === documentType
-          && document.scope.kind === RegistrationDocumentScopeKind.SpecificChild
-          && document.scope.localChildId === childState.child.id;
-      });
-    })
-    .map((childState) => ({
+    .filter((child) => !uploadedDocuments.some((document) => {
+      return document.documentType === documentType
+        && document.scope.kind === RegistrationDocumentScopeKind.SpecificChild
+        && document.scope.localChildId === child.id;
+    }))
+    .map((child) => ({
       documentType,
-      scope: {
-        kind: RegistrationDocumentScopeKind.SpecificChild,
-        localChildId: childState.child.id,
-      },
-      label: `${documentType === DocumentType.SignedContract ? 'חוזה חתום' : 'אישור הוראת קבע'} - ${childState.child.fullName}`,
+      scope: { kind: RegistrationDocumentScopeKind.SpecificChild, localChildId: child.id },
+      label: `${documentType === DocumentType.SignedContract ? 'חוזה חתום' : 'אישור הוראת קבע'} - ${child.child.fullName}`,
     }));
 }
 
-function isSameDocumentRequirement(
-  document: RegistrationDocument,
-  documentType: DocumentType,
-  scope: RegistrationDocumentScope,
-): boolean {
+function isSameDocumentRequirement(document: RegistrationDocument, documentType: DocumentType, scope: RegistrationDocumentScope): boolean {
   if (document.documentType !== documentType || document.scope.kind !== scope.kind) return false;
-  if (scope.kind === RegistrationDocumentScopeKind.AllChildren) return true;
+  return scope.kind === RegistrationDocumentScopeKind.AllChildren
+    || (document.scope.kind === RegistrationDocumentScopeKind.SpecificChild && document.scope.localChildId === scope.localChildId);
+}
 
-  return document.scope.kind === RegistrationDocumentScopeKind.SpecificChild
-    && document.scope.localChildId === scope.localChildId;
+function compareRegistrations(left: RegistrationState, right: RegistrationState): number {
+  return right.submittedAt.localeCompare(left.submittedAt) || right.id - left.id;
 }
 
 function clone<T>(value: T): T {

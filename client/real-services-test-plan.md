@@ -1,158 +1,125 @@
-# Real Services Test Plan
+# Real Services Dry-Run Test Plan
 
-This document is the checklist for the test suite we want once the mock services are replaced with real backend integrations.
-It is intentionally not executable. It exists so we can translate each case into automated tests at the right time.
+This is a manual and integration dry-run specification for the backend-shaped in-memory application. It is intentionally not an automated test suite. Do not add fixture registrations to make any case pass: all registrations must be created through the parent flow.
 
-## Auth
+## Preconditions
 
-- Verify `getMe()` restores the current session on app startup.
-- Verify an unauthenticated session clears `GlobalStore`.
-- Verify a parent session sets the parent identity in `GlobalStore`.
-- Verify an admin session sets the admin identity in `GlobalStore`.
-- Verify OTP request, verify, and logout all persist and clear the real session correctly.
-- Verify a session that expires between app loads is treated as logged out.
-- Verify a refreshed page after login still restores the correct session.
-- Verify multiple OTP requests for the same email invalidate the older challenge.
-- Verify OTP reuse is rejected after successful verification.
-- Verify OTP verification with a different email than the challenge is rejected.
-- Verify login works for both known parent emails used in the system.
-- Verify logout clears the current session and prevents guarded pages from loading stale data.
-- Verify the app bootstraps auth once and does not flash guest-only content for a returning parent.
+- Start from a fresh browser session with the configured mock parent and admin authentication flows available.
+- Use the active registration year and plans returned by `DataService`.
+- Record the exact values entered during each run: parent name, phone, email, child names, genders, allergies, plan, payment method, file names, and document scopes.
+- Use a browser refresh only for the reset case. Logout must preserve repository data.
 
-## Route Guards
+## Repository And Empty Dashboard
 
-- Verify `/login` redirects authenticated users away from the login screen.
-- Verify `/login` allows guests to enter the login flow.
-- Verify `/home` redirects unauthenticated users to `/login`.
-- Verify `/home` allows authenticated parents only.
-- Verify `/home/:registrationId` allows authenticated parents only.
-- Verify `/registration` stays open for guests and logged-in parents.
-- Verify `/registration` redirects a logged-in parent with an active `WaitingForDocuments` registration to `/home/:registrationId`.
-- Verify `/registration` redirects a logged-in parent with an active `PendingApproval` registration to `/home/:registrationId`.
-- Verify `/registration` allows a logged-in parent with only `Approved`, `Rejected`, or `Cancelled` registrations to start a new registration.
-- Verify a saved draft does not bypass the registration guard when the backend returns an active submitted registration.
-- Verify parent-only guards do not rely on draft localStorage.
-- Verify guest-only guards send authenticated parents to `/home`.
-- Verify guest-only guards send authenticated admins to `/admin`.
-- Verify parent-only guards keep admins away from parent home screens.
-- Verify deep links into `/home/:registrationId` preserve the target URL after redirect to login.
-- Verify direct navigation to `/home` after logout is blocked even if the route was previously open.
-- Verify guard decisions use the auth session from the facade, not stale component state.
+1. Refresh the browser before creating any registration.
+2. Authenticate as the configured admin and open `/admin`.
+3. Verify the dashboard loads asynchronously with zero registrations, zero waiting queues, zero pending approvals, and metrics derived as zero from the empty repository.
+4. Verify no demo registration, fixed total, placeholder parent, or manually maintained admin registration is displayed.
+5. Verify loading, empty, and error states are rendered by the dashboard store/component flow.
 
-## Registration
+## Parent Submission With Complete Documents
 
-- Verify a logged-in parent starts the registration flow at stage 2, with parent details prefilled from the authenticated session.
-- Verify a logged-in parent enters the child details and plan-selection flow immediately, without a transient return to the parent-details stage.
-- Verify the logged-in parent can keep adding and updating children and plan selections from that same stage before moving forward.
-- Verify an anonymous parent starts at the parent-details stage.
-- Verify a persisted draft is restored only for authenticated users.
-- Verify a logged-in parent with an existing draft starts at the plan/children stage with the draft details as the source of truth.
-- Verify saved draft parent details override the authenticated parent profile data while the draft is active.
-- Verify child, document, and submission data all come from real registration responses.
-- Verify submitted registration data becomes the source of truth after submit.
-- Verify uploaded missing documents update the registration status returned by the backend.
-- Verify replacement uploads preserve the latest file state returned by the backend.
-- Verify a registered parent can restart the flow and reuse their real parent details.
-- Verify registration starts from child selection only after auth is confirmed, not before.
-- Verify a logged-in parent can manually navigate back to the parent-details stage without being forced forward again.
-- Verify parent fields are not overwritten when the authenticated user has already filled different values in the current draft.
-- Verify a saved draft for one parent is never restored for another parent.
-- Verify switching from guest to logged-in state during the flow hydrates the logged-in parent details once.
-- Verify switching from logged-in to logged-out state does not keep privileged draft data accessible.
-- Verify all registration stages survive page refresh with real backend state, not local placeholders.
-- Verify the child stage correctly handles one child, multiple children, and zero children from backend data.
-- Verify child pricing, discounts, and monthly-plan requirements are computed from the real plans returned by the service.
-- Verify allergy data appears only when present and stays hidden when absent.
-- Verify no fake children, placeholder names, or fallback plans appear when backend data is incomplete.
-- Verify submitting with missing parent fields is blocked by validation.
-- Verify submitting with missing child details is blocked by validation.
-- Verify submitting with missing plan selection is blocked by validation.
-- Verify save-and-continue-later preserves real draft data and resumes at the same stage only for the same authenticated parent.
-- Verify document scope choices persist across navigation and refresh.
-- Verify document upload inputs can be replaced before final submission.
-- Verify the documents stage hides the standing-order upload section when the selected plan is a daily plan.
-- Verify missing document upload before submit does not accidentally advance to submitted summary.
-- Verify submission from the documents stage creates a submitted registration only once, even if the button is clicked repeatedly.
-- Verify after submit, the flow displays the submitted summary from backend truth, not draft state.
-- Verify successful submit removes the saved draft so reopening registration does not resume stale draft data.
-- Verify a registration can be resumed after submit only through the submitted summary state, not by reopening the draft.
+1. Open the registration flow as a parent.
+2. Enter a unique parent name, phone, and email.
+3. Add at least two children with distinct names, genders, dates of birth, and allergy values.
+4. Select a plan for each child and explicitly select a payment method for each child.
+5. Upload every required document, including the correct shared or child-specific scope, using distinctive file names.
+6. Submit the registration.
+7. Verify the returned registration has repository-generated registration and document IDs, creation/submission timestamps, uploaded timestamps, `PendingReview` document state, stored payment methods, selected plans, pricing, allergies, year, parent, and children.
+8. Verify the registration starts in `PendingApproval` and no required document is missing.
+9. Verify the parent home reads the submitted registration from `DataService` and shows the exact values entered.
 
-## Home
+## Parent Submission With Missing Documents
 
-- Verify authenticated parent home loads using the current parent identity.
-- Verify active registration, history, and holiday periods are all returned from the backend.
-- Verify drilling into a submitted registration opens the submitted summary view.
-- Verify missing-document uploads on the home screen update the backend-backed registration state.
-- Verify the home screen renders no placeholder parent data when no authenticated parent exists.
-- Verify home load is filtered by the authenticated parent's email, not by a generic fallback.
-- Verify a parent with no active registration still sees a stable empty home state.
-- Verify a parent with multiple registrations sees the latest active registration and the full registration history.
-- Verify registration history renders one row per child registration, even when multiple children were submitted in the same parent registration group.
-- Verify home history cards do not navigate unless the flow explicitly allows drill-in.
-- Verify the submitted-registration card opens the exact submitted summary for the selected registration id.
-- Verify home stays on the list view when there is no selected registration id.
-- Verify missing-document uploads on home can add, replace, remove, and reupload files before saving.
-- Verify saving missing documents updates the visible status returned by the backend.
-- Verify the status changes after the final missing file is uploaded.
-- Verify uploaded document names reflect the current selected file after replacement.
-- Verify the home screen does not show stale selected files after a save or reload.
-- Verify the home screen shows holiday periods for the active year only.
-- Verify a parent with no allergies in the submitted registration sees no allergy line.
-- Verify a parent with allergies sees the allergy details on both home and summary views.
-- Verify drill-in from history and drill-in from active registration both resolve the correct registration record.
-- Verify navigating directly to `/home/:registrationId` opens the correct summary for that id.
-- Verify navigating to another registration id after one is already open replaces the detail view instead of appending it.
-- Verify back navigation from the detail view returns to the parent home list without losing the loaded home data.
+1. Create a second registration with a different parent and child set.
+2. Select a plan/payment combination that requires a document and omit at least one required upload.
+3. Submit the registration.
+4. Verify the registration starts in `WaitingForDocuments` and the missing requirement contains the correct document type and scope.
+5. Upload the missing document through the parent flow.
+6. Verify the matching requirement is replaced, the new document is `PendingReview`, and status recalculates to `PendingApproval` when all requirements are present.
 
-## Error Paths
+## Data And Projection Fidelity
 
-- Verify unknown emails fail login cleanly.
-- Verify invalid OTP codes fail without changing auth state.
-- Verify missing parent home data returns a handled error state.
-- Verify missing registration IDs return a handled error state.
-- Verify upload failures surface a visible error and do not silently clear the selected file.
-- Verify expired sessions produce a handled login or home error, not a blank shell.
-- Verify network failures during auth restoration leave the app in a safe logged-out state.
-- Verify network failures during registration load keep the user on the registration screen with an actionable error.
-- Verify network failures during home load keep the user on the home screen with an actionable error.
-- Verify failures during submit do not clear entered registration data.
-- Verify failures during document upload do not clear the selected file input.
-- Verify a bad registration id in the URL does not crash the home screen.
-- Verify a bad parent email in the backend response does not leak data from another parent.
-- Verify loading states are cleared after both success and failure paths.
-- Verify duplicate clicks during loading do not cause duplicate submissions or duplicate uploads.
+1. In admin, verify both registrations appear under the correct queue for the active year.
+2. Verify exact propagation of parent name, phone, email, children, genders, allergies, plan labels, prices, payment methods, file names, document types, and scopes.
+3. Verify shared documents appear once in the shared-document group.
+4. Verify child-specific documents appear under the matching child only.
+5. Verify missing documents are projected from registration requirements and are not a separate admin fixture.
+6. Verify dashboard totals, queue counts, registered-child count, and remaining capacity change only when stored registrations change.
+7. Verify registrations from other years are excluded from the active-year dashboard.
 
-## Notifications
+## Authentication And Route Protection
 
-- Verify the app renders a single global Spartan Sonner toaster in the shell.
-- Verify the notification service contract can be swapped without changing feature code.
-- Verify login success shows a success toast.
-- Verify login failure shows an error toast.
-- Verify logout success shows a success toast and logout failure shows an error toast.
-- Verify registration submit success and failure both surface through the notification service.
-- Verify missing-document save success and failure both surface through the notification service.
-- Verify notification copy stays short and localized for parent-facing flows.
+1. Logout as the parent.
+2. Log in with the configured admin identity and open `/admin`.
+3. Verify the dashboard shows the parent-created registrations without code or fixture changes.
+4. While authenticated as a parent, navigate directly to `/admin`; verify access is redirected to the parent home.
+5. While unauthenticated, navigate directly to `/admin`; verify access is redirected to login and the requested URL is preserved as the redirect target.
+6. Verify logout clears the session only and does not remove registrations.
 
-## Data Integrity
+## Document Review And Readiness
 
-- Verify real service responses are treated as the source of truth for parent name, phone, email, registration year, children, plans, documents, and status.
-- Verify no route, screen, or store falls back to hardcoded parent data.
-- Verify no route, screen, or store falls back to hardcoded registration labels or placeholder names.
-- Verify localStorage is only read for drafts after auth is confirmed.
-- Verify the app never uses mock-only parents, registrations, years, or plans in the real-service path.
-- Verify backend-provided identifiers are preserved end to end.
-- Verify child, registration, and document ids are stable across refresh and drill-in.
-- Verify empty strings from the backend are displayed as empty states, not replaced by invented copy.
-- Verify all backend-driven status labels and document labels are rendered from the real service enum mapping.
-- Verify no feature reads from localStorage when the user is not authenticated.
-- Verify saved drafts are keyed by the right authenticated parent and not shared across users.
-- Verify backend refreshes replace stale client state instead of layering on top of it.
+1. In a pending approval registration, verify uploaded documents initially show the pending review state.
+2. Use the admin document action to approve a document.
+3. Verify the stored document changes to `Approved` and receives a review timestamp.
+4. Verify the parent-visible registration reads the updated document state from the same repository.
+5. Approve each required document and verify readiness recalculates from stored review state and required documents.
+6. Attempt approval before readiness; verify the command fails, the status does not change, and an error notification is shown.
+7. Verify duplicate document actions are ignored while the registration mutation is busy.
 
-## Suggested Coverage Order
+## Payment Method And Required Documents
 
-1. Auth session restoration
-2. Parent route guards
-3. Registration startup and submit flow
-4. Home data loading and drill-in
-5. Document upload and replacement flows
-6. Error handling and empty-state behavior
+1. Change a child from cash to standing order in the parent registration flow and submit.
+2. Verify the child domain record stores `StandingOrder` and the standing-order requirement is calculated for the correct scope.
+3. In admin, change the payment method and reload the dashboard.
+4. Verify the parent-visible registration reflects the new method and recalculated missing-document state.
+5. Change a child to cash and verify the child-specific standing-order requirement/document is removed or no longer required.
+6. Attempt to switch a pending approval child to standing order without its required document; verify the command returns an expected error and does not partially update the registration.
+7. Verify payment controls use the same stored child state as the dashboard projection.
+
+## Registration Approval And Parent State
+
+1. Approve all required documents for a ready pending approval registration.
+2. Approve the registration from admin.
+3. Verify the registration changes to `Approved` and leaves the pending queues.
+4. Return to the parent home and verify the same registration is `Approved` with unchanged parent, child, plan, payment, pricing, and document data.
+5. Attempt approval for a waiting-for-documents registration; verify the confirmation/override behavior and expected readiness error path.
+
+## Permanent Removal
+
+1. Request removal for a registration from admin.
+2. Cancel the confirmation and verify no data changes.
+3. Confirm removal and verify the registration disappears from the dashboard.
+4. Verify the parent home can no longer load that registration from the repository.
+5. Verify dashboard metrics and queue counts recalculate after removal.
+
+## Invalid Actions, Errors, And Busy State
+
+- Approve an unknown registration ID: expect a domain error and error notification.
+- Approve an unknown document ID: expect a domain error and unchanged registration.
+- Change payment for an unknown child: expect a domain error and unchanged registration.
+- Remove an unknown registration: expect a domain error and unchanged dashboard data.
+- Trigger a second mutation while one registration is busy: expect the duplicate action to be ignored.
+- Force a dashboard read failure: verify store error state and failure notification without stale mutation success.
+- Verify successful mutations reload the dashboard read model through `AdminFacade` instead of patching a precomputed snapshot.
+
+## Refresh Reset
+
+1. Create and submit at least one parent registration.
+2. Confirm it appears in admin and parent views during the current browser session.
+3. Refresh the browser completely.
+4. Verify the in-memory repository starts empty, the dashboard returns to zero derived totals, and the former registration is gone.
+5. Verify a logout without refresh does not reset the repository.
+
+## Architecture Verification
+
+- `MockDataService` starts with an empty registration repository.
+- No dashboard registration fixture, demo registration, fixed dashboard total, or admin-only registration map is required.
+- Parent reads, parent writes, admin reads, and admin commands use the same registration collection.
+- Reads and writes are asynchronous and return cloned DTO-shaped values.
+- Registration and document IDs are generated by repository-owned counters.
+- Registration, document, and review timestamps are stored on domain records.
+- Admin dashboard data is a projection/read model derived from `RegistrationState`.
+- `AdminDashboardStore` owns loading, error, confirmation, busy, notifications, computed queues, metrics, and reload-after-mutation behavior.
+- `AdminDashboard` remains a thin store-driven component.
+- Browser refresh resets the process-local repository; logout preserves it.

@@ -1,29 +1,45 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NgClass } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { NgClass, NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
-  lucideCircleCheck,
+  lucideBadgeCheck,
+  lucideBanknote,
+  lucideCheck,
+  lucideChevronDown,
+  lucideChevronUp,
+  lucideCircleAlert,
+  lucideClipboardList,
   lucideClock3,
   lucideFileText,
-  lucideFolderOpen,
-  lucideUserRound,
+  lucideLandmark,
+  lucideLoaderCircle,
+  lucidePhone,
+  lucideTrash2,
   lucideUsersRound,
 } from '@ng-icons/lucide';
+import { BrnCollapsibleImports } from '@spartan-ng/brain/collapsible';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-
-type AdminStageState = 'done' | 'pending' | 'empty';
+import { AdminDashboardStore } from './admin-dashboard.store';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [NgClass, NgIcon, RouterLink, HlmButtonImports],
+  imports: [NgClass, NgTemplateOutlet, NgIcon, BrnCollapsibleImports, HlmButtonImports],
   providers: [
+    AdminDashboardStore,
     provideIcons({
-      lucideCircleCheck,
+      lucideBadgeCheck,
+      lucideBanknote,
+      lucideCheck,
+      lucideChevronDown,
+      lucideChevronUp,
+      lucideCircleAlert,
+      lucideClipboardList,
       lucideClock3,
       lucideFileText,
-      lucideFolderOpen,
-      lucideUserRound,
+      lucideLandmark,
+      lucideLoaderCircle,
+      lucidePhone,
+      lucideTrash2,
       lucideUsersRound,
     }),
   ],
@@ -31,57 +47,5 @@ type AdminStageState = 'done' | 'pending' | 'empty';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminDashboard {
-  protected readonly metrics = [
-    { value: '24', label: 'ילדים', icon: 'lucideUsersRound', tone: 'success' },
-    { value: '30', label: 'תפוסה', icon: 'lucideUsersRound', tone: 'success' },
-    { value: '18', label: 'הושלמו', icon: 'lucideCircleCheck', tone: 'success' },
-    { value: '6', label: 'ממתינים', icon: 'lucideClock3', tone: 'warning' },
-  ];
-
-  protected readonly registrations: Array<{
-    title: string;
-    icon: string;
-    tags: Array<{ label: string; icon: string }>;
-    stages: Array<{ label: string; state: AdminStageState }>;
-    compact?: boolean;
-  }> = [
-    {
-      title: 'נועה לוי ואורי לוי',
-      icon: 'lucideUsersRound',
-      tags: [
-        { label: '2 ילדים', icon: 'lucideUsersRound' },
-        { label: 'מסמכים משותפים', icon: 'lucideFolderOpen' },
-      ],
-      stages: [
-        { label: 'פרטים', state: 'done' },
-        { label: 'חוזה', state: 'done' },
-        { label: 'הוראת קבע', state: 'pending' },
-        { label: 'ביטוח', state: 'pending' },
-      ],
-    },
-    {
-      title: 'תמר ישראלי',
-      icon: 'lucideUserRound',
-      tags: [{ label: 'ילד אחד', icon: 'lucideUsersRound' }],
-      stages: [
-        { label: 'פרטים', state: 'done' },
-        { label: 'חוזה', state: 'done' },
-        { label: 'הוראת קבע', state: 'done' },
-        { label: 'ביטוח', state: 'pending' },
-      ],
-    },
-    {
-      title: 'יואב מזרחי',
-      icon: 'lucideUserRound',
-      tags: [],
-      stages: [
-        { label: 'פרטים', state: 'done' },
-        { label: 'חוזה', state: 'pending' },
-        { label: 'הוראת קבע', state: 'empty' },
-        { label: 'ביטוח', state: 'empty' },
-      ],
-      compact: true,
-    },
-  ];
-
+  protected readonly store = inject(AdminDashboardStore);
 }

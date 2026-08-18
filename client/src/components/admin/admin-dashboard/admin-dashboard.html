@@ -1,83 +1,366 @@
-<main
-  class="relative min-h-[calc(100dvh-var(--app-sticky-header-height))] overflow-hidden bg-[radial-gradient(circle_at_50%_20%,color-mix(in_oklch,var(--surface-sage)_14%,transparent),transparent_18rem),linear-gradient(180deg,var(--background),var(--surface-warm)_76%,var(--background))] px-[var(--app-screen-padding)] pb-20 text-foreground lg:min-h-dvh lg:px-10 lg:pb-32"
-  dir="rtl"
->
-  <section class="relative z-[1] mx-auto grid w-[min(100%,min(72rem,calc(100vw-8rem)))] justify-items-start gap-2 pt-5 text-right">
-    <p class="m-0 text-sm text-foreground">בית</p>
-    <h1 class="m-0 text-[clamp(1.58rem,4.8vw,2.22rem)] font-extrabold leading-tight text-brand">סקירת שנה נוכחית</h1>
-    <p class="m-0 text-sm text-foreground/80">תשפ״ז · 2026/2027 · הרשמה פתוחה</p>
-  </section>
+<main class="relative min-h-[calc(100dvh-var(--app-sticky-header-height))] overflow-hidden bg-background px-[var(--app-screen-padding)] pb-44 text-foreground" dir="rtl">
+  <div class="relative z-[1] mx-auto w-full max-w-[64rem] pt-6 lg:pt-9">
+    <header class="text-right">
+      <h1 class="m-0 text-[length:var(--app-page-title-size)] font-black leading-tight text-brand">תמונת מצב</h1>
+    </header>
 
-  <section class="relative z-[1] mx-auto mt-6 grid w-[min(100%,min(72rem,calc(100vw-8rem)))] gap-4 lg:gap-3">
-    <section class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:[direction:rtl]" aria-label="מדדי שנה נוכחית">
-      @for (metric of metrics; track metric.label) {
-        <article class="grid min-h-16 grid-cols-[auto_minmax(0,1fr)] items-center gap-2 rounded-[var(--app-card-radius)] border border-border bg-[radial-gradient(circle_at_18%_32%,color-mix(in_oklch,white_52%,transparent),transparent_10rem),color-mix(in_oklch,var(--card)_84%,transparent)] px-3 py-2 lg:min-h-24 lg:px-4">
-          <span
-            class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-surface-sage/70 text-brand lg:h-10 lg:w-10"
-            [ngClass]="{ 'bg-primary/20 text-primary': metric.tone === 'warning' }"
-          >
-            <ng-icon [name]="metric.icon" class="h-4 w-4" />
-          </span>
+    @if (store.loading() && !store.dashboard()) {
+      <section class="mt-10 grid min-h-60 place-items-center rounded-[var(--app-card-radius)] border border-border bg-card/80" aria-live="polite">
+        <div class="grid justify-items-center gap-3 text-brand">
+          <ng-icon name="lucideLoaderCircle" class="h-7 w-7 animate-spin" />
+          <span class="text-[length:var(--app-body-size)] font-bold">טוען את נתוני לוח הניהול</span>
+        </div>
+      </section>
+    } @else if (store.hasError()) {
+      <section class="relative z-[1] mx-auto grid min-h-60 place-items-center rounded-[var(--app-card-radius)] border border-destructive/30 bg-red-50 p-6 text-center" role="alert">
+        <p class="m-0 text-[length:var(--app-body-size)] font-bold text-destructive">{{ store.error() }}</p>
+      </section>
+    } @else if (store.dashboard()) {
+      <section class="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="סיכום שנה פעילה">
+        @for (metric of store.metrics(); track metric.label) {
+          <article class="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-[var(--app-card-radius)] border border-border bg-card/80 p-3 shadow-sm shadow-foreground/5 lg:min-h-32 lg:gap-3 lg:p-5">
+            <div class="min-w-0 text-right">
+              <strong
+                class="block whitespace-nowrap text-xl font-black leading-none text-brand sm:text-2xl lg:text-3xl"
+                [ngClass]="{ 'text-primary': metric.tone === 'warning' }"
+                [attr.dir]="metric.leftToRight ? 'ltr' : null"
+              >{{ metric.value }}</strong>
+              <span class="mt-2 block text-[length:var(--app-card-title-size)] font-bold leading-tight">{{ metric.label }}</span>
+              <span class="mt-1 block text-[length:var(--app-muted-size)] leading-snug text-muted-foreground">{{ metric.detail }}</span>
+            </div>
+            <span
+              class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-surface-sage/45 text-brand lg:h-14 lg:w-14"
+              [ngClass]="{ 'bg-primary/8 text-primary': metric.tone === 'warning' }"
+            >
+              <ng-icon [name]="metric.icon" class="h-10 w-10 lg:h-11 lg:w-11" />
+            </span>
+          </article>
+        }
+      </section>
+
+      <section class="mt-12" aria-labelledby="waiting-documents-title">
+        <div class="flex items-end justify-between gap-4 border-b border-border pb-3">
           <div>
-            <strong class="block text-2xl font-extrabold leading-none text-brand lg:text-[1.62rem]" [class.text-primary]="metric.tone === 'warning'">{{ metric.value }}</strong>
-            <span class="mt-1 block text-sm text-foreground">{{ metric.label }}</span>
+            <h2 id="waiting-documents-title" class="m-0 text-[length:var(--app-section-title-size)] font-black text-brand">ממתינות למסמכים</h2>
+            <p class="mt-1 mb-0 text-[length:var(--app-body-size)] text-muted-foreground">הרשמות שטרם הושלמו מסמכים נדרשים</p>
           </div>
-        </article>
-      }
-    </section>
-
-    <h2 class="mt-3 justify-self-start text-lg font-extrabold text-brand lg:text-[1.1rem]">הרשמות ממתינות</h2>
-
-    @for (registration of registrations; track registration.title) {
-      <article class="grid gap-3 rounded-[var(--app-card-radius)] border border-border bg-[radial-gradient(circle_at_18%_32%,color-mix(in_oklch,white_52%,transparent),transparent_10rem),color-mix(in_oklch,var(--card)_84%,transparent)] p-3 lg:grid-cols-[minmax(13rem,17rem)_minmax(0,1fr)_minmax(12rem,15.5rem)] lg:items-center">
-        <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
-          <span class="inline-flex h-10 w-10 items-center justify-center text-brand">
-            <ng-icon [name]="registration.icon" class="h-8 w-8 stroke-[1.55]" />
+          <span class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-full bg-primary/15 px-2 text-[length:var(--app-body-size)] font-black text-primary">
+            {{ store.waitingForDocumentsRegistrations().length }}
           </span>
-          <div class="grid justify-items-start gap-2">
-            <h2 class="m-0 text-base font-[850] leading-tight text-foreground">{{ registration.title }}</h2>
-            @if (registration.tags.length) {
-              <div class="flex flex-wrap justify-start gap-1.5">
-                @for (tag of registration.tags; track tag.label) {
-                  <span class="inline-flex min-h-5 items-center gap-1 rounded-full bg-surface-sage/70 px-2 text-xs font-bold text-brand">
-                    <ng-icon [name]="tag.icon" class="h-3.5 w-3.5" /> {{ tag.label }}
-                  </span>
-                }
-              </div>
-            }
-          </div>
         </div>
 
-        <div class="grid grid-cols-4 items-start" aria-label="סיכום שלבי הרשמה">
-          @for (stage of registration.stages; track stage.label) {
-            <div class="grid min-w-0 justify-items-center gap-1.5 border-s border-border text-center text-[0.68rem] text-foreground first:border-s-0">
-              <span>{{ stage.label }}</span>
-              <span
-                class="grid h-6 w-6 place-items-center rounded-full bg-surface-sage/70 text-brand"
-                [ngClass]="{
-                  'bg-primary/15 text-primary': stage.state === 'pending',
-                  'border border-foreground/30 bg-background/70 text-foreground/40': stage.state === 'empty'
-                }"
-              >
-                @if (stage.state === 'done') {
-                  <ng-icon name="lucideCircleCheck" class="h-3.5 w-3.5" />
-                } @else if (stage.state === 'pending') {
-                  <ng-icon name="lucideClock3" class="h-3.5 w-3.5" />
-                } @else {
-                  <span class="h-0.5 w-3 rounded-full bg-current" aria-hidden="true"></span>
-                }
-              </span>
+        <div class="mt-4 grid gap-4">
+          @for (registration of store.waitingForDocumentsRegistrations(); track registration.registrationId) {
+            <ng-container
+              [ngTemplateOutlet]="registrationCard"
+              [ngTemplateOutletContext]="{ registration: registration, queue: 'waitingForDocuments' }"
+            />
+          } @empty {
+            <div class="grid min-h-32 place-items-center rounded-[var(--app-card-radius)] border border-dashed border-border bg-card/55 p-6 text-center">
+              <div>
+                <ng-icon name="lucideCheck" class="mx-auto h-6 w-6 text-success" />
+                <p class="mt-2 mb-0 text-[length:var(--app-body-size)] font-bold text-brand">אין הרשמות שממתינות למסמכים</p>
+              </div>
             </div>
           }
         </div>
+      </section>
 
-        <a hlmBtn variant="outline" class="relative h-11 w-full justify-center border-brand bg-background/80 text-sm font-medium text-brand [direction:rtl] lg:h-10" routerLink="/admin/documents">
-          <ng-icon name="lucideFileText" class="absolute left-6 h-4 w-4" />
-          <span>צפייה בפרטי ההרשמה</span>
-        </a>
-      </article>
+      <section class="mt-16" aria-labelledby="pending-approval-title">
+        <div class="flex items-end justify-between gap-4 border-b border-border pb-3">
+          <div>
+            <h2 id="pending-approval-title" class="m-0 text-[length:var(--app-section-title-size)] font-black text-brand">ממתינות לאישור</h2>
+            <p class="mt-1 mb-0 text-[length:var(--app-body-size)] text-muted-foreground">הרשמות שהעלאותיהן הושלמו וממתינות להחלטה</p>
+          </div>
+          <span class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-full bg-surface-sage px-2 text-[length:var(--app-body-size)] font-black text-brand">
+            {{ store.pendingApprovalRegistrations().length }}
+          </span>
+        </div>
+
+        <div class="mt-4 grid gap-4">
+          @for (registration of store.pendingApprovalRegistrations(); track registration.registrationId) {
+            <ng-container
+              [ngTemplateOutlet]="registrationCard"
+              [ngTemplateOutletContext]="{ registration: registration, queue: 'pendingApproval' }"
+            />
+          } @empty {
+            <div class="grid min-h-32 place-items-center rounded-[var(--app-card-radius)] border border-dashed border-border bg-card/55 p-6 text-center">
+              <div>
+                <ng-icon name="lucideCheck" class="mx-auto h-6 w-6 text-success" />
+                <p class="mt-2 mb-0 text-[length:var(--app-body-size)] font-bold text-brand">אין הרשמות שממתינות לאישור</p>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
     }
-  </section>
+  </div>
 
-  <img class="absolute inset-x-0 bottom-0 z-0 h-32 w-full object-cover object-bottom" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
+  <img class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-36 w-full object-cover object-bottom opacity-75" src="/assets/landing-footer-foliage.png" alt="" aria-hidden="true" />
 </main>
+
+<ng-template #statusBadge let-label="label" let-tone="tone" let-icon="icon">
+  <span
+    class="inline-flex min-h-[var(--app-chip-height)] items-center gap-1 rounded-full px-2.5 text-[length:var(--app-muted-size)] font-bold"
+    [ngClass]="tone === 'success'
+      ? 'bg-surface-sage/70 text-brand'
+      : tone === 'warning'
+        ? 'bg-surface-warm text-foreground'
+        : 'bg-primary/15 text-primary'"
+  >
+    @if (icon) {
+      <ng-icon [name]="icon" class="h-3.5 w-3.5" />
+    }
+    {{ label }}
+  </span>
+</ng-template>
+
+<ng-template #registrationCard let-registration="registration" let-queue="queue">
+  <article
+    brnCollapsible
+    class="overflow-hidden rounded-[var(--app-card-radius)] border border-border bg-card/85 shadow-sm shadow-foreground/5"
+    [expanded]="registration.expanded"
+    (expandedChange)="store.setRegistrationExpanded(queue, registration.registrationId, $event)"
+  >
+    <button
+      brnCollapsibleTrigger
+      type="button"
+      class="grid min-h-20 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-0 bg-transparent p-4 text-right text-foreground lg:min-h-24 lg:px-6 lg:py-5"
+    >
+      <div class="min-w-0 space-y-2">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <h3 class="m-0 text-[length:var(--app-card-title-size)] font-black text-brand">{{ registration.parentFullName }}</h3>
+          <span class="inline-flex items-center gap-1 text-[length:var(--app-body-size)] text-muted-foreground">
+            <ng-icon name="lucidePhone" class="h-3.5 w-3.5" /> {{ registration.parentPhoneNumber }}
+          </span>
+        </div>
+        <p class="m-0 text-[length:var(--app-body-size)] font-bold">
+          {{ registration.children.length === 1 ? 'ילד אחד' : registration.children.length + ' ילדים' }}:
+          @for (child of registration.children; track child.registrationChildId; let last = $last) {
+            {{ child.fullName }}{{ last ? '' : ' · ' }}
+          }
+        </p>
+        <div class="mt-2">
+          @if (registration.status === 'WaitingForDocuments') {
+            <ng-container
+              [ngTemplateOutlet]="statusBadge"
+              [ngTemplateOutletContext]="{
+                label: registration.uploadComplete ? 'ההעלאות הושלמו' : 'חסרים מסמכים נדרשים',
+                tone: 'primary',
+                icon: null
+              }"
+            />
+          } @else if (registration.approvalReady) {
+            <ng-container
+              [ngTemplateOutlet]="statusBadge"
+              [ngTemplateOutletContext]="{ label: 'מוכן להחלטת מנהל', tone: 'success', icon: 'lucideBadgeCheck' }"
+            />
+          } @else {
+            <ng-container
+              [ngTemplateOutlet]="statusBadge"
+              [ngTemplateOutletContext]="{ label: 'נדרשת בדיקת מסמכים', tone: 'warning', icon: 'lucideClock3' }"
+            />
+          }
+        </div>
+      </div>
+      <span class="grid h-8 w-8 place-items-center rounded-[var(--app-control-radius)] text-brand">
+        <ng-icon [name]="registration.expanded ? 'lucideChevronUp' : 'lucideChevronDown'" class="h-4 w-4" />
+      </span>
+    </button>
+
+    <div
+      brnCollapsibleContent
+      class="max-h-[var(--brn-collapsible-content-height)] overflow-hidden border-t border-border px-4 pt-6 pb-5 opacity-100 transition-[max-height,opacity,padding-top,padding-bottom,border-color] duration-300 ease-out data-[state=closed]:max-h-0 data-[state=closed]:border-transparent data-[state=closed]:py-0 data-[state=closed]:opacity-0 lg:px-7 lg:pt-7 lg:pb-7"
+    >
+        @if (registration.sharedDocuments.length) {
+          <section class="mb-8" aria-label="מסמכים משותפים">
+            <div class="mb-2">
+              <h4 class="m-0 text-[length:var(--app-card-title-size)] font-black text-brand">מסמכים משותפים</h4>
+            </div>
+            @for (document of registration.sharedDocuments; track document.id) {
+              <ng-container
+                [ngTemplateOutlet]="documentRow"
+                [ngTemplateOutletContext]="{ document: document, registration: registration, queue: queue }"
+              />
+            }
+          </section>
+        }
+
+        <div class="grid gap-12 lg:grid-cols-2 lg:gap-8">
+          @for (child of registration.children; track child.registrationChildId) {
+            <section
+              class="mx-auto w-full max-w-[34rem] border-t border-border pt-8 first:border-t-0 first:pt-0 lg:border-t-0 lg:pt-0"
+              [attr.aria-label]="'פרטי ' + child.fullName"
+            >
+              <div class="flex min-h-7 flex-wrap items-center justify-between gap-2">
+                <h4 class="m-0 inline-flex items-center gap-1.5 text-[length:var(--app-card-title-size)] font-black text-brand">
+                  <img
+                    class="h-7 w-7 shrink-0 object-contain"
+                    [src]="child.gender === 'Boy' ? '/assets/child-avatar-boy.png' : '/assets/child-avatar-girl.png'"
+                    [alt]="child.gender === 'Boy' ? 'ילד' : 'ילדה'"
+                  />
+                  {{ child.fullName }}
+                </h4>
+                @if (child.isCashOnly) {
+                  <ng-container
+                    [ngTemplateOutlet]="statusBadge"
+                    [ngTemplateOutletContext]="{ label: 'מזומן', tone: 'success', icon: 'lucideBanknote' }"
+                  />
+                }
+              </div>
+
+              <div class="mt-3 grid gap-3 border-y border-border/70 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                <div>
+                  <span class="block text-[length:var(--app-muted-size)] text-muted-foreground">מסלול</span>
+                  <strong class="mt-1 block text-[length:var(--app-body-size)]">{{ child.planName }} · {{ store.billingLabel(child.billingPeriod) }}</strong>
+                </div>
+                <div>
+                  <span class="mb-1 block text-[length:var(--app-muted-size)] text-muted-foreground">אמצעי תשלום</span>
+                  <div class="inline-grid grid-cols-2 overflow-hidden rounded-[var(--app-control-radius)] border border-border bg-background" role="group" aria-label="אמצעי תשלום">
+                    <button
+                      type="button"
+                      class="inline-flex min-h-8 items-center justify-center gap-1 border-0 px-2 text-[length:var(--app-muted-size)] font-bold transition-[background-color,color,box-shadow,transform] duration-200 ease-out active:scale-[0.97]"
+                      [class.bg-brand]="child.isCashOnly"
+                      [class.text-brand-foreground]="child.isCashOnly"
+                      (click)="store.setPaymentMethod(queue, registration.registrationId, child.registrationChildId, true)"
+                    >
+                      <ng-icon name="lucideBanknote" class="h-3 w-3" /> מזומן
+                    </button>
+                    <button
+                      type="button"
+                      class="inline-flex min-h-8 items-center justify-center gap-1 border-0 border-s border-border px-2 text-[length:var(--app-muted-size)] font-bold transition-[background-color,color,box-shadow,transform] duration-200 ease-out active:scale-[0.97]"
+                      [class.bg-brand]="!child.isCashOnly"
+                      [class.text-brand-foreground]="!child.isCashOnly"
+                      (click)="store.setPaymentMethod(queue, registration.registrationId, child.registrationChildId, false)"
+                    >
+                      <ng-icon name="lucideLandmark" class="h-3 w-3" /> הוראת קבע
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 grid gap-2">
+                @for (document of child.documents; track document.id) {
+                  <ng-container
+                    [ngTemplateOutlet]="documentRow"
+                    [ngTemplateOutletContext]="{ document: document, registration: registration, queue: queue }"
+                  />
+                } @empty {
+                  <p class="m-0 py-2 text-[length:var(--app-muted-size)] text-muted-foreground">אין מסמכים נוספים הנדרשים לילד זה.</p>
+                }
+              </div>
+            </section>
+          }
+        </div>
+
+        <div class="mt-8 grid gap-2.5 border-t border-border pt-5 sm:flex sm:items-center sm:justify-start">
+          <button
+            hlmBtn
+            type="button"
+            class="h-8 rounded-[var(--app-control-radius)] bg-primary px-3 text-[length:var(--app-muted-size)] font-black text-primary-foreground disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground sm:min-w-48 sm:flex-none"
+            [disabled]="store.busyRegistrationId() === registration.registrationId || (queue === 'pendingApproval' && !registration.approvalReady)"
+            (click)="store.requestApproval(queue, registration)"
+          >
+            @if (store.busyRegistrationId() === registration.registrationId) {
+              <ng-icon name="lucideLoaderCircle" class="h-3.5 w-3.5 animate-spin" />
+            } @else {
+              <ng-icon name="lucideCheck" class="h-3.5 w-3.5" />
+            }
+            {{ queue === 'waitingForDocuments' ? 'אישור חריג של ההרשמה' : 'אישור ההרשמה' }}
+          </button>
+          <button
+            hlmBtn
+            variant="outline"
+            type="button"
+            class="h-8 rounded-[var(--app-control-radius)] border-destructive px-3 text-[length:var(--app-muted-size)] font-bold text-destructive sm:min-w-36 sm:flex-none"
+            [disabled]="store.busyRegistrationId() === registration.registrationId"
+            (click)="store.requestRemoval(queue, registration)"
+          >
+            <ng-icon name="lucideTrash2" class="h-3.5 w-3.5" /> הסרה לצמיתות
+          </button>
+        </div>
+    </div>
+  </article>
+</ng-template>
+
+<ng-template #documentRow let-document="document" let-registration="registration" let-queue="queue">
+  <div class="grid min-h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b border-border/60 px-1 py-3 last:border-b-0 sm:gap-3 lg:px-2">
+    <span
+      class="grid h-9 w-9 place-items-center rounded-[var(--app-control-radius)]"
+      [ngClass]="document.fileName ? 'bg-surface-sage/70 text-brand' : 'bg-primary/12 text-primary'"
+    >
+      <ng-icon [name]="document.fileName ? 'lucideFileText' : 'lucideCircleAlert'" class="h-4 w-4" />
+    </span>
+    <div class="min-w-0">
+      <strong class="block text-[length:var(--app-body-size)]">{{ store.documentLabel(document.type) }}</strong>
+      @if (document.fileName) {
+        <span class="block truncate text-[length:var(--app-muted-size)] text-muted-foreground">{{ document.fileName }}</span>
+      } @else {
+        <span class="block text-[length:var(--app-muted-size)] font-bold text-primary">טרם הועלה</span>
+      }
+    </div>
+    <div class="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
+      @if (document.reviewStatus === 'Approved') {
+        <ng-container
+          [ngTemplateOutlet]="statusBadge"
+          [ngTemplateOutletContext]="{ label: 'מסמך אושר', tone: 'success', icon: null }"
+        />
+      } @else if (document.fileName) {
+        <button
+          hlmBtn
+          variant="ghost"
+          type="button"
+          class="h-8 w-fit shrink-0 px-2 text-[length:var(--app-muted-size)] font-bold text-brand"
+          aria-label="פתיחת מסמך"
+          title="פתיחת מסמך"
+          (click)="store.openDocument(document)"
+        >
+          פתח
+        </button>
+        <button
+          hlmBtn
+          variant="outline"
+          type="button"
+          class="h-8 w-fit shrink-0 border-border px-2 text-[length:var(--app-muted-size)] font-bold text-success transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:border-success hover:bg-success hover:text-white focus-visible:ring-2 focus-visible:ring-success/40 active:scale-[0.97]"
+          aria-label="אשר את המסמך"
+          title="אשר את המסמך"
+          (click)="store.approveDocument(queue, registration.registrationId, document.id)"
+        >
+          אשר
+        </button>
+      }
+    </div>
+  </div>
+</ng-template>
+
+@if (store.confirmation(); as dialog) {
+  <div class="fixed inset-0 z-[80] grid place-items-center bg-foreground/35 p-4 backdrop-blur-[2px]" role="presentation" (click)="store.dismissConfirmation()">
+    <section class="w-[min(100%,28rem)] rounded-[var(--app-card-radius)] border border-border bg-background p-5 text-right shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="confirmation-title" (click)="$event.stopPropagation()">
+      <span class="grid h-11 w-11 place-items-center rounded-full bg-destructive/10 text-destructive">
+        <ng-icon [name]="dialog.kind === 'remove' ? 'lucideTrash2' : 'lucideCircleAlert'" class="h-5 w-5" />
+      </span>
+      <h2 id="confirmation-title" class="mt-4 mb-0 text-[length:var(--app-section-title-size)] font-black text-brand">
+        {{ dialog.kind === 'remove' ? 'הסרת הרשמה לצמיתות' : 'אישור חריג ללא כל המסמכים' }}
+      </h2>
+      <p class="mt-2 mb-0 text-[length:var(--app-body-size)] leading-relaxed text-muted-foreground">
+        @if (dialog.kind === 'remove') {
+          הפעולה תמחק לצמיתות את ההרשמה של {{ dialog.parentFullName }} ואת הקבצים המשויכים אליה. לא ניתן לבטל פעולה זו.
+        } @else {
+          ההרשמה של {{ dialog.parentFullName }} עדיין ממתינה למסמכים. אישור מפורש יעביר אותה ישירות למצב מאושר.
+        }
+      </p>
+      <div class="mt-5 grid grid-cols-2 gap-3">
+        <button hlmBtn variant="outline" type="button" class="h-11 border-border text-[length:var(--app-button-size)] font-bold" (click)="store.dismissConfirmation()">ביטול</button>
+        <button
+          hlmBtn
+          type="button"
+          class="h-11 text-[length:var(--app-button-size)] font-black text-white"
+          [ngClass]="dialog.kind === 'remove' ? 'bg-destructive' : 'bg-primary'"
+          (click)="store.confirmAction()"
+        >
+          {{ dialog.kind === 'remove' ? 'הסרה לצמיתות' : 'אישור חריג' }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

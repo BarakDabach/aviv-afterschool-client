@@ -1,56 +1,51 @@
-# Admin Home Design QA
+# Admin Dashboard Design QA
 
-Source visual truth:
-- `mockups/admin-home.png`
-- `mockups/admin-home-desktop.png`
-Implementation route: `http://127.0.0.1:4200/admin`
-Implementation screenshots:
-- `client/qa-admin-home-846.png`
-- `client/qa-admin-home-mobile.png`
-- `client/qa-admin-home-desktop.png`
-- `client/qa-admin-home-desktop-1490.png`
-Comparison evidence:
-- `client/qa-admin-home-comparison.png`
-- `client/qa-admin-home-desktop-comparison.png`
+## Evidence
 
-Viewport and density:
-- Mobile/tablet source image: `846 x 1880` pixels.
-- Desktop source image: `1490 x 1048` pixels.
-- Primary implementation capture: `846 x 1880` viewport, `deviceScaleFactor: 1`.
-- Responsive checks: `390 x 1100` mobile and `1490 x 1048` desktop, `deviceScaleFactor: 1`.
-State: default admin home screen; hamburger drawer opened during interaction check on mobile/mock widths.
+- Source visual truth: `mockups/admin-home.png` for brand, color, typography, card treatment, RTL direction, and responsive shell.
+- Product hierarchy truth: SDS v9, Screen SR-005. The v9 queue content intentionally replaces the older stage-summary content in the available visual mock.
+- Mobile implementation: `admin-dashboard-mobile-viewport.png`.
+- Narrow implementation: `admin-dashboard-mobile-320.png`.
+- Desktop implementation: `admin-dashboard-desktop.png`.
+- Side-by-side evidence: `admin-dashboard-mobile-comparison.png`.
+- Route and state: `/admin`, initial state with one expanded registration in each queue.
 
-Full-view comparison evidence:
-- The implementation recreates the admin home structure from the mock: admin header, hamburger/user area, logo lockup, current-year title block, four metric cards, pending registration section, three registration cards, stage status summary, outline details action, and botanical footer.
+## Normalization
 
-Focused region comparison evidence:
-- Header: checked menu/user/brand placement and no overlap at `846`, `390`, and `1180` widths.
-- Metrics: checked four stat cards render in a two-by-two grid at the source viewport, with smaller circular icon badges and centered SVG glyphs.
-- Pending cards: checked three registration cards render with RTL title, badges, four stage indicators, smaller child/family avatars, and document action buttons sized to the mock.
-- Icon placement: checked metric icons, registration avatars, stage icons, and the document icon inside each outline action. The document icon is anchored on the left side of the button while the Hebrew label remains centered, matching the mock.
-- Responsive behavior: checked mobile drawer opens and desktop nav appears only at desktop width.
-- Desktop layout: checked the desktop home screen uses a full-width header, centered text-only nav, one-row four-card metrics, and horizontal pending registration rows with action button on the left, stage summary in the middle, and child/family block on the right.
+- Source pixels: 853 x 1844.
+- Mobile implementation pixels: 390 x 813, browser viewport width 405 with a 390 CSS-pixel page client area, device scale factor 1.
+- Narrow implementation pixels: 320 x 806, 320 CSS-pixel page client area, device scale factor 1.
+- Desktop implementation pixels: 1425 x 2194 full page, 1440 x 900 browser viewport, device scale factor 1.
+- The side-by-side comparison scales the source and implementation to equal 390px content widths. Content differences are evaluated against SDS v9 rather than the obsolete stage-summary fields in the older mock.
 
-Findings:
-- No P0/P1/P2 findings remain.
+## Required Fidelity Surfaces
 
-Follow-up polish:
-- P3: Child/family illustrations use Lucide line icons rather than the exact custom hand-drawn mock illustrations.
-- P3: Button and card typography is close to the mock, but the mock uses slightly softer optical weight in a few card labels.
+- Fonts and typography: Hebrew system stack, weight hierarchy, line height, and RTL wrapping match the established app. Compact admin headings remain readable at 320px.
+- Spacing and layout rhythm: two-column mobile metric grid, four-column desktop grid, separated queue sections, indented child surfaces, and expanded/collapsed hierarchy are stable without horizontal overflow.
+- Colors and visual tokens: existing background, card, border, brand green, orange warning/primary, success green, and destructive red tokens are reused.
+- Image quality and assets: existing brand mark and footer foliage are reused at native quality. No visible source asset is approximated in CSS or markup.
+- Copy and content: the screen uses SDS v9 metrics, separate queues, neutral readiness wording, child-specific payment methods, only the two approved document types, and generic Admin identity.
 
-Verification:
-- Browser console: no errors or warnings.
-- Horizontal overflow: none at `1490`, `846`, or `390` widths.
-- RTL: document and screen direction compute as `rtl`.
-- Spartan primitives: menu/action buttons use `hlmBtn`.
+## Interaction Verification
 
-Comparison history:
-- Initial implementation was too compact at the mock width and used the old bottom-nav dashboard structure.
-- Fixed by replacing `/admin` with the new home flow, hamburger drawer, 2x2 metric grid, and pending registration cards.
-- Header overlap and gutter mismatches were found in rendered captures, then fixed with home-specific header grid, responsive brand sizing, and gutter correction.
-- The latest pass tightened component sizing and icon positioning against `admin-home.png`: metric icon containers were reduced and centered, registration avatars were reduced, stage status icons were reduced, the pending-section title was moved to the correct RTL side, and the compact third-card action was aligned to the left like the source.
-- Added `admin-home-desktop.png` support by changing only responsive layout rules: desktop content expands to the mock width, metrics become a single row, pending registration cards become horizontal rows, desktop nav is text-only and centered, and the header divider spans the full viewport.
-- Reduced mobile home component scale for the recurring oversized primitive issue: mobile metric cards, metric icons, pending avatars, section title, and stage status icons are now smaller while desktop keeps its own sizing.
-- Final captures show no console errors, no failed resource responses, no horizontal overflow, no header collisions, and matching core admin-home hierarchy.
+- Expanded and collapsed registration states render independently.
+- Individual document approval updates readiness and enables normal registration approval.
+- Successful approval removes the registration from its queue and refreshes capacity.
+- Waiting-for-documents approval opens an explicit override confirmation.
+- Permanent removal opens a distinct destructive confirmation.
+- Payment-method controls update child-specific applicability.
+- Empty queue states are present.
+- No framework error overlay or browser console errors were detected.
 
-Final result: passed
+## Comparison History
+
+1. Initial comparison found the child-capacity ratio visually reversed by bidirectional text. Added explicit LTR direction for the ratio.
+2. The 320px check found the ratio wrapping to two lines. Tightened only the mobile metric-card spacing and icon size; the revised capture keeps `42 / 60` on one line with no horizontal overflow.
+
+## Findings
+
+No actionable P0, P1, or P2 visual differences remain. The larger content height versus the available mock is expected because SDS v9 adds two independent expandable work queues and detailed child/document controls.
+
+Focused-region comparison was performed on the header, metric grid, queue heading, expanded parent row, child payment control, and document-action rows because those surfaces carry the primary fidelity and behavior requirements.
+
+final result: passed

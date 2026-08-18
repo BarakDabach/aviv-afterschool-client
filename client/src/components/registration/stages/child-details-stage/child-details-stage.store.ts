@@ -1,7 +1,7 @@
 import { computed, effect, inject, signal, untracked } from '@angular/core';
 import { applyEach, applyWhen, form, schema, validate, type FieldTree } from '@angular/forms/signals';
 import { signalStore, withComputed, withHooks, withMethods, withProps } from '@ngrx/signals';
-import { AllergyAnswer, Gender, type RegistrationChildDraft } from '../../../../app/types/registration-status.type';
+import { AllergyAnswer, Gender, PaymentMethod, type RegistrationChildDraft } from '../../../../app/types/registration-status.type';
 import { RegistrationStore } from '../../registration.store';
 
 type ChildDetailsFormModel = RegistrationChildDraft[];
@@ -196,6 +196,7 @@ function createEmptyChild(id: number, selectedYearPlanId: number | null): Regist
     allergyAnswer: AllergyAnswer.No,
     allergyDetails: '',
     selectedYearPlanId,
+    paymentMethod: PaymentMethod.Cash,
   };
 }
 
@@ -212,6 +213,7 @@ function normalizeChildDraft(child: RegistrationChildDraft, defaultPlanId: numbe
     allergyAnswer: child.allergyAnswer === AllergyAnswer.Yes ? AllergyAnswer.Yes : AllergyAnswer.No,
     allergyDetails: child.allergyDetails ?? '',
     selectedYearPlanId: child.selectedYearPlanId ?? defaultPlanId,
+    paymentMethod: child.paymentMethod === PaymentMethod.StandingOrder ? PaymentMethod.StandingOrder : PaymentMethod.Cash,
   };
 }
 

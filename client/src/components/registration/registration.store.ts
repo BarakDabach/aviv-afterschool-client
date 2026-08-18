@@ -8,6 +8,7 @@ import {
   AllergyAnswer,
   DocumentType,
   Gender,
+  PaymentMethod,
   LOCAL_DRAFT_STATUS_DISPLAY,
   REGISTRATION_STATUS_DISPLAY,
   RegistrationDocumentScopeKind,
@@ -27,6 +28,7 @@ import {
 import { isValidEmail } from '../../app/utils/email.validation';
 import { isValidIsraeliMobilePhone } from '../shared/validations/phone.validation';
 import { hasMinimumTrimmedLength } from '../shared/validations/text.validation';
+import { ACTIVE_REGISTRATION_YEAR } from '../../app/config/registration.config';
 
 type RegistrationStep = {
   index: number;
@@ -62,8 +64,7 @@ type RegistrationDraftSnapshot = {
 };
 
 const fallbackYear: Year = {
-  id: 0,
-  yearNumber: 2027,
+  ...ACTIVE_REGISTRATION_YEAR,
 };
 
 const currencyFormatter = new Intl.NumberFormat('he-IL');
@@ -76,6 +77,7 @@ const createEmptyRegistrationChild = (id: number, selectedYearPlanId: number | n
   allergyAnswer: AllergyAnswer.No,
   allergyDetails: '',
   selectedYearPlanId,
+  paymentMethod: PaymentMethod.Cash,
 });
 
 const createEmptyParentDetails = (): ParentRegistrationDetails => ({
@@ -296,6 +298,7 @@ export const RegistrationStore = signalStore(
         allergyAnswer: child.allergyAnswer === AllergyAnswer.Yes ? AllergyAnswer.Yes : AllergyAnswer.No,
         allergyDetails: child.allergyDetails ?? '',
         selectedYearPlanId: child.selectedYearPlanId ?? store.availableYearPlans()[0]?.yearPlanId ?? null,
+        paymentMethod: child.paymentMethod === PaymentMethod.StandingOrder ? PaymentMethod.StandingOrder : PaymentMethod.Cash,
       }));
     };
     const registrationChildrenToDrafts = (registration: RegistrationState | null | undefined, defaultPlanId: number | null): RegistrationChildDraft[] | null => {
@@ -312,6 +315,7 @@ export const RegistrationStore = signalStore(
           allergyAnswer: allergies ? AllergyAnswer.Yes : AllergyAnswer.No,
           allergyDetails: allergies,
           selectedYearPlanId: childState.selectedPlan?.yearPlanId ?? defaultPlanId,
+          paymentMethod: childState.paymentMethod,
         };
       });
     };
@@ -539,6 +543,13 @@ export const RegistrationStore = signalStore(
 
         patchState(store, {
           children: store.children().map((child) => (child.id === childId ? { ...child, selectedYearPlanId: yearPlanId } : child)),
+        });
+      },
+      setPaymentMethod(childId: number, paymentMethod: PaymentMethod): void {
+        if (paymentMethod !== PaymentMethod.Cash && paymentMethod !== PaymentMethod.StandingOrder) return;
+
+        patchState(store, {
+          children: store.children().map((child) => (child.id === childId ? { ...child, paymentMethod } : child)),
         });
       },
       getPlanLabel(selectedYearPlanId: number | null): string {

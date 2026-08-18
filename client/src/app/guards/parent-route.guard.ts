@@ -61,6 +61,20 @@ export const parentAuthGuard: CanActivateFn = async (_route, state) => {
   return true;
 };
 
+export const adminAuthGuard: CanActivateFn = async (_route, state) => {
+  const globalStore = inject(GlobalStore);
+  const authFacade = inject(AuthFacade);
+  const router = inject(Router);
+
+  await ensureAuthSession(globalStore, authFacade);
+
+  if (!globalStore.loggedIn()) {
+    return router.createUrlTree(['/login'], { queryParams: { redirect: state.url } });
+  }
+
+  return globalStore.isAdmin() ? true : router.createUrlTree(['/home']);
+};
+
 export const parentRegistrationAvailabilityGuard: CanActivateFn = async () => {
   const globalStore = inject(GlobalStore);
   const authFacade = inject(AuthFacade);

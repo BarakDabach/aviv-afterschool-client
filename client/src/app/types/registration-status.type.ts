@@ -74,6 +74,16 @@ export enum DocumentType {
   StandingOrderApproval = 'StandingOrderApproval',
 }
 
+export enum DocumentReviewStatus {
+  PendingReview = 'PendingReview',
+  Approved = 'Approved',
+}
+
+export enum PaymentMethod {
+  Cash = 'Cash',
+  StandingOrder = 'StandingOrder',
+}
+
 export enum RegistrationDocumentScopeKind {
   AllChildren = 'AllChildren',
   SpecificChild = 'SpecificChild',
@@ -149,6 +159,7 @@ export interface RegistrationChildState {
   child: Child;
   selectedPlan: SelectedYearPlan | null;
   status: RegistrationChildStatus;
+  paymentMethod: PaymentMethod;
   leaveDate?: string | null;
   appliedDiscountPercent?: number;
   finalPrice?: number;
@@ -161,6 +172,8 @@ export interface RegistrationDocument {
   documentType: DocumentType;
   scope: RegistrationDocumentScope;
   uploadedAt: string;
+  reviewStatus: DocumentReviewStatus;
+  reviewedAt: string | null;
 }
 
 export interface RegistrationState {
@@ -171,6 +184,8 @@ export interface RegistrationState {
   children: RegistrationChildState[];
   documents: RegistrationDocument[];
   missingDocuments: MissingRegistrationDocument[];
+  createdAt: string;
+  submittedAt: string;
 }
 
 export interface ParentHome {
@@ -188,6 +203,7 @@ export interface RegistrationChildDraft {
   allergyAnswer: AllergyAnswer;
   allergyDetails: string;
   selectedYearPlanId: number | null;
+  paymentMethod: PaymentMethod;
 }
 
 export interface RegistrationDocumentDraft {
