@@ -159,7 +159,7 @@ export interface RegistrationChildState {
   child: Child;
   selectedPlan: SelectedYearPlan | null;
   status: RegistrationChildStatus;
-  paymentMethod: PaymentMethod;
+  paymentMethod?: PaymentMethod;
   leaveDate?: string | null;
   appliedDiscountPercent?: number;
   finalPrice?: number;
@@ -172,8 +172,8 @@ export interface RegistrationDocument {
   documentType: DocumentType;
   scope: RegistrationDocumentScope;
   uploadedAt: string;
-  reviewStatus: DocumentReviewStatus;
-  reviewedAt: string | null;
+  reviewStatus?: DocumentReviewStatus;
+  reviewedAt?: string | null;
 }
 
 export interface RegistrationState {
@@ -184,8 +184,8 @@ export interface RegistrationState {
   children: RegistrationChildState[];
   documents: RegistrationDocument[];
   missingDocuments: MissingRegistrationDocument[];
-  createdAt: string;
-  submittedAt: string;
+  createdAt?: string;
+  submittedAt?: string;
 }
 
 export interface ParentHome {
@@ -203,7 +203,7 @@ export interface RegistrationChildDraft {
   allergyAnswer: AllergyAnswer;
   allergyDetails: string;
   selectedYearPlanId: number | null;
-  paymentMethod: PaymentMethod;
+  paymentMethod?: PaymentMethod;
 }
 
 export interface RegistrationDocumentDraft {

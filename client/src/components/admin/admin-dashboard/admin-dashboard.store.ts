@@ -206,7 +206,7 @@ export const AdminDashboardStore = signalStore(
 );
 
 async function runMutation(
-  store: InstanceType<typeof AdminDashboardStore>,
+  store: any,
   registrationId: number,
   operation: () => Promise<unknown>,
   successMessage: string,

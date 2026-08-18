@@ -125,7 +125,7 @@ export class MockDataService extends DataService {
         },
         selectedPlan,
         status: RegistrationChildStatus.Active,
-        paymentMethod: child.paymentMethod,
+        paymentMethod: child.paymentMethod ?? (selectedPlan?.plan.requiresStandingOrder ? PaymentMethod.StandingOrder : PaymentMethod.Cash),
         leaveDate: null,
         appliedDiscountPercent: discountPercent,
         finalPrice: Math.round(planPrice * (1 - discountPercent / 100)),
@@ -341,7 +341,7 @@ export class MockDataService extends DataService {
       id: document.id,
       type: document.documentType,
       fileName: document.fileName,
-      reviewStatus: document.reviewStatus,
+      reviewStatus: document.reviewStatus ?? null,
       coversChildren,
     };
   }
@@ -407,7 +407,7 @@ function isSameDocumentRequirement(document: RegistrationDocument, documentType:
 }
 
 function compareRegistrations(left: RegistrationState, right: RegistrationState): number {
-  return right.submittedAt.localeCompare(left.submittedAt) || right.id - left.id;
+  return (right.submittedAt ?? '').localeCompare(left.submittedAt ?? '') || right.id - left.id;
 }
 
 function clone<T>(value: T): T {
