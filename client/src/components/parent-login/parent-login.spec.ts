@@ -76,13 +76,13 @@ describe('ParentLogin', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    const otpInput = compiled.querySelector('input[aria-label="קוד אימות"]') as HTMLInputElement;
+    const otpInput = compiled.querySelector('#login-otp-input') as HTMLInputElement;
     setInputValue(otpInput, '12');
     otpInput.dispatchEvent(new Event('blur'));
     fixture.detectChanges();
 
     expect(compiled.textContent).toContain('קוד האימות צריך להכיל 6 ספרות');
-    expect(otpInput.getAttribute('aria-invalid')).toBe('true');
+    expect(compiled.querySelector('brn-input-otp')?.getAttribute('aria-invalid')).toBe('true');
   });
 
   it('moves from email entry to OTP verification and signs in a parent', async () => {
@@ -99,10 +99,10 @@ describe('ParentLogin', () => {
 
     expect(compiled.textContent).toContain('קוד אימות');
     expect(compiled.textContent).toContain('שליחה מחדש בעוד');
-    expect(compiled.textContent).not.toContain('שינוי כתובת אימייל');
+    expect(compiled.textContent).toContain('שינוי כתובת אימייל');
     expect(compiled.textContent).not.toContain('הקוד נשלח אל');
 
-    const otpInput = compiled.querySelector('input[aria-label="קוד אימות"]') as HTMLInputElement;
+    const otpInput = compiled.querySelector('#login-otp-input') as HTMLInputElement;
     setInputValue(otpInput, '123456');
     fixture.detectChanges();
 

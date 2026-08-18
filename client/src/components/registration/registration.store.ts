@@ -18,6 +18,7 @@ import {
   type ParentRegistrationDetails,
   type RegistrationChildDraft,
   type RegistrationDocumentDraft,
+  type RegistrationDocument,
   type RegistrationDocumentScope,
   type RegistrationSelectedFile,
   type RegistrationState,
@@ -265,6 +266,7 @@ export const RegistrationStore = signalStore(
       contractScope,
       standingOrderScope,
       requiresStandingOrderDocuments,
+      hasSelectedMissingDocumentFiles: computed(() => selectedFiles().length > 0),
       selectedFileCount,
       uploadedDraftDocuments,
       submittedSubtotal,
@@ -393,6 +395,16 @@ export const RegistrationStore = signalStore(
       selectedFiles: RegistrationSelectedFile[],
       documentType: DocumentType,
     ): RegistrationSelectedFile[] => selectedFiles.filter((selectedFile) => selectedFile.documentType !== documentType);
+    const documentRequirementKey = (documentType: DocumentType, scope: RegistrationDocumentScope): string => {
+      const scopeKey = scope.kind === RegistrationDocumentScopeKind.AllChildren
+        ? RegistrationDocumentScopeKind.AllChildren
+        : `${RegistrationDocumentScopeKind.SpecificChild}:${scope.localChildId}`;
+
+      return `${documentType}:${scopeKey}`;
+    };
+    const selectedFileKey = (selectedFile: RegistrationSelectedFile): string => {
+      return documentRequirementKey(selectedFile.documentType, selectedFile.scope);
+    };
 
     return {
       async initialize(): Promise<void> {
@@ -642,6 +654,76 @@ export const RegistrationStore = signalStore(
           input.value = '';
         }
       },
+      selectMissingDocumentFile(missingDocument: MissingRegistrationDocument | RegistrationDocument, event: Event): void {
+        const submittedRegistration = store.submittedRegistration();
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+
+        if (!submittedRegistration || submittedRegistration.status !== RegistrationStatus.WaitingForDocuments || !file) return;
+
+        const nextFile: RegistrationSelectedFile = {
+          documentType: missingDocument.documentType,
+          scope: missingDocument.scope,
+          file,
+        };
+        const nextKey = selectedFileKey(nextFile);
+
+        patchState(store, {
+          selectedFiles: [
+            ...store.selectedFiles().filter((selectedFile) => selectedFileKey(selectedFile) !== nextKey),
+            nextFile,
+          ],
+          error: null,
+        });
+
+        input.value = '';
+      },
+      removeMissingDocumentFile(missingDocument: MissingRegistrationDocument | RegistrationDocument): void {
+        const key = documentRequirementKey(missingDocument.documentType, missingDocument.scope);
+
+        patchState(store, {
+          selectedFiles: store.selectedFiles().filter((selectedFile) => selectedFileKey(selectedFile) !== key),
+        });
+      },
+      missingDocumentFileName(missingDocument: MissingRegistrationDocument | RegistrationDocument): string {
+        const key = documentRequirementKey(missingDocument.documentType, missingDocument.scope);
+
+        return store.selectedFiles().find((selectedFile) => selectedFileKey(selectedFile) === key)?.file.name ?? '';
+      },
+      async saveMissingDocuments(): Promise<void> {
+        const submittedRegistration = store.submittedRegistration();
+        const selectedFiles = store.selectedFiles();
+
+        if (!submittedRegistration || submittedRegistration.status !== RegistrationStatus.WaitingForDocuments || selectedFiles.length === 0) return;
+
+        patchState(store, { loading: true, error: null });
+
+        try {
+          let updatedRegistration = submittedRegistration;
+
+          for (const selectedFile of selectedFiles) {
+            updatedRegistration = await store.parentFacade.uploadRegistrationDocument({
+              registrationId: submittedRegistration.id,
+              documentType: selectedFile.documentType,
+              scope: selectedFile.scope,
+              file: selectedFile.file,
+            });
+          }
+
+          patchState(store, {
+            submittedRegistration: updatedRegistration,
+            selectedFiles: [],
+            loading: false,
+          });
+          store.notifications.success('המסמכים נשמרו בהצלחה.');
+        } catch (error) {
+          store.notifications.error(error instanceof Error ? error.message : 'לא הצלחנו להעלות את המסמך.');
+          patchState(store, {
+            loading: false,
+            error: error instanceof Error ? error.message : 'לא הצלחנו להעלות את המסמך.',
+          });
+        }
+      },
       sharedScope(): RegistrationDocumentScope {
         return { kind: RegistrationDocumentScopeKind.AllChildren };
       },
@@ -706,6 +788,7 @@ export const RegistrationStore = signalStore(
             activeStep: store.steps.length - 1,
             submittedRegistration,
             savedDraft: null,
+            selectedFiles: [],
             loading: false,
           });
           store.notifications.success('ההרשמה נשלחה בהצלחה.');

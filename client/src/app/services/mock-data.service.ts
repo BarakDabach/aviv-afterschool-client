@@ -206,21 +206,6 @@ export class MockDataService extends DataService {
     const nextPaymentMethod = request.isCashOnly ? PaymentMethod.Cash : PaymentMethod.StandingOrder;
     if (child.paymentMethod === nextPaymentMethod) return clone(registration);
 
-    const requiresMissingStandingOrder =
-      registration.status === RegistrationStatus.PendingApproval &&
-      nextPaymentMethod === PaymentMethod.StandingOrder &&
-      child.selectedPlan?.plan.requiresStandingOrder === true &&
-      !registration.documents.some((document) => {
-        return document.documentType === DocumentType.StandingOrderApproval
-          && document.scope.kind === RegistrationDocumentScopeKind.SpecificChild
-          && document.scope.localChildId === child.id
-          && document.fileName;
-      });
-
-    if (requiresMissingStandingOrder) {
-      throw new Error('לא ניתן לעבור להוראת קבע לאחר שההרשמה עברה לאישור ללא מסמך מתאים.');
-    }
-
     const documents = nextPaymentMethod === PaymentMethod.Cash
       ? registration.documents.filter((document) => {
           return !(document.documentType === DocumentType.StandingOrderApproval
@@ -258,6 +243,13 @@ export class MockDataService extends DataService {
 
   override async approveAdminRegistration(request: AdminRegistrationActionRequest): Promise<RegistrationState> {
     const registration = this.requireRegistration(request.registrationId);
+
+    if (registration.status === RegistrationStatus.WaitingForDocuments) {
+      const updatedRegistration = { ...registration, status: RegistrationStatus.Approved };
+      this.registrations.set(updatedRegistration.id, updatedRegistration);
+      return clone(updatedRegistration);
+    }
+
     const readyRegistration = this.withCalculatedRequirements(registration);
 
     if (readyRegistration.status !== RegistrationStatus.PendingApproval || !this.isApprovalReady(readyRegistration)) {

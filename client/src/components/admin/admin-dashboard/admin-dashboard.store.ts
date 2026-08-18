@@ -88,8 +88,8 @@ export const AdminDashboardStore = signalStore(
       }),
     };
   }),
-  withMethods((store) => ({
-    async load(): Promise<void> {
+  withMethods((store) => {
+    const loadDashboard = async (): Promise<void> => {
       patchState(store, { loading: true, error: null });
 
       try {
@@ -100,104 +100,113 @@ export const AdminDashboardStore = signalStore(
           error: errorMessage(error, 'לא ניתן לטעון את נתוני לוח הניהול.'),
         });
       }
-    },
-    setRegistrationExpanded(_queue: AdminQueue, registrationId: number, expanded: boolean): void {
-      const currentDashboard = store.dashboard();
-      if (!currentDashboard) return;
+    };
 
-      patchState(store, {
-        dashboard: {
-          ...currentDashboard,
-          registrations: currentDashboard.registrations.map((registration) =>
-            registration.registrationId === registrationId ? { ...registration, expanded } : registration,
-          ),
-        },
-      });
-    },
-    setPaymentMethod(_queue: AdminQueue, registrationId: number, childId: number, isCashOnly: boolean): Promise<void> {
-      return runMutation(
-        store,
-        registrationId,
-        () => store.adminFacade.setPaymentMethod({ registrationId, childId, isCashOnly }),
-        'אמצעי התשלום עודכן ודרישות המסמכים חושבו מחדש.',
-      );
-    },
-    approveDocument(_queue: AdminQueue, registrationId: number, documentId: number): Promise<void> {
-      return runMutation(
-        store,
-        registrationId,
-        () => store.adminFacade.approveDocument({ registrationId, documentId }),
-        'המסמך אושר בהצלחה.',
-      );
-    },
-    openDocument(document: AdminDocument): void {
-      if (document.fileName) store.notifications.info(`פתיחת ${document.fileName}`);
-    },
-    requestApproval(queue: AdminQueue, registration: AdminRegistration): void {
-      if (queue === 'waitingForDocuments') {
+    return {
+      load: loadDashboard,
+      setRegistrationExpanded(_queue: AdminQueue, registrationId: number, expanded: boolean): void {
+        const currentDashboard = store.dashboard();
+        if (!currentDashboard) return;
+
+        patchState(store, {
+          dashboard: {
+            ...currentDashboard,
+            registrations: currentDashboard.registrations.map((registration) =>
+              registration.registrationId === registrationId ? { ...registration, expanded } : registration,
+            ),
+          },
+        });
+      },
+      setPaymentMethod(_queue: AdminQueue, registrationId: number, childId: number, isCashOnly: boolean): Promise<void> {
+        return runMutation(
+          store,
+          registrationId,
+          () => store.adminFacade.setPaymentMethod({ registrationId, childId, isCashOnly }),
+          'אמצעי התשלום עודכן ודרישות המסמכים חושבו מחדש.',
+          loadDashboard,
+        );
+      },
+      approveDocument(_queue: AdminQueue, registrationId: number, documentId: number): Promise<void> {
+        return runMutation(
+          store,
+          registrationId,
+          () => store.adminFacade.approveDocument({ registrationId, documentId }),
+          'המסמך אושר בהצלחה.',
+          loadDashboard,
+        );
+      },
+      openDocument(document: AdminDocument): void {
+        if (document.fileName) store.notifications.info(`פתיחת ${document.fileName}`);
+      },
+      requestApproval(queue: AdminQueue, registration: AdminRegistration): void {
+        if (queue === 'waitingForDocuments') {
+          patchState(store, {
+            confirmation: {
+              kind: 'override',
+              registrationId: registration.registrationId,
+              parentFullName: registration.parentFullName,
+            },
+          });
+          return;
+        }
+
+        if (!registration.approvalReady) {
+          store.notifications.warning('אפשר לאשר את ההרשמה רק לאחר אישור כל המסמכים הרלוונטיים.');
+          return;
+        }
+
+        void runMutation(
+          store,
+          registration.registrationId,
+          () => store.adminFacade.approveRegistration({ registrationId: registration.registrationId }),
+          'ההרשמה אושרה והוסרה מתור העבודה.',
+          loadDashboard,
+        );
+      },
+      requestRemoval(_queue: AdminQueue, registration: AdminRegistration): void {
         patchState(store, {
           confirmation: {
-            kind: 'override',
+            kind: 'remove',
             registrationId: registration.registrationId,
             parentFullName: registration.parentFullName,
           },
         });
-        return;
-      }
+      },
+      async confirmAction(): Promise<void> {
+        const confirmation = store.confirmation();
+        if (!confirmation) return;
+        patchState(store, { confirmation: null });
 
-      if (!registration.approvalReady) {
-        store.notifications.warning('אפשר לאשר את ההרשמה רק לאחר אישור כל המסמכים הרלוונטיים.');
-        return;
-      }
+        if (confirmation.kind === 'override') {
+          await runMutation(
+            store,
+            confirmation.registrationId,
+            () => store.adminFacade.approveRegistration({ registrationId: confirmation.registrationId }),
+            'ההרשמה אושרה והוסרה מתור העבודה.',
+            loadDashboard,
+          );
+          return;
+        }
 
-      void runMutation(
-        store,
-        registration.registrationId,
-        () => store.adminFacade.approveRegistration({ registrationId: registration.registrationId }),
-        'ההרשמה אושרה והוסרה מתור העבודה.',
-      );
-    },
-    requestRemoval(_queue: AdminQueue, registration: AdminRegistration): void {
-      patchState(store, {
-        confirmation: {
-          kind: 'remove',
-          registrationId: registration.registrationId,
-          parentFullName: registration.parentFullName,
-        },
-      });
-    },
-    async confirmAction(): Promise<void> {
-      const confirmation = store.confirmation();
-      if (!confirmation) return;
-      patchState(store, { confirmation: null });
-
-      if (confirmation.kind === 'override') {
         await runMutation(
           store,
           confirmation.registrationId,
-          () => store.adminFacade.approveRegistration({ registrationId: confirmation.registrationId }),
-          'ההרשמה אושרה והוסרה מתור העבודה.',
+          () => store.adminFacade.removeRegistration({ registrationId: confirmation.registrationId }),
+          'ההרשמה הוסרה לצמיתות.',
+          loadDashboard,
         );
-        return;
-      }
-
-      await runMutation(
-        store,
-        confirmation.registrationId,
-        () => store.adminFacade.removeRegistration({ registrationId: confirmation.registrationId }),
-        'ההרשמה הוסרה לצמיתות.',
-      );
-    },
-    dismissConfirmation(): void {
-      patchState(store, { confirmation: null });
-    },
-    documentLabel(type: AdminDocument['type']): string {
-      return type === 'SignedContract' ? 'חוזה חתום' : 'אישור הוראת קבע';
-    },
-    billingLabel(period: AdminRegistration['children'][number]['billingPeriod']): string {
-      return period === 'Monthly' ? 'חיוב חודשי' : 'חיוב יומי';
-    },
-  })),
+      },
+      dismissConfirmation(): void {
+        patchState(store, { confirmation: null });
+      },
+      documentLabel(type: AdminDocument['type']): string {
+        return type === 'SignedContract' ? 'חוזה חתום' : 'אישור הוראת קבע';
+      },
+      billingLabel(period: AdminRegistration['children'][number]['billingPeriod']): string {
+        return period === 'Monthly' ? 'חיוב חודשי' : 'חיוב יומי';
+      },
+    };
+  }),
   withHooks((store) => ({
     onInit(): void {
       void store.load();
@@ -210,13 +219,14 @@ async function runMutation(
   registrationId: number,
   operation: () => Promise<unknown>,
   successMessage: string,
+  reload: () => Promise<void>,
 ): Promise<void> {
   if (store.busyRegistrationId() !== null) return;
 
   patchState(store, { busyRegistrationId: registrationId, error: null });
   try {
     await operation();
-    await store.load();
+    await reload();
     store.notifications.success(successMessage);
   } catch (error) {
     patchState(store, { error: errorMessage(error, 'לא ניתן להשלים את הפעולה.') });

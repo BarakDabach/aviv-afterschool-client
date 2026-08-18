@@ -44,7 +44,7 @@
             <h2 id="waiting-documents-title" class="m-0 text-[length:var(--app-section-title-size)] font-black text-brand">ממתינות למסמכים</h2>
             <p class="mt-1 mb-0 text-[length:var(--app-body-size)] text-muted-foreground">הרשמות שטרם הושלמו מסמכים נדרשים</p>
           </div>
-          <span class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-full bg-primary/15 px-2 text-[length:var(--app-body-size)] font-black text-primary">
+          <span class="inline-flex min-h-[var(--app-chip-height)] min-w-[var(--app-chip-height)] items-center justify-center rounded-full bg-primary/15 px-2.5 text-[length:var(--app-body-size)] font-black text-primary">
             {{ store.waitingForDocumentsRegistrations().length }}
           </span>
         </div>
@@ -72,7 +72,7 @@
             <h2 id="pending-approval-title" class="m-0 text-[length:var(--app-section-title-size)] font-black text-brand">ממתינות לאישור</h2>
             <p class="mt-1 mb-0 text-[length:var(--app-body-size)] text-muted-foreground">הרשמות שהעלאותיהן הושלמו וממתינות להחלטה</p>
           </div>
-          <span class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-full bg-surface-sage px-2 text-[length:var(--app-body-size)] font-black text-brand">
+          <span class="inline-flex min-h-[var(--app-chip-height)] min-w-[var(--app-chip-height)] items-center justify-center rounded-full bg-surface-sage px-2.5 text-[length:var(--app-body-size)] font-black text-brand">
             {{ store.pendingApprovalRegistrations().length }}
           </span>
         </div>
@@ -163,15 +163,16 @@
           }
         </div>
       </div>
-      <span class="grid h-8 w-8 place-items-center rounded-[var(--app-control-radius)] text-brand">
-        <ng-icon [name]="registration.expanded ? 'lucideChevronUp' : 'lucideChevronDown'" class="h-4 w-4" />
+      <span class="grid h-10 w-10 place-items-center rounded-[var(--app-control-radius)] text-brand sm:h-8 sm:w-8">
+        <ng-icon [name]="registration.expanded ? 'lucideChevronUp' : 'lucideChevronDown'" class="h-5 w-5 sm:h-4 sm:w-4" />
       </span>
     </button>
 
     <div
       brnCollapsibleContent
-      class="max-h-[var(--brn-collapsible-content-height)] overflow-hidden border-t border-border px-4 pt-6 pb-5 opacity-100 transition-[max-height,opacity,padding-top,padding-bottom,border-color] duration-300 ease-out data-[state=closed]:max-h-0 data-[state=closed]:border-transparent data-[state=closed]:py-0 data-[state=closed]:opacity-0 lg:px-7 lg:pt-7 lg:pb-7"
+      class="max-h-[var(--brn-collapsible-content-height)] overflow-hidden opacity-100 transition-[max-height,opacity] duration-300 ease-out data-[state=closed]:max-h-0 data-[state=closed]:opacity-0"
     >
+      <div class="border-t border-border px-4 pt-6 pb-5 lg:px-7 lg:pt-7 lg:pb-7" (click)="$event.stopPropagation()" (pointerdown)="$event.stopPropagation()">
         @if (registration.sharedDocuments.length) {
           <section class="mb-8" aria-label="מסמכים משותפים">
             <div class="mb-2">
@@ -192,7 +193,7 @@
               class="mx-auto w-full max-w-[34rem] border-t border-border pt-8 first:border-t-0 first:pt-0 lg:border-t-0 lg:pt-0"
               [attr.aria-label]="'פרטי ' + child.fullName"
             >
-              <div class="flex min-h-7 flex-wrap items-center justify-between gap-2">
+              <div class="flex min-h-8 flex-wrap items-center justify-between gap-2">
                 <h4 class="m-0 inline-flex items-center gap-1.5 text-[length:var(--app-card-title-size)] font-black text-brand">
                   <img
                     class="h-7 w-7 shrink-0 object-contain"
@@ -219,19 +220,19 @@
                   <div class="inline-grid grid-cols-2 overflow-hidden rounded-[var(--app-control-radius)] border border-border bg-background" role="group" aria-label="אמצעי תשלום">
                     <button
                       type="button"
-                      class="inline-flex min-h-8 items-center justify-center gap-1 border-0 px-2 text-[length:var(--app-muted-size)] font-bold transition-[background-color,color,box-shadow,transform] duration-200 ease-out active:scale-[0.97]"
+                      class="inline-flex min-h-10 items-center justify-center gap-1.5 border-0 px-3 text-[length:var(--app-muted-size)] font-bold transition-[background-color,color,box-shadow,transform] duration-200 ease-out active:scale-[0.97] sm:min-h-8 sm:px-2"
                       [class.bg-brand]="child.isCashOnly"
                       [class.text-brand-foreground]="child.isCashOnly"
-                      (click)="store.setPaymentMethod(queue, registration.registrationId, child.registrationChildId, true)"
+                      (click)="$event.stopPropagation(); store.setPaymentMethod(queue, registration.registrationId, child.registrationChildId, true)"
                     >
                       <ng-icon name="lucideBanknote" class="h-3 w-3" /> מזומן
                     </button>
                     <button
                       type="button"
-                      class="inline-flex min-h-8 items-center justify-center gap-1 border-0 border-s border-border px-2 text-[length:var(--app-muted-size)] font-bold transition-[background-color,color,box-shadow,transform] duration-200 ease-out active:scale-[0.97]"
+                      class="inline-flex min-h-10 items-center justify-center gap-1.5 border-0 border-s border-border px-3 text-[length:var(--app-muted-size)] font-bold transition-[background-color,color,box-shadow,transform] duration-200 ease-out active:scale-[0.97] sm:min-h-8 sm:px-2"
                       [class.bg-brand]="!child.isCashOnly"
                       [class.text-brand-foreground]="!child.isCashOnly"
-                      (click)="store.setPaymentMethod(queue, registration.registrationId, child.registrationChildId, false)"
+                      (click)="$event.stopPropagation(); store.setPaymentMethod(queue, registration.registrationId, child.registrationChildId, false)"
                     >
                       <ng-icon name="lucideLandmark" class="h-3 w-3" /> הוראת קבע
                     </button>
@@ -257,9 +258,9 @@
           <button
             hlmBtn
             type="button"
-            class="h-8 rounded-[var(--app-control-radius)] bg-primary px-3 text-[length:var(--app-muted-size)] font-black text-primary-foreground disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground sm:min-w-48 sm:flex-none"
+            class="h-[var(--app-button-height)] rounded-[var(--app-control-radius)] bg-primary px-4 text-[length:var(--app-button-size)] font-black text-primary-foreground disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground sm:h-8 sm:min-w-48 sm:flex-none sm:px-3 sm:text-[length:var(--app-muted-size)]"
             [disabled]="store.busyRegistrationId() === registration.registrationId || (queue === 'pendingApproval' && !registration.approvalReady)"
-            (click)="store.requestApproval(queue, registration)"
+            (click)="$event.stopPropagation(); store.requestApproval(queue, registration)"
           >
             @if (store.busyRegistrationId() === registration.registrationId) {
               <ng-icon name="lucideLoaderCircle" class="h-3.5 w-3.5 animate-spin" />
@@ -272,21 +273,22 @@
             hlmBtn
             variant="outline"
             type="button"
-            class="h-8 rounded-[var(--app-control-radius)] border-destructive px-3 text-[length:var(--app-muted-size)] font-bold text-destructive sm:min-w-36 sm:flex-none"
+            class="h-[var(--app-button-height)] rounded-[var(--app-control-radius)] border-destructive px-4 text-[length:var(--app-button-size)] font-bold text-destructive sm:h-8 sm:min-w-36 sm:flex-none sm:px-3 sm:text-[length:var(--app-muted-size)]"
             [disabled]="store.busyRegistrationId() === registration.registrationId"
-            (click)="store.requestRemoval(queue, registration)"
+            (click)="$event.stopPropagation(); store.requestRemoval(queue, registration)"
           >
             <ng-icon name="lucideTrash2" class="h-3.5 w-3.5" /> הסרה לצמיתות
           </button>
         </div>
+      </div>
     </div>
   </article>
 </ng-template>
 
 <ng-template #documentRow let-document="document" let-registration="registration" let-queue="queue">
-  <div class="grid min-h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b border-border/60 px-1 py-3 last:border-b-0 sm:gap-3 lg:px-2">
+  <div class="grid min-h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-border/60 px-1 py-3.5 last:border-b-0 sm:min-h-14 sm:gap-3 sm:py-3 lg:px-2">
     <span
-      class="grid h-9 w-9 place-items-center rounded-[var(--app-control-radius)]"
+      class="grid h-10 w-10 place-items-center rounded-[var(--app-control-radius)] sm:h-9 sm:w-9"
       [ngClass]="document.fileName ? 'bg-surface-sage/70 text-brand' : 'bg-primary/12 text-primary'"
     >
       <ng-icon [name]="document.fileName ? 'lucideFileText' : 'lucideCircleAlert'" class="h-4 w-4" />
@@ -310,10 +312,10 @@
           hlmBtn
           variant="ghost"
           type="button"
-          class="h-8 w-fit shrink-0 px-2 text-[length:var(--app-muted-size)] font-bold text-brand"
+          class="h-10 w-fit shrink-0 px-3 text-[length:var(--app-muted-size)] font-bold text-brand sm:h-8 sm:px-2"
           aria-label="פתיחת מסמך"
           title="פתיחת מסמך"
-          (click)="store.openDocument(document)"
+          (click)="$event.stopPropagation(); store.openDocument(document)"
         >
           פתח
         </button>
@@ -321,10 +323,10 @@
           hlmBtn
           variant="outline"
           type="button"
-          class="h-8 w-fit shrink-0 border-border px-2 text-[length:var(--app-muted-size)] font-bold text-success transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:border-success hover:bg-success hover:text-white focus-visible:ring-2 focus-visible:ring-success/40 active:scale-[0.97]"
+          class="h-10 w-fit shrink-0 border-border px-3 text-[length:var(--app-muted-size)] font-bold text-success transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:border-success hover:bg-success hover:text-white focus-visible:ring-2 focus-visible:ring-success/40 active:scale-[0.97] sm:h-8 sm:px-2"
           aria-label="אשר את המסמך"
           title="אשר את המסמך"
-          (click)="store.approveDocument(queue, registration.registrationId, document.id)"
+          (click)="$event.stopPropagation(); store.approveDocument(queue, registration.registrationId, document.id)"
         >
           אשר
         </button>

@@ -26,6 +26,11 @@ import { injectHlmDatePickerConfig } from './hlm-date-picker.token';
       [value]="_inputValue()"
       [id]="inputId()"
       [placeholder]="placeholder()"
+      [attr.inputmode]="inputMode()"
+      [attr.enterkeyhint]="enterKeyHint()"
+      [attr.autocomplete]="autoComplete()"
+      [attr.aria-describedby]="ariaDescribedBy()"
+      [attr.aria-required]="ariaRequired()"
       [disabled]="_disabled()"
       [forceInvalid]="forceInvalid()"
       [attr.aria-invalid]="_ariaInvalid()"
@@ -46,6 +51,7 @@ import { injectHlmDatePickerConfig } from './hlm-date-picker.token';
           hlmInputGroupButton
           size="icon-xs"
           variant="ghost"
+          data-focus-next-skip
           [attr.aria-label]="clearAriaLabel()"
           (click)="_clear()"
           [disabled]="_disabled()"
@@ -56,6 +62,7 @@ import { injectHlmDatePickerConfig } from './hlm-date-picker.token';
       <button
         hlmInputGroupButton
         size="icon-xs"
+        data-focus-next-skip
         [attr.aria-label]="calendarAriaLabel()"
         (click)="_popover().open()"
         [disabled]="_disabled()"
@@ -76,7 +83,7 @@ export class HlmDatePickerInput<T> extends BrnDateInput<T> implements BrnDatePic
   protected readonly _dirty = this._fieldControl?.dirty;
   protected readonly _touched = this._fieldControl?.touched;
 
-  protected readonly _ariaInvalid = computed(() => (this._invalid?.() ? 'true' : null));
+  protected readonly _ariaInvalid = computed(() => (this.forceInvalid() || this._invalid?.() ? 'true' : null));
 
   /**
    * Parses input text into a date value. Return `null` for invalid
@@ -94,6 +101,11 @@ export class HlmDatePickerInput<T> extends BrnDateInput<T> implements BrnDatePic
    * Defaults to `formatInputDate` from `HlmDatePickerConfig`.
    */
   public readonly formatInputDate = input<(date: T) => string>(this._config.formatInputDate);
+  public readonly inputMode = input<string | null>(null);
+  public readonly enterKeyHint = input<string | null>(null);
+  public readonly autoComplete = input<string | null>(null);
+  public readonly ariaDescribedBy = input<string | null>(null);
+  public readonly ariaRequired = input<string | null>(null, { alias: 'aria-required' });
 
   protected parseValue(value: string): T | null {
     return this.parseDate()(value);

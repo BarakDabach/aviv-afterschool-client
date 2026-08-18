@@ -42,7 +42,28 @@
       <app-documents-stage />
     }
     @case (3) {
-      <app-summary-stage />
+      @if (store.submittedRegistration(); as registration) {
+        <app-registration-details-view
+          [registration]="registration"
+          [status]="store.registrationStatus()"
+          [showBackLink]="false"
+          [loading]="store.loading()"
+          [hasSelectedMissingDocumentFiles]="store.hasSelectedMissingDocumentFiles()"
+          [saveButtonLabel]="'שמירת מסמכים'"
+          [savingButtonLabel]="'שומרים מסמכים'"
+          [missingDocumentFileName]="store.missingDocumentFileName"
+          (missingDocumentSelected)="store.selectMissingDocumentFile($event.document, $event.event)"
+          (missingDocumentRemoved)="store.removeMissingDocumentFile($event)"
+          (missingDocumentsSaved)="store.saveMissingDocuments()"
+        />
+      } @else {
+        <section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[1rem]">
+          <article class="grid min-h-[4rem] grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-[var(--app-card-radius)] border border-border bg-card px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] text-start">
+            <ng-icon name="lucideCheck" class="h-7 w-7 text-brand" />
+            <p class="m-0 text-[length:var(--app-body-size)] leading-relaxed text-foreground/80">הטיוטה נשמרה בדפדפן הזה בלבד. אפשר לחזור מאוחר יותר ולהמשיך מאותה נקודה.</p>
+          </article>
+        </section>
+      }
     }
   }
 

@@ -3,6 +3,7 @@ import {
   AllergyAnswer,
   DocumentType,
   Gender,
+  PaymentMethod,
   RegistrationDraftStep,
   RegistrationDocumentScopeKind,
   RegistrationStatus,
@@ -294,6 +295,69 @@ describe('DataService', () => {
     expect(completed.status).toBe(RegistrationStatus.PendingApproval);
     expect(completed.missingDocuments).toHaveLength(0);
     expect(completed.documents.map((document) => document.fileName)).toEqual(['contract.pdf', 'standing-order.pdf']);
+  });
+
+  it('lets admins change payment type while a registration is waiting for documents', async () => {
+    const service = configureMockService();
+    const year = await service.getActiveRegistrationYear();
+    const plans = await service.getAvailableYearPlans();
+    const monthlyPlan = plans.find((yearPlan) => yearPlan.plan.requiresStandingOrder)!;
+    const draft = createDraft(year, monthlyPlan.yearPlanId, [
+      { id: 1, fullName: 'אורי לוי' },
+    ]);
+    const registration = await service.submitRegistration({
+      draft,
+      selectedFiles: [],
+    });
+
+    expect(registration.status).toBe(RegistrationStatus.WaitingForDocuments);
+
+    const cashRegistration = await service.setAdminPaymentMethod({
+      registrationId: registration.id,
+      childId: 1,
+      isCashOnly: true,
+    });
+
+    expect(cashRegistration.status).toBe(RegistrationStatus.WaitingForDocuments);
+    expect(cashRegistration.children[0].paymentMethod).toBe(PaymentMethod.Cash);
+    expect(cashRegistration.missingDocuments.map((document) => document.documentType)).toEqual([
+      DocumentType.SignedContract,
+    ]);
+
+    const standingOrderRegistration = await service.setAdminPaymentMethod({
+      registrationId: registration.id,
+      childId: 1,
+      isCashOnly: false,
+    });
+
+    expect(standingOrderRegistration.status).toBe(RegistrationStatus.WaitingForDocuments);
+    expect(standingOrderRegistration.children[0].paymentMethod).toBe(PaymentMethod.StandingOrder);
+    expect(standingOrderRegistration.missingDocuments.map((document) => document.documentType)).toEqual([
+      DocumentType.SignedContract,
+      DocumentType.StandingOrderApproval,
+    ]);
+  });
+
+  it('lets admins approve a registration that is still waiting for documents', async () => {
+    const service = configureMockService();
+    const year = await service.getActiveRegistrationYear();
+    const plans = await service.getAvailableYearPlans();
+    const draft = createDraft(year, plans[0].yearPlanId, [
+      { id: 1, fullName: 'אורי לוי' },
+    ]);
+    const registration = await service.submitRegistration({
+      draft,
+      selectedFiles: [],
+    });
+
+    expect(registration.status).toBe(RegistrationStatus.WaitingForDocuments);
+
+    const approvedRegistration = await service.approveAdminRegistration({
+      registrationId: registration.id,
+    });
+
+    expect(approvedRegistration.status).toBe(RegistrationStatus.Approved);
+    expect(approvedRegistration.missingDocuments).toHaveLength(2);
   });
 
   it('accepts document replacements while a registration is pending approval', async () => {

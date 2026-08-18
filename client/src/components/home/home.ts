@@ -19,11 +19,12 @@ import {
   lucideUsersRound,
 } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { RegistrationDetailsView } from '../shared/registration-details-view/registration-details-view';
 import { ParentHomeStore } from './home.store';
 
 @Component({
   selector: 'app-home',
-  imports: [NgClass, NgIcon, RouterLink, HlmButtonImports],
+  imports: [NgClass, NgIcon, RouterLink, HlmButtonImports, RegistrationDetailsView],
   providers: [
     ParentHomeStore,
     provideIcons({

@@ -113,34 +113,34 @@
   --surface-sage: oklch(0.32 0.052 142);
 }
 
-@media (max-width: 540px) {
+@media (max-width: 640px) {
   :root {
-    --app-screen-padding: 1.05rem;
-    --app-card-radius: 0.62rem;
-    --app-control-radius: 0.58rem;
-    --app-page-title-size: clamp(1.2rem, 5.5vw, 1.62rem);
-    --app-section-title-size: 0.9rem;
-    --app-card-title-size: 0.86rem;
-    --app-body-size: 0.72rem;
-    --app-muted-size: 0.64rem;
-    --app-button-size: 0.82rem;
-    --app-button-height: 2.42rem;
-    --app-field-height: 2.38rem;
-    --app-section-gap: 0.9rem;
-    --app-section-margin: 1.15rem;
-    --app-between-section-margin: 1.65rem;
-    --app-card-min-height: 4rem;
-    --app-card-padding-y: 0.62rem;
-    --app-card-padding-x: 0.72rem;
-    --app-card-gap: 0.58rem;
-    --app-chip-height: 1.42rem;
-    --app-secondary-button-height: 2.05rem;
-    --app-selection-size: 1.35rem;
-    --app-icon-xs: 0.72rem;
-    --app-icon-sm: 0.95rem;
-    --app-icon-md: 1.15rem;
-    --app-icon-lg: 1.85rem;
-    --app-icon-xl: 2.25rem;
+    --app-screen-padding: 1rem;
+    --app-card-radius: 0.66rem;
+    --app-control-radius: 0.62rem;
+    --app-page-title-size: 1.55rem;
+    --app-section-title-size: 1.12rem;
+    --app-card-title-size: 1rem;
+    --app-body-size: 0.94rem;
+    --app-muted-size: 0.82rem;
+    --app-button-size: 0.94rem;
+    --app-button-height: 2.75rem;
+    --app-field-height: 2.75rem;
+    --app-section-gap: 1rem;
+    --app-section-margin: 1.25rem;
+    --app-between-section-margin: 1.8rem;
+    --app-card-min-height: 4.5rem;
+    --app-card-padding-y: 0.78rem;
+    --app-card-padding-x: 0.9rem;
+    --app-card-gap: 0.72rem;
+    --app-chip-height: 1.7rem;
+    --app-secondary-button-height: 2.5rem;
+    --app-selection-size: 1.5rem;
+    --app-icon-xs: 0.82rem;
+    --app-icon-sm: 1.05rem;
+    --app-icon-md: 1.24rem;
+    --app-icon-lg: 1.95rem;
+    --app-icon-xl: 2.35rem;
   }
 }
 

@@ -19,13 +19,13 @@
   </section>
 
   @for (child of store.children(); track child.id; let index = $index) {
-    <section class="mt-5 grid gap-[0.7rem] rounded-[var(--app-card-radius)] border border-border p-6 text-start [direction:rtl] first:mt-0 max-[540px]:p-4">
+    <section class="mt-5 grid gap-[0.7rem] rounded-[var(--app-card-radius)] border border-border p-6 text-start [direction:rtl] first:mt-0 max-[540px]:p-4" data-focus-scope>
       @let childField = store.childField(index);
       <h2 class="inline-flex items-center justify-self-start gap-[0.55rem] text-start text-[length:var(--app-section-title-size)] font-extrabold text-brand after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']">פרטים אישיים - {{ store.childDisplayName(child, index) }}</h2>
       <div class="grid grid-cols-2 gap-[0.65rem] max-[540px]:grid-cols-1">
         <label class="grid gap-[0.3rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive" [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.childNameHasError(childField) }">
           <span>שם מלא של הילד</span>
-          <input hlmInput [formField]="childField.fullName" [placeholder]="index === 0 ? 'לדוגמה: אורי לוי' : 'שם מלא'" [attr.aria-label]="'שם מלא של ' + store.childDisplayName(child, index)" [attr.aria-invalid]="store.childNameHasError(childField)" [attr.aria-describedby]="store.childNameHasError(childField) ? 'child-name-error-' + child.id : null" />
+          <input hlmInput appFocusNextOnEnter [formField]="childField.fullName" autocomplete="off" enterkeyhint="next" aria-required="true" [placeholder]="index === 0 ? 'לדוגמה: אורי לוי' : 'שם מלא'" [attr.aria-label]="'שם מלא של ' + store.childDisplayName(child, index)" [attr.aria-invalid]="store.childNameHasError(childField)" [attr.aria-describedby]="store.childNameHasError(childField) ? 'child-name-error-' + child.id : null" />
           <small [id]="'child-name-error-' + child.id">{{ store.childNameError(childField) }}</small>
         </label>
         <label class="grid gap-[0.3rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive" [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.birthDateHasError(childField) }">
@@ -42,9 +42,15 @@
             (dateChange)="store.setBirthDate(childField, $event)"
           >
             <hlm-date-picker-input
+              appFocusNextOnEnter
               dir="rtl"
               [inputId]="'child-birth-date-' + child.id"
               placeholder="בחרו תאריך לידה"
+              [inputMode]="'numeric'"
+              [enterKeyHint]="'next'"
+              [autoComplete]="'bday'"
+              aria-required="true"
+              [ariaDescribedBy]="store.birthDateHasError(childField) ? 'child-birth-date-error-' + child.id : null"
               [openOnClick]="true"
               [forceInvalid]="store.birthDateHasError(childField)"
               [calendarAriaLabel]="'תאריך לידה של ' + store.childDisplayName(child, index)"
@@ -84,7 +90,7 @@
         @if (childField.allergyAnswer().value() === allergyAnswer.Yes) {
           <label class="grid gap-[0.3rem] pt-[0.2rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive" animate.enter="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-1 motion-safe:duration-200 motion-safe:ease-out" animate.leave="motion-safe:animate-out motion-safe:fade-out motion-safe:slide-out-to-top-1 motion-safe:duration-150 motion-safe:ease-in" [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.allergyDetailsHasError(childField) }">
             <span>פירוט אלרגיות או רגישויות</span>
-            <input hlmInput [formField]="childField.allergyDetails" placeholder="לדוגמה: רגישות לחלב" [attr.aria-label]="'פירוט אלרגיות או רגישויות עבור ' + store.childDisplayName(child, index)" [attr.aria-invalid]="store.allergyDetailsHasError(childField)" [attr.aria-describedby]="store.allergyDetailsHasError(childField) ? 'child-allergy-details-error-' + child.id : null" />
+            <input hlmInput appFocusNextOnEnter [formField]="childField.allergyDetails" autocomplete="off" enterkeyhint="done" placeholder="לדוגמה: רגישות לחלב" [attr.aria-label]="'פירוט אלרגיות או רגישויות עבור ' + store.childDisplayName(child, index)" [attr.aria-invalid]="store.allergyDetailsHasError(childField)" [attr.aria-describedby]="store.allergyDetailsHasError(childField) ? 'child-allergy-details-error-' + child.id : null" />
             <small [id]="'child-allergy-details-error-' + child.id">{{ store.allergyDetailsError(childField) }}</small>
           </label>
         }

@@ -1,22 +1,22 @@
 <section class="relative z-[1] mx-auto mt-[var(--app-section-margin)] grid w-[min(100%,var(--app-content-width))] gap-[var(--app-section-gap)]">
   <app-details-card iconName="lucideIdCard" title="פרטי ההורה הראשי" description="פרטי הקשר יישמרו כחלק מטיוטת ההרשמה המקומית עד השליחה." />
 
-  <section class="grid gap-[0.55rem] text-start [direction:rtl]">
+  <section class="grid gap-[0.55rem] text-start [direction:rtl]" data-focus-scope>
     <h2 class="inline-flex items-center justify-self-start gap-[0.55rem] text-start text-[length:var(--app-section-title-size)] font-extrabold text-brand after:inline-block after:h-[0.68rem] after:w-[1.65rem] after:bg-[url(/assets/section-leaf-divider.png)] after:bg-contain after:bg-center after:bg-no-repeat after:opacity-80 after:content-['']">פרטים אישיים</h2>
     <div class="grid grid-cols-2 gap-[0.65rem] max-[540px]:grid-cols-1">
       <label class="grid gap-[0.3rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive" [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.fullNameHasError() }">
         <span>שם מלא של ההורה</span>
-        <input hlmInput [formField]="store.parentForm.fullName" [attr.aria-invalid]="store.fullNameHasError()" [attr.aria-describedby]="store.fullNameHasError() ? 'parent-full-name-error' : null" aria-label="שם מלא של ההורה" />
+        <input hlmInput appFocusNextOnEnter [formField]="store.parentForm.fullName" autocomplete="name" enterkeyhint="next" aria-required="true" [attr.aria-invalid]="store.fullNameHasError()" [attr.aria-describedby]="store.fullNameHasError() ? 'parent-full-name-error' : null" aria-label="שם מלא של ההורה" />
         <small id="parent-full-name-error">{{ store.fullNameError() }}</small>
       </label>
       <label class="grid gap-[0.3rem] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive" [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.phoneHasError() }">
         <span>מספר טלפון נייד</span>
-        <input hlmInput [formField]="store.parentForm.phoneNumber" placeholder="05X-XXX-XXXX" [attr.aria-invalid]="store.phoneHasError()" [attr.aria-describedby]="store.phoneHasError() ? 'parent-phone-error' : null" aria-label="מספר טלפון נייד" />
+        <input hlmInput appFocusNextOnEnter [formField]="store.parentForm.phoneNumber" type="tel" inputmode="numeric" autocomplete="tel" enterkeyhint="next" placeholder="0501234567" dir="ltr" aria-required="true" [attr.aria-invalid]="store.phoneHasError()" [attr.aria-describedby]="store.phoneHasError() ? 'parent-phone-error' : null" aria-label="מספר טלפון נייד" />
         <small id="parent-phone-error">{{ store.phoneError() }}</small>
       </label>
       <label class="col-span-2 grid gap-[0.3rem] max-[540px]:col-span-1 [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:ltr] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive" [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.emailHasError() }">
         <span>אימייל</span>
-        <input hlmInput [formField]="store.parentForm.email" type="email" placeholder="parent@example.com" [attr.aria-invalid]="store.emailHasError()" [attr.aria-describedby]="store.emailHasError() ? 'parent-email-error' : null" aria-label="אימייל" />
+        <input hlmInput appFocusNextOnEnter [formField]="store.parentForm.email" type="email" inputmode="email" autocomplete="email" enterkeyhint="done" placeholder="parent@example.com" aria-required="true" [attr.aria-invalid]="store.emailHasError()" [attr.aria-describedby]="store.emailHasError() ? 'parent-email-error' : null" aria-label="אימייל" />
         <small id="parent-email-error">{{ store.emailError() }}</small>
       </label>
     </div>
