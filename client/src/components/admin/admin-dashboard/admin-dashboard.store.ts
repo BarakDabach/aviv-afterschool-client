@@ -8,6 +8,7 @@ import type {
   AdminQueue,
   AdminRegistration,
 } from '../../../app/types/admin.type';
+import type { AdminSummaryCard } from '../admin-summary-cards/admin-summary-cards';
 
 type AdminDashboardState = {
   dashboard: AdminDashboardData | null;
@@ -47,11 +48,11 @@ export const AdminDashboardStore = signalStore(
       hasError: computed(() => error() !== null),
       waitingForDocumentsRegistrations,
       pendingApprovalRegistrations,
-      metrics: computed(() => {
+      metrics: computed<readonly AdminSummaryCard[]>(() => {
         const currentDashboard = dashboard();
         if (!currentDashboard) return [];
 
-        return [
+        const metrics: AdminSummaryCard[] = [
           {
             label: 'סה״כ הרשמות',
             value: currentDashboard.totalRegistrations.toString(),
@@ -85,6 +86,8 @@ export const AdminDashboardStore = signalStore(
             leftToRight: true,
           },
         ];
+
+        return metrics;
       }),
     };
   }),

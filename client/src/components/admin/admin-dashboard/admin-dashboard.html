@@ -1,5 +1,5 @@
 <main class="relative min-h-[calc(100dvh-var(--app-sticky-header-height))] overflow-hidden bg-background px-[var(--app-screen-padding)] pb-44 text-foreground" dir="rtl">
-  <div class="relative z-[1] mx-auto w-full max-w-[64rem] pt-6 lg:pt-9">
+  <div class="relative z-[1] mx-auto w-full max-w-[var(--app-dashboard-content-width)] pt-6 lg:pt-9">
     <header class="text-right">
       <h1 class="m-0 text-[length:var(--app-page-title-size)] font-black leading-tight text-brand">תמונת מצב</h1>
     </header>
@@ -16,27 +16,11 @@
         <p class="m-0 text-[length:var(--app-body-size)] font-bold text-destructive">{{ store.error() }}</p>
       </section>
     } @else if (store.dashboard()) {
-      <section class="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="סיכום שנה פעילה">
-        @for (metric of store.metrics(); track metric.label) {
-          <article class="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-[var(--app-card-radius)] border border-border bg-card/80 p-3 shadow-sm shadow-foreground/5 lg:min-h-32 lg:gap-3 lg:p-5">
-            <div class="min-w-0 text-right">
-              <strong
-                class="block whitespace-nowrap text-xl font-black leading-none text-brand sm:text-2xl lg:text-3xl"
-                [ngClass]="{ 'text-primary': metric.tone === 'warning' }"
-                [attr.dir]="metric.leftToRight ? 'ltr' : null"
-              >{{ metric.value }}</strong>
-              <span class="mt-2 block text-[length:var(--app-card-title-size)] font-bold leading-tight">{{ metric.label }}</span>
-              <span class="mt-1 block text-[length:var(--app-muted-size)] leading-snug text-muted-foreground">{{ metric.detail }}</span>
-            </div>
-            <span
-              class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-surface-sage/45 text-brand lg:h-14 lg:w-14"
-              [ngClass]="{ 'bg-primary/8 text-primary': metric.tone === 'warning' }"
-            >
-              <ng-icon [name]="metric.icon" class="h-10 w-10 lg:h-11 lg:w-11" />
-            </span>
-          </article>
-        }
-      </section>
+      <app-admin-summary-cards
+        [cards]="store.metrics()"
+        containerClass="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4"
+        valueClass="text-[length:calc(var(--app-card-title-size)*1.28)]"
+      />
 
       <section class="mt-12" aria-labelledby="waiting-documents-title">
         <div class="flex items-end justify-between gap-4 border-b border-border pb-3">

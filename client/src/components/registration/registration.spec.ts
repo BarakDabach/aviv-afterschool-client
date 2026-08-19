@@ -30,7 +30,12 @@ describe('Registration', () => {
         {
           provide: ParentFacade,
           useValue: {
-            getActiveRegistrationYear: vi.fn().mockResolvedValue({ id: 1, yearNumber: 2027 }),
+            getActiveRegistrationYear: vi.fn().mockResolvedValue({
+              id: 1,
+              yearNumber: 2027,
+              maxChildCapacity: 60,
+              oneTimeInsuranceAmount: 200,
+            }),
             getAvailableYearPlans: vi.fn().mockResolvedValue([
               {
                 yearPlanId: 101,

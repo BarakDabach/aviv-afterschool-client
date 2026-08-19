@@ -106,7 +106,13 @@ export const LoginStore = signalStore(
     };
 
     const routeAfterLogin = async (user: AuthenticatedUser): Promise<void> => {
-      await store.router.navigateByUrl(user.role === 'admin' ? '/admin' : '/home');
+      const fallbackRoute = user.role === 'admin' ? '/admin' : '/home';
+      const redirect = store.router.parseUrl(store.router.url).queryParams['redirect'];
+      const targetRoute = typeof redirect === 'string' && isAllowedRedirect(redirect, user.role)
+        ? redirect
+        : fallbackRoute;
+
+      await store.router.navigateByUrl(targetRoute);
     };
     const sendOtp = async (notice: string): Promise<void> => {
       patchState(store, {
@@ -246,3 +252,11 @@ export const LoginStore = signalStore(
     };
   }),
 );
+
+function isAllowedRedirect(redirect: string, role: AuthenticatedUser['role']): boolean {
+  if (!redirect.startsWith('/') || redirect.startsWith('//')) return false;
+
+  return role === 'admin'
+    ? redirect === '/admin' || redirect.startsWith('/admin/')
+    : redirect === '/home' || redirect.startsWith('/home/');
+}

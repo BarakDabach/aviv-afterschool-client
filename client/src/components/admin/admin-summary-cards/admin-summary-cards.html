@@ -1,0 +1,20 @@
+<section [class]="containerClass()">
+  @for (card of cards(); track card.label) {
+    <article class="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-[var(--app-card-radius)] border border-border bg-card/80 p-3 shadow-sm shadow-foreground/5 lg:min-h-32 lg:gap-3 lg:p-5">
+      <div class="min-w-0 text-right">
+        <strong
+          [class]="'block whitespace-nowrap font-black leading-none ' + valueClass() + (card.tone === 'warning' ? ' text-primary' : ' text-brand')"
+          [attr.dir]="card.leftToRight ? 'ltr' : null"
+        >{{ card.value }}</strong>
+        <span class="mt-2 block text-[length:var(--app-card-title-size)] font-bold leading-tight">{{ card.label }}</span>
+        <span class="mt-1 block text-[length:var(--app-muted-size)] leading-snug text-muted-foreground">{{ card.detail }}</span>
+      </div>
+      <span
+        class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-surface-sage/45 text-brand lg:h-14 lg:w-14"
+        [ngClass]="{ 'bg-primary/8 text-primary': card.tone === 'warning' }"
+      >
+        <ng-icon [name]="card.icon" class="h-10 w-10 lg:h-11 lg:w-11" />
+      </span>
+    </article>
+  }
+</section>

@@ -129,6 +129,8 @@ export interface Plan {
 export interface Year {
   id: number;
   yearNumber: number;
+  maxChildCapacity: number;
+  oneTimeInsuranceAmount: number;
 }
 
 export interface HolidayPeriod {

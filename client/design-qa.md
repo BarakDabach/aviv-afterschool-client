@@ -24,6 +24,55 @@ Final result: passed
 
 ---
 
+# Admin Working Years Design QA
+
+Source visual truth:
+- `../mockups/admin-working-years-mobile.png`
+- `../mockups/admin-working-years-desktop.png`
+
+Implementation:
+- Route: `http://127.0.0.1:4200/admin/years`
+- Mobile screenshot: `C:\Users\BARAKDA\AppData\Local\Temp\admin-working-years-mobile-implementation.png`
+- Desktop screenshot: `C:\Users\BARAKDA\AppData\Local\Temp\admin-working-years-desktop-implementation.png`
+
+Comparison setup:
+- Mobile viewport: `390 × 844`; source pixels: `851 × 1847`; implementation full-page pixels: `375 × 1297` after the browser excluded its scrollbar. The source was compared by matching its intended 390px-wide layout proportions rather than raw density.
+- Desktop viewport: `1440 × 1024`; source pixels: `1486 × 1059`; implementation full-page pixels: `1425 × 1036` after scrollbar exclusion. Both were compared at their intended desktop viewport proportions.
+- State: authenticated administrator, current year expanded, service repository empty, no historical years.
+- Intentional state differences from the populated mockups: empty child/history states use service truth, year-management actions are disabled until the shared form exists, and child age/date of birth are excluded by the final requirement.
+
+Full-view evidence:
+- Mobile preserves the selected hierarchy: admin header, exact page title, current-year accordion, three summary values, edit action, children area, create/duplicate actions, and history below.
+- Desktop preserves the dashboard hierarchy: RTL title/actions row, four summary cards, vertical children region, and vertical history region within the 1180px content width.
+- Both layouts use the existing warm background, green/orange tokens, typography, borders, foliage asset, and project header.
+
+Focused-region evidence:
+- Current-year header and summary values remain RTL while numeric year/capacity/currency values remain readable.
+- The mobile accordion collapsed and expanded successfully (`aria-expanded`: `true → false → true`).
+- Empty children and history areas use Spartan Empty; summaries use Spartan Card; status surfaces use Spartan Badge; actions use Spartan Button; year disclosure uses Spartan Accordion.
+- Disabled actions have visible disabled treatment and do not mutate data.
+- Browser console check returned no warnings or errors.
+- Mobile measured `scrollWidth 375` at a `390px` viewport and desktop measured `scrollWidth 1425` at a `1440px` viewport; neither layout has horizontal overflow.
+
+Required fidelity surfaces:
+- Fonts and typography: existing Hebrew application stack, weights, hierarchy, wrapping, and numeric LTR treatment match the established project design.
+- Spacing and layout rhythm: mobile card spacing and touch sizes are consistent; desktop summary cards and two-column content preserve the mock's dashboard proportions.
+- Colors and tokens: brand green, primary orange, sage/warm surfaces, borders, and semantic states come from project tokens.
+- Image quality and assets: existing brand, child-avatar, and footer-foliage assets are reused; no custom SVG/CSS substitute artwork was introduced.
+- Copy and content: title and required Hebrew labels are exact; `מצב הרשמה` is used; neither age nor date of birth appears.
+
+Comparison history:
+- Iteration 1 found a P1 duplicate admin header because the feature rendered a header already owned by the app shell, plus a suspected P2 mobile overflow.
+- Fix: removed the feature-local header and retained the shared application header only.
+- Iteration 2 evidence: one header at both viewports, clean DOM hierarchy, no horizontal overflow, clean console, and successful accordion interaction. The suspected overflow was not present after the header fix.
+
+Remaining P3 polish:
+- The reference mockups show populated data while the verified implementation correctly shows empty states until registrations and historical years are created through application flows.
+
+Final result: passed
+
+---
+
 # Cross-App Sizing and RTL QA
 
 Screens:
