@@ -22,7 +22,7 @@
             </span>
             <span class="grid gap-1 text-start max-[760px]:col-start-2">
               <strong class="text-[clamp(1.08rem,1.85vw,1.35rem)]">₪{{ yearPlan.plan.price }}</strong>
-              <small class="text-[0.82rem] text-foreground/70">לחודש</small>
+              <small class="text-[0.82rem] text-foreground/70">{{ yearPlan.plan.requiresStandingOrder ? 'לחודש' : 'ליום' }}</small>
             </span>
           </hlm-radio>
         }
@@ -33,6 +33,7 @@
           <span>{{ store.getPlanLabel(child.selectedYearPlanId) }}</span>
           <strong class="text-brand">לתשלום: ₪{{ store.getChildFinalPrice(child, childIndex) }}</strong>
         </article>
+
       }
     </section>
   }

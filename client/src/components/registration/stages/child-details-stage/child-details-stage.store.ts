@@ -1,7 +1,7 @@
 import { computed, effect, inject, signal, untracked } from '@angular/core';
 import { applyEach, applyWhen, form, schema, validate, type FieldTree } from '@angular/forms/signals';
 import { signalStore, withComputed, withHooks, withMethods, withProps } from '@ngrx/signals';
-import { AllergyAnswer, Gender, type RegistrationChildDraft } from '../../../../app/types/registration-status.type';
+import { AllergyAnswer, Gender, PaymentMethod, type RegistrationChildDraft } from '../../../../app/types/registration-status.type';
 import { RegistrationStore } from '../../registration.store';
 
 type ChildDetailsFormModel = RegistrationChildDraft[];
@@ -152,6 +152,11 @@ export const ChildDetailsStageStore = signalStore(
     getChildFinalPrice(child: RegistrationChildDraft, index: number): number {
       return registrationStore.getChildFinalPrice(child, index);
     },
+    getPlanPriceMeta(selectedYearPlanId: number | null): string {
+      const selectedPlan = registrationStore.availableYearPlans().find((yearPlan) => yearPlan.yearPlanId === selectedYearPlanId);
+
+      return selectedPlan?.plan.requiresStandingOrder === false ? 'ליום' : 'לחודש';
+    },
     getChildDiscountPercent(index: number): number {
       return registrationStore.getChildDiscountPercent(index);
     },
@@ -196,6 +201,7 @@ function createEmptyChild(id: number, selectedYearPlanId: number | null): Regist
     allergyAnswer: AllergyAnswer.No,
     allergyDetails: '',
     selectedYearPlanId,
+    paymentMethod: PaymentMethod.StandingOrder,
   };
 }
 
@@ -204,6 +210,8 @@ function sameChildren(left: RegistrationChildDraft[], right: RegistrationChildDr
 }
 
 function normalizeChildDraft(child: RegistrationChildDraft, defaultPlanId: number | null): RegistrationChildDraft {
+  const selectedYearPlanId = child.selectedYearPlanId ?? defaultPlanId;
+
   return {
     ...child,
     fullName: child.fullName ?? '',
@@ -211,7 +219,8 @@ function normalizeChildDraft(child: RegistrationChildDraft, defaultPlanId: numbe
     gender: child.gender === Gender.Male ? Gender.Male : Gender.Female,
     allergyAnswer: child.allergyAnswer === AllergyAnswer.Yes ? AllergyAnswer.Yes : AllergyAnswer.No,
     allergyDetails: child.allergyDetails ?? '',
-    selectedYearPlanId: child.selectedYearPlanId ?? defaultPlanId,
+    selectedYearPlanId,
+    paymentMethod: PaymentMethod.StandingOrder,
   };
 }
 

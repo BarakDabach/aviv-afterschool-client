@@ -3,14 +3,14 @@
     type="button"
     role="radio"
     dir="rtl"
-    class="grid min-h-[3.25rem] w-full grid-cols-[auto_minmax(0,1fr)_minmax(4.7rem,auto)] items-center gap-3 rounded-[0.42rem] border px-3 py-2 text-start text-foreground transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out"
+    class="grid min-h-[4.25rem] w-full grid-cols-[auto_minmax(0,1fr)_minmax(5.5rem,auto)] items-center gap-3 rounded-[var(--app-control-radius)] border px-4 py-3 text-start text-foreground transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out sm:min-h-[3.5rem] sm:grid-cols-[auto_minmax(0,1fr)_minmax(4.9rem,auto)] sm:px-3 sm:py-2"
     [ngClass]="cardStateClasses"
     [attr.aria-checked]="selected"
     [attr.aria-label]="ariaLabel || title"
     (click)="select()"
   >
     <span
-      class="grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-[border-color,box-shadow] duration-200"
+      class="grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-[border-color,box-shadow] duration-200 sm:h-4 sm:w-4"
       aria-hidden="true"
       [ngClass]="{
         'border-brand shadow-[0_0_0_1px_color-mix(in_oklch,var(--brand)_12%,transparent)]': selected,
@@ -18,42 +18,42 @@
       }"
     >
       @if (selected) {
-        <span class="h-2 w-2 rounded-full bg-brand motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:duration-150"></span>
+        <span class="h-2.5 w-2.5 rounded-full bg-brand motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:duration-150 sm:h-2 sm:w-2"></span>
       }
     </span>
 
-    <span class="grid min-w-0 justify-items-start gap-[0.08rem] text-start">
-      <strong class="text-[0.82rem] font-extrabold leading-tight text-brand">{{ title }}</strong>
+    <span class="grid min-w-0 justify-items-start gap-1 text-start sm:gap-[0.08rem]">
+      <strong class="text-[length:var(--app-card-title-size)] font-extrabold leading-tight text-brand">{{ title }}</strong>
       @if (description) {
-        <small class="text-[0.62rem] leading-[1.25] text-foreground/70">{{ description }}</small>
+        <small class="text-[length:var(--app-muted-size)] leading-snug text-foreground/70">{{ description }}</small>
       }
     </span>
 
-    <span class="grid justify-items-end gap-[0.08rem] text-end">
-      <strong class="text-[0.82rem] font-extrabold leading-tight text-brand">{{ displayPrice }}</strong>
+    <span class="grid justify-items-end gap-1 text-end sm:gap-[0.08rem]">
+      <strong class="text-[length:var(--app-card-title-size)] font-extrabold leading-tight text-brand">{{ displayPrice }}</strong>
       @if (priceMeta) {
-        <small class="text-[0.62rem] leading-[1.25] text-foreground/70">{{ priceMeta }}</small>
+        <small class="text-[length:var(--app-muted-size)] leading-snug text-foreground/70">{{ priceMeta }}</small>
       }
     </span>
   </button>
 } @else {
   <article
     dir="rtl"
-    class="grid min-h-[3.25rem] w-full grid-cols-[minmax(0,1fr)_minmax(4.7rem,auto)] items-center gap-3 rounded-[0.42rem] border px-3 py-2 text-start text-foreground transition-[border-color,background-color,box-shadow] duration-200 ease-out"
+    class="grid min-h-[4.25rem] w-full grid-cols-[minmax(0,1fr)_minmax(5.5rem,auto)] items-center gap-3 rounded-[var(--app-control-radius)] border px-4 py-3 text-start text-foreground transition-[border-color,background-color,box-shadow] duration-200 ease-out sm:min-h-[3.5rem] sm:grid-cols-[minmax(0,1fr)_minmax(4.9rem,auto)] sm:px-3 sm:py-2"
     [ngClass]="cardStateClasses"
     [attr.aria-label]="ariaLabel || title"
   >
-    <span class="grid min-w-0 justify-items-start gap-[0.08rem] text-start">
-      <strong class="text-[0.82rem] font-extrabold leading-tight text-brand">{{ title }}</strong>
+    <span class="grid min-w-0 justify-items-start gap-1 text-start sm:gap-[0.08rem]">
+      <strong class="text-[length:var(--app-card-title-size)] font-extrabold leading-tight text-brand">{{ title }}</strong>
       @if (description) {
-        <small class="text-[0.62rem] leading-[1.25] text-foreground/70">{{ description }}</small>
+        <small class="text-[length:var(--app-muted-size)] leading-snug text-foreground/70">{{ description }}</small>
       }
     </span>
 
-    <span class="grid justify-items-end gap-[0.08rem] text-end">
-      <strong class="text-[0.82rem] font-extrabold leading-tight text-brand">{{ displayPrice }}</strong>
+    <span class="grid justify-items-end gap-1 text-end sm:gap-[0.08rem]">
+      <strong class="text-[length:var(--app-card-title-size)] font-extrabold leading-tight text-brand">{{ displayPrice }}</strong>
       @if (priceMeta) {
-        <small class="text-[0.62rem] leading-[1.25] text-foreground/70">{{ priceMeta }}</small>
+        <small class="text-[length:var(--app-muted-size)] leading-snug text-foreground/70">{{ priceMeta }}</small>
       }
     </span>
   </article>

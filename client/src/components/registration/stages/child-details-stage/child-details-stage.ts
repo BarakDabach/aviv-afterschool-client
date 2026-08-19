@@ -9,6 +9,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDatePickerImports } from '@spartan-ng/helm/date-picker';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { AllergyAnswer, Gender } from '../../../../app/types/registration-status.type';
+import { FocusNextOnEnterDirective } from '../../focus-next-on-enter.directive';
 import { DetailsCard } from '../../../shared/details-card/details-card';
 import { SelectionCard } from '../../../shared/selection-card/selection-card';
 import { ChildDetailsStageStore } from './child-details-stage.store';
@@ -23,6 +24,7 @@ import { ChildDetailsStageStore } from './child-details-stage.store';
     HlmDatePickerImports,
     HlmInputImports,
     BrnToggleGroupImports,
+    FocusNextOnEnterDirective,
     DetailsCard,
     SelectionCard,
   ],

@@ -36,9 +36,9 @@ describe('Registration', () => {
                 yearPlanId: 101,
                 plan: {
                   id: 1,
-                  name: 'מסלול חודשי מלא',
-                  price: 1450,
-                  hours: 'ימים א-ה עד 16:30',
+                  name: '4-5 פעמים בשבוע',
+                  price: 1350,
+                  hours: '13:00-17:00',
                   isActive: true,
                   requiresStandingOrder: true,
                 },

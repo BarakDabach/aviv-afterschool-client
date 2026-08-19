@@ -8,6 +8,7 @@ import {
   AllergyAnswer,
   DocumentType,
   Gender,
+  PaymentMethod,
   RegistrationDocumentScopeKind,
   RegistrationChildStatus,
   RegistrationDraftStep,
@@ -30,20 +31,20 @@ const availableYearPlans: AvailableYearPlan[] = [
     yearPlanId: 101,
     plan: {
       id: 1,
-      name: 'מסלול חודשי מלא',
-      price: 1450,
-      hours: 'ימים א-ה עד 16:30',
+      name: '4-5 פעמים בשבוע',
+      price: 1350,
+      hours: '13:00-17:00',
       isActive: true,
       requiresStandingOrder: true,
     },
   },
   {
-    yearPlanId: 102,
+    yearPlanId: 104,
     plan: {
-      id: 2,
-      name: 'מסלול יומי',
-      price: 1050,
-      hours: 'שלושה ימים לבחירה עד 16:30',
+      id: 4,
+      name: 'חד פעמי',
+      price: 100,
+      hours: '13:00-17:00',
       isActive: true,
       requiresStandingOrder: false,
     },
@@ -362,6 +363,22 @@ describe('RegistrationStore', () => {
 
     expect(facade.submitRegistration).not.toHaveBeenCalled();
     expect(store.error()).toContain('חסרים פרטי הורה תקינים');
+  });
+
+  it('uses cash only for the one-time daily plan', async () => {
+    await store.initialize();
+    await settle();
+    store.setChildren([createChildDraft(1, 'אורי לוי', availableYearPlans[1].yearPlanId)]);
+
+    expect(store.children()[0].paymentMethod).toBe(PaymentMethod.Cash);
+
+    store.setChildPlan(1, availableYearPlans[0].yearPlanId);
+
+    expect(store.children()[0].paymentMethod).toBe(PaymentMethod.StandingOrder);
+
+    store.setChildPlan(1, availableYearPlans[1].yearPlanId);
+
+    expect(store.children()[0].paymentMethod).toBe(PaymentMethod.Cash);
   });
 
   it('stores serializable draft data in localStorage without persisting selected file contents', async () => {

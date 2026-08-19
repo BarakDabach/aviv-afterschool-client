@@ -33,7 +33,18 @@ describe('DocumentsStage', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
     expect(compiled.textContent).toContain('אישור הוראת קבע');
-    expect(compiled.textContent).toContain('העלאת אישור משותף');
+    expect(compiled.textContent).toContain('הוראת קבע - נועה לוי');
+  });
+
+  it('treats a single-child registration as child-specific documents', async () => {
+    const fixture = await renderDocumentsStage([
+      monthlyPlan(),
+    ]);
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.textContent).not.toContain('משותף');
+    expect(compiled.textContent).toContain('חוזה חתום - נועה לוי');
+    expect(compiled.textContent).toContain('הוראת קבע - נועה לוי');
   });
 });
 
@@ -77,12 +88,12 @@ async function renderDocumentsStage(availableYearPlans: Array<{ yearPlanId: numb
 
 function dailyPlan() {
   return {
-    yearPlanId: 102,
+    yearPlanId: 104,
     plan: {
-      id: 2,
-      name: 'מסלול יומי',
-      price: 1050,
-      hours: 'שלושה ימים לבחירה עד 16:30',
+      id: 4,
+      name: 'חד פעמי',
+      price: 100,
+      hours: '13:00-17:00',
       isActive: true,
       requiresStandingOrder: false,
     },
@@ -94,9 +105,9 @@ function monthlyPlan() {
     yearPlanId: 101,
     plan: {
       id: 1,
-      name: 'מסלול חודשי מלא',
-      price: 1450,
-      hours: 'ימים א-ה עד 16:30',
+      name: '4-5 פעמים בשבוע',
+      price: 1350,
+      hours: '13:00-17:00',
       isActive: true,
       requiresStandingOrder: true,
     },

@@ -7,7 +7,7 @@ import { LandingPage } from '../components/landing-page/landing-page';
 import { Home } from '../components/home/home';
 import { ParentLogin } from '../components/parent-login/parent-login';
 import { Registration } from '../components/registration/registration';
-import { guestOnlyGuard, parentAuthGuard, parentRegistrationAvailabilityGuard } from './guards/parent-route.guard';
+import { adminAuthGuard, guestOnlyGuard, parentAuthGuard, parentRegistrationAvailabilityGuard } from './guards/parent-route.guard';
 
 export const routes: Routes = [
   { path: '', component: LandingPage },
@@ -15,9 +15,9 @@ export const routes: Routes = [
   { path: 'registration', component: Registration, canActivate: [parentRegistrationAvailabilityGuard] },
   { path: 'home/:registrationId', component: Home, canActivate: [parentAuthGuard] },
   { path: 'home', component: Home, canActivate: [parentAuthGuard] },
-  { path: 'admin', component: AdminDashboard },
-  { path: 'admin/family', component: AdminFamily },
-  { path: 'admin/settings', component: AdminSettings },
-  { path: 'admin/documents', component: AdminDocuments },
+  { path: 'admin', component: AdminDashboard, canActivate: [adminAuthGuard] },
+  { path: 'admin/family', component: AdminFamily, canActivate: [adminAuthGuard] },
+  { path: 'admin/settings', component: AdminSettings, canActivate: [adminAuthGuard] },
+  { path: 'admin/documents', component: AdminDocuments, canActivate: [adminAuthGuard] },
   { path: '**', redirectTo: '' },
 ];

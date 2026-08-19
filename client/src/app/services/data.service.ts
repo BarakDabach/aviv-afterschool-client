@@ -7,6 +7,12 @@ import type {
   Year,
 } from '../types/registration-status.type';
 import type { AuthenticatedUser } from '../types/auth.type';
+import type {
+  AdminDashboardData,
+  AdminDocumentActionRequest,
+  AdminPaymentMethodRequest,
+  AdminRegistrationActionRequest,
+} from '../types/admin.type';
 
 export abstract class DataService {
   abstract getAuthOtpResendTimeoutSeconds(): Promise<number>;
@@ -24,4 +30,14 @@ export abstract class DataService {
   abstract submitRegistration(request: SubmitRegistrationRequest): Promise<RegistrationState>;
 
   abstract uploadRegistrationDocument(request: UploadRegistrationDocumentRequest): Promise<RegistrationState>;
+
+  abstract getAdminDashboard(): Promise<AdminDashboardData>;
+
+  abstract setAdminPaymentMethod(request: AdminPaymentMethodRequest): Promise<RegistrationState>;
+
+  abstract approveAdminDocument(request: AdminDocumentActionRequest): Promise<RegistrationState>;
+
+  abstract approveAdminRegistration(request: AdminRegistrationActionRequest): Promise<RegistrationState>;
+
+  abstract removeAdminRegistration(request: AdminRegistrationActionRequest): Promise<void>;
 }

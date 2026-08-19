@@ -23,44 +23,66 @@
           class="grid w-full gap-[0.3rem] text-start [direction:rtl] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive"
           [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.emailHasError() }"
         >
-          <span>כתובת אימייל</span>
+          <span id="login-email-label">כתובת אימייל</span>
           <input
             hlmInput
+            id="login-email-input"
+            type="email"
+            dir="ltr"
             inputmode="email"
             autocomplete="email"
+            enterkeyhint="next"
             placeholder="name@example.com"
             aria-label="כתובת אימייל"
+            aria-required="true"
+            aria-labelledby="login-email-label"
             [attr.aria-invalid]="store.emailHasError()"
             [attr.aria-describedby]="store.emailHasError() ? 'login-email-error' : null"
             [value]="store.email()"
             (input)="store.updateEmail($any($event.target).value)"
+            (keydown.enter)="focusRequestOtpButton($event)"
             (blur)="store.markEmailTouched()"
           />
           <small id="login-email-error">{{ store.emailError() }}</small>
         </label>
       } @else {
-        <div class="grid w-full gap-3">
-          <label
-            class="grid w-full gap-[0.3rem] text-start [direction:rtl] [&_span]:text-[length:var(--app-body-size)] [&_span]:text-foreground [&_input]:h-[var(--app-field-height)] [&_input]:rounded-[0.48rem] [&_input]:bg-[color-mix(in_oklch,var(--background)_74%,white)] [&_input]:text-center [&_input]:text-[length:var(--app-body-size)] [&_input]:text-foreground [&_input]:[direction:rtl] [&_input]:focus-visible:border-brand [&_input]:focus-visible:ring-2 [&_input]:focus-visible:ring-brand/20 [&_small]:min-h-4 [&_small]:text-[0.72rem] [&_small]:font-semibold [&_small]:text-destructive"
-            [ngClass]="{ '[&_input]:border-destructive [&_input]:focus-visible:border-destructive [&_input]:focus-visible:ring-destructive/20': store.otpHasError() }"
-          >
-            <span>קוד אימות</span>
-            <input
-              hlmInput
-              class="tracking-[0.28em]"
-              inputmode="numeric"
-              autocomplete="one-time-code"
-              maxlength="6"
-              placeholder="123456"
-              aria-label="קוד אימות"
-              [attr.aria-invalid]="store.otpHasError()"
-              [attr.aria-describedby]="store.otpHasError() ? 'login-otp-error' : null"
+        <div class="grid w-full gap-3 overflow-visible">
+          <div class="grid w-full gap-[0.45rem] overflow-visible text-start [direction:rtl]">
+            <div class="flex items-center justify-between gap-3">
+              <label id="login-otp-label" for="login-otp-input" class="text-[length:var(--app-body-size)] text-foreground">קוד אימות</label>
+              <button type="button" class="text-[0.82rem] font-medium text-brand underline underline-offset-4 disabled:text-muted-foreground disabled:no-underline" [disabled]="store.loading()" (click)="navigateToEmailStep()">
+                שינוי כתובת אימייל
+              </button>
+            </div>
+            <brn-input-otp
+              class="mx-auto flex w-full max-w-[24rem] items-center justify-center overflow-visible px-3 py-1"
+              dir="ltr"
+              inputId="login-otp-input"
+              [inputClass]="'[direction:ltr] text-center text-[1rem]'"
+              [inputMode]="'numeric'"
+              [inputAutocomplete]="'one-time-code'"
+              [length]="6"
               [value]="store.otp()"
-              (input)="store.updateOtp($any($event.target).value)"
-              (blur)="store.markOtpTouched()"
-            />
-            <small id="login-otp-error">{{ store.otpError() }}</small>
-          </label>
+              [disabled]="store.loading()"
+              [autofocus]="true"
+              [attr.aria-labelledby]="'login-otp-label'"
+              [attr.aria-invalid]="store.otpHasError()"
+              [attr.aria-describedby]="store.otpHasError() ? 'login-otp-hint login-otp-error' : 'login-otp-hint'"
+              (valueChange)="handleOtpInput($event)"
+              (completed)="handleOtpCompleted($event)"
+              (focusout)="store.markOtpTouched()"
+            >
+              @for (slot of otpSlots; track slot) {
+                <brn-input-otp-slot
+                  [index]="slot"
+                  [forceInvalid]="store.otpHasError()"
+                  class="mx-1 grid h-12 w-10 shrink-0 place-items-center rounded-[0.48rem] border border-border bg-[color-mix(in_oklch,var(--background)_74%,white)] text-center text-[1.05rem] font-black text-brand transition-[border-color,box-shadow] data-[active=true]:border-brand data-[active=true]:ring-2 data-[active=true]:ring-brand/20 data-[invalid=true]:border-destructive data-[invalid=true]:ring-2 data-[invalid=true]:ring-destructive/20 max-[380px]:mx-0.5 max-[380px]:w-9"
+                />
+              }
+            </brn-input-otp>
+            <span id="login-otp-hint" class="sr-only">יש להזין קוד אימות בן 6 ספרות. לאחר הזנת הספרה השישית כפתור הכניסה יקבל פוקוס.</span>
+            <small id="login-otp-error" class="min-h-4 text-[0.72rem] font-semibold text-destructive">{{ store.otpError() }}</small>
+          </div>
         </div>
       }
 
@@ -70,6 +92,7 @@
 
       @if (store.step() === 'email') {
         <button
+          #requestOtpButton
           hlmBtn
           type="button"
           class="mt-3 h-[var(--app-button-height)] w-[min(100%,24rem)] gap-2 rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/95 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20 disabled:bg-none disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
@@ -81,6 +104,7 @@
         </button>
       } @else {
         <button
+          #verifyButton
           hlmBtn
           type="button"
           class="mt-3 h-[var(--app-button-height)] w-[min(100%,24rem)] gap-2 rounded-[var(--app-control-radius)] bg-gradient-to-b from-primary/95 to-primary text-[length:var(--app-button-size)] font-bold text-primary-foreground shadow-xl shadow-primary/20 disabled:bg-none disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"

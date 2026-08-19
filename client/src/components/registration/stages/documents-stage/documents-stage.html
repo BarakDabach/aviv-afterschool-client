@@ -4,7 +4,9 @@
   <section class="grid gap-[0.72rem]">
     <header class="grid gap-1 text-start">
       <h2 class="m-0 text-[0.98rem] font-extrabold text-brand">1. חוזה חתום</h2>
-      <p class="m-0 text-[0.82rem] leading-[1.5] text-foreground/80">בחרו האם להעלות חוזה אחד לכל הילדים או חוזה נפרד לכל ילד.</p>
+      <p class="m-0 text-[0.82rem] leading-[1.5] text-foreground/80">
+        {{ store.children().length > 1 ? 'בחרו האם להעלות חוזה אחד לכל הילדים או חוזה נפרד לכל ילד.' : 'העלו חוזה חתום עבור הילד.' }}
+      </p>
       <button hlmBtn variant="outline" type="button" class="mt-2 h-[var(--app-secondary-button-height)] justify-self-start gap-2 border-brand text-brand">
         <ng-icon name="lucideDownload" />
         <span>הורדת חוזה לשנת {{ store.year().yearNumber }}</span>
@@ -18,7 +20,7 @@
       </hlm-radio-group>
     }
 
-    @if (store.children().length <= 1 || store.contractScope() === scopeKind.AllChildren) {
+    @if (store.children().length > 1 && store.contractScope() === scopeKind.AllChildren) {
       @let sharedScope = store.sharedScope();
       <label class="grid cursor-pointer justify-items-center gap-[0.42rem] rounded-[var(--app-card-radius)] border border-dashed border-brand bg-[color-mix(in_oklch,var(--card)_84%,transparent)] px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center">
         <ng-icon name="lucideFileUp" class="h-[1.82rem] w-[1.82rem] text-brand" />
@@ -53,7 +55,7 @@
         </hlm-radio-group>
       }
 
-      @if (store.children().length <= 1 || store.standingOrderScope() === scopeKind.AllChildren) {
+      @if (store.children().length > 1 && store.standingOrderScope() === scopeKind.AllChildren) {
         @let sharedScope = store.sharedScope();
         <label class="grid cursor-pointer justify-items-center gap-[0.42rem] rounded-[var(--app-card-radius)] border border-dashed border-brand bg-[color-mix(in_oklch,var(--card)_84%,transparent)] px-[0.72rem] pb-[0.68rem] pt-[0.78rem] text-center">
           <ng-icon name="lucideFileUp" class="h-[1.82rem] w-[1.82rem] text-brand" />
