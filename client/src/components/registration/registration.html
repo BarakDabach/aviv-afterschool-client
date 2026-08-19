@@ -4,8 +4,8 @@
       <p class="m-0 text-[0.84rem] font-medium text-[color-mix(in_oklch,var(--foreground)_82%,white)]">הרשמה לשנת תשפ״ז</p>
       <ol class="m-0 grid list-none p-0" [style.grid-template-columns]="'repeat(' + store.visibleSteps().length + ', minmax(0, 1fr))'">
         @for (step of store.visibleSteps(); track step.label; let index = $index) {
-          <li class="relative grid justify-items-center gap-[0.36rem] text-[0.78rem] font-semibold text-foreground before:absolute before:right-[-50%] before:top-[0.88rem] before:z-0 before:h-px before:w-full before:bg-border first:before:hidden max-[540px]:text-[0.68rem]" [ngClass]="{ 'before:bg-brand': store.activeStep() >= step.index }">
-            <span class="relative z-[1] grid h-[1.8rem] w-[1.8rem] place-items-center rounded-full border border-border bg-[color-mix(in_oklch,var(--background)_84%,white)] text-[0.78rem] font-bold text-foreground max-[540px]:h-[1.62rem] max-[540px]:w-[1.62rem]" [ngClass]="{ 'border-brand bg-brand text-white shadow-[0_0_0_0.18rem_color-mix(in_oklch,var(--surface-sage)_75%,transparent)]': store.activeStep() >= step.index }" [attr.aria-current]="store.activeStep() === step.index ? 'step' : null">
+          <li class="relative grid justify-items-center gap-[0.36rem] text-[0.78rem] font-semibold text-foreground before:absolute before:right-[-50%] before:top-[0.88rem] before:z-0 before:h-px before:w-full before:bg-border first:before:hidden max-[540px]:text-[0.72rem] max-[540px]:before:top-[0.92rem]" [ngClass]="{ 'before:bg-brand': store.activeStep() >= step.index }">
+            <span class="relative z-[1] grid h-[1.8rem] w-[1.8rem] place-items-center rounded-full border border-border bg-[color-mix(in_oklch,var(--background)_84%,white)] text-[0.78rem] font-bold text-foreground max-[540px]:h-[1.72rem] max-[540px]:w-[1.72rem] max-[540px]:text-[0.82rem]" [ngClass]="{ 'border-brand bg-brand text-white shadow-[0_0_0_0.18rem_color-mix(in_oklch,var(--surface-sage)_75%,transparent)]': store.activeStep() >= step.index }" [attr.aria-current]="store.activeStep() === step.index ? 'step' : null">
               @if (store.activeStep() > step.index) {
                 <ng-icon name="lucideCheck" class="h-[0.82rem] w-[0.82rem]" />
               } @else {
@@ -47,6 +47,7 @@
           [registration]="registration"
           [status]="store.registrationStatus()"
           [showBackLink]="false"
+          [showSubmissionNotice]="true"
           [loading]="store.loading()"
           [hasSelectedMissingDocumentFiles]="store.hasSelectedMissingDocumentFiles()"
           [saveButtonLabel]="'שמירת מסמכים'"

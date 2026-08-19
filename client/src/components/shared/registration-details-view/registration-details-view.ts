@@ -54,6 +54,7 @@ export class RegistrationDetailsView {
   @Input() showBackLink = true;
   @Input() loading = false;
   @Input() allowDocumentUpload = true;
+  @Input() showSubmissionNotice = false;
   @Input() hasSelectedMissingDocumentFiles = false;
   @Input() saveButtonLabel = 'שמירת מסמכים';
   @Input() savingButtonLabel = 'שומרים מסמכים';
@@ -71,6 +72,28 @@ export class RegistrationDetailsView {
 
   protected childCountLabel(registration: RegistrationState): string {
     return registration.children.length === 1 ? 'ילד אחד' : `${registration.children.length} ילדים`;
+  }
+
+  protected submissionNoticeTitle(registration: RegistrationState): string {
+    if (registration.status === RegistrationStatus.Approved) return 'ההרשמה הוגשה ואושרה';
+    if (registration.status === RegistrationStatus.Rejected) return 'ההרשמה הוגשה ונבדקה';
+    if (registration.status === RegistrationStatus.Cancelled) return 'ההרשמה הוגשה ובוטלה';
+
+    return 'ההרשמה נשלחה בהצלחה';
+  }
+
+  protected submissionNoticeDescription(registration: RegistrationState): string {
+    if (registration.missingDocuments.length) {
+      const missingCount = registration.missingDocuments.length;
+
+      return `סטטוס ההרשמה הוא ${this.status.label}. חסרים ${missingCount} ${missingCount === 1 ? 'מסמך נדרש' : 'מסמכים נדרשים'} להשלמת הבדיקה.`;
+    }
+
+    if (registration.status === RegistrationStatus.PendingApproval) {
+      return `סטטוס ההרשמה הוא ${this.status.label}. כל המסמכים הנדרשים הועלו וההרשמה ממתינה לבדיקה של צוות הצהרון.`;
+    }
+
+    return `סטטוס ההרשמה הוא ${this.status.label}. ${this.status.description}`;
   }
 
   protected allergyLabel(childState: RegistrationChildState): string {

@@ -4,6 +4,36 @@
   </section>
 
   <section class="grid gap-[var(--app-section-gap)]">
+    @if (showSubmissionNotice) {
+      <article
+        class="grid gap-2 rounded-[var(--app-card-radius)] border px-[var(--app-card-padding-x)] py-[calc(var(--app-card-padding-y)_+_0.18rem)] shadow-[0_0.8rem_1.8rem_color-mix(in_oklch,var(--brand)_7%,transparent)]"
+        role="status"
+        aria-live="polite"
+        [ngClass]="{
+          'border-primary/35 bg-primary/10': status.tone === 'warning',
+          'border-brand/25 bg-surface-sage/85': status.tone === 'success',
+          'border-destructive/25 bg-red-50': status.tone === 'danger'
+        }"
+      >
+        <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
+          <span
+            class="grid h-10 w-10 place-items-center rounded-full"
+            [ngClass]="{
+              'bg-primary/15 text-primary': status.tone === 'warning',
+              'bg-background/70 text-brand': status.tone === 'success',
+              'bg-red-100 text-destructive': status.tone === 'danger'
+            }"
+          >
+            <ng-icon [name]="status.tone === 'success' ? 'lucideCheck' : 'lucideClock3'" class="h-5 w-5" />
+          </span>
+          <div class="grid gap-1">
+            <h2 class="m-0 text-[length:var(--app-section-title-size)] font-black text-brand">{{ submissionNoticeTitle(registration) }}</h2>
+            <p class="m-0 text-[length:var(--app-body-size)] leading-relaxed text-foreground/80">{{ submissionNoticeDescription(registration) }}</p>
+          </div>
+        </div>
+      </article>
+    }
+
     <article class="grid gap-[var(--app-card-gap)] rounded-[var(--app-card-radius)] border border-border bg-card px-[var(--app-card-padding-x)] py-[var(--app-card-padding-y)] shadow-[0_0.6rem_1.4rem_color-mix(in_oklch,var(--brand)_5%,transparent)]">
       <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-[var(--app-card-gap)]">
         <span class="grid h-[var(--app-icon-xl)] w-[var(--app-icon-xl)] place-items-center rounded-full bg-surface-sage/75 text-brand">
