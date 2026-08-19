@@ -42,6 +42,104 @@ describe('DataService', () => {
     expect(overview.historicalYears).toEqual([]);
   });
 
+  it('creates a new admin year and promotes it to the current year in the mock repository', async () => {
+    const service = configureMockService();
+    const currentYear = await service.getActiveRegistrationYear();
+    const plans = await service.getAvailableYearPlans();
+
+    const overview = await service.createAdminYear({
+      yearNumber: currentYear.yearNumber + 1,
+      maxChildCapacity: 72,
+      oneTimeInsuranceAmount: 220,
+      contractFileName: 'contract-2028.pdf',
+      contractMimeType: 'application/pdf',
+      plans: plans.map((yearPlan) => ({
+        planId: yearPlan.plan.id,
+        name: yearPlan.plan.name,
+        price: yearPlan.plan.price + 10,
+        hours: yearPlan.plan.hours,
+        isActive: yearPlan.plan.isActive,
+        requiresStandingOrder: yearPlan.plan.requiresStandingOrder,
+      })),
+      holidayPeriods: [{ name: 'ראש השנה', startDate: '2027-09-01', endDate: '2027-09-03' }],
+    });
+
+    expect(overview.currentYear).toMatchObject({
+      yearNumber: 2028,
+      maxChildCapacity: 72,
+      oneTimeInsuranceAmount: 220,
+      contractFileName: 'contract-2028.pdf',
+    });
+    expect(overview.currentYear.plans).toHaveLength(4);
+    expect(overview.currentYear.holidayPeriods).toHaveLength(1);
+    expect(overview.historicalYears[0].yearNumber).toBe(2027);
+  });
+
+  it('duplicates a year contract in the mock repository without requiring copied-contract form metadata', async () => {
+    const service = configureMockService();
+    const currentYear = await service.getActiveRegistrationYear();
+    const plans = await service.getAvailableYearPlans();
+    const sourceOverview = await service.createAdminYear({
+      yearNumber: currentYear.yearNumber + 1,
+      maxChildCapacity: 72,
+      oneTimeInsuranceAmount: 220,
+      contractFileName: 'contract-source.pdf',
+      contractMimeType: 'application/pdf',
+      plans: plans.map((yearPlan) => ({
+        planId: yearPlan.plan.id,
+        name: yearPlan.plan.name,
+        price: yearPlan.plan.price,
+        hours: yearPlan.plan.hours,
+        isActive: yearPlan.plan.isActive,
+        requiresStandingOrder: yearPlan.plan.requiresStandingOrder,
+      })),
+      holidayPeriods: [],
+    });
+
+    const duplicatedOverview = await service.createAdminYear({
+      sourceYearId: sourceOverview.currentYear.yearId,
+      yearNumber: currentYear.yearNumber + 2,
+      maxChildCapacity: sourceOverview.currentYear.maxChildCapacity,
+      oneTimeInsuranceAmount: sourceOverview.currentYear.oneTimeInsuranceAmount,
+      contractFileName: '',
+      contractMimeType: '',
+      plans: sourceOverview.currentYear.plans.map((yearPlan) => ({
+        planId: yearPlan.plan.id,
+        name: yearPlan.plan.name,
+        price: yearPlan.plan.price,
+        hours: yearPlan.plan.hours,
+        isActive: yearPlan.plan.isActive,
+        requiresStandingOrder: yearPlan.plan.requiresStandingOrder,
+      })),
+      holidayPeriods: [],
+    });
+
+    expect(duplicatedOverview.currentYear.contractFileName).toBe('contract-source.pdf');
+  });
+
+  it('updates admin year settings without changing submitted children', async () => {
+    const service = configureMockService();
+    const year = await service.getActiveRegistrationYear();
+    const plans = await service.getAvailableYearPlans();
+    await service.submitRegistration({
+      draft: createDraft(year, plans[0].yearPlanId, [{ id: 1, fullName: 'אורי לוי' }]),
+      selectedFiles: [],
+    });
+
+    const overview = await service.updateAdminYear({
+      yearId: year.id,
+      maxChildCapacity: 64,
+      contractFileName: 'replacement-contract.pdf',
+      contractMimeType: 'application/pdf',
+      holidayPeriods: [{ name: 'סוכות', startDate: '2026-10-01', endDate: '2026-10-07' }],
+    });
+
+    expect(overview.currentYear.maxChildCapacity).toBe(64);
+    expect(overview.currentYear.contractFileName).toBe('replacement-contract.pdf');
+    expect(overview.currentYear.holidayPeriods.map((period) => period.name)).toEqual(['סוכות']);
+    expect(overview.currentYear.children).toHaveLength(1);
+  });
+
   it('projects parent-submitted children into the admin years overview without exposing birth dates', async () => {
     const service = configureMockService();
     const year = await service.getActiveRegistrationYear();

@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import type {
   AdminDashboardData,
   AdminDocumentActionRequest,
+  AdminYearCreateRequest,
+  AdminYearUpdateRequest,
   AdminPaymentMethodRequest,
   AdminRegistrationActionRequest,
   AdminYearsOverview,
@@ -19,6 +21,14 @@ export class AdminFacade {
 
   getYearsOverview(): Promise<AdminYearsOverview> {
     return this.dataService.getAdminYearsOverview();
+  }
+
+  createYear(request: AdminYearCreateRequest): Promise<AdminYearsOverview> {
+    return this.dataService.createAdminYear(request);
+  }
+
+  updateYear(request: AdminYearUpdateRequest): Promise<AdminYearsOverview> {
+    return this.dataService.updateAdminYear(request);
   }
 
   setPaymentMethod(request: AdminPaymentMethodRequest): Promise<RegistrationState> {

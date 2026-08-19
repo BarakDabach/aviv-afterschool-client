@@ -14,7 +14,10 @@ type AdminYearsState = {
   overview: AdminYearsOverview | null;
   loading: boolean;
   error: string | null;
+  activeFormMode: AdminYearFormMode | null;
 };
+
+export type AdminYearFormMode = 'create' | 'duplicate' | 'edit';
 
 export type AdminYearChildView = AdminYearChild & {
   genderLabel: string;
@@ -37,14 +40,16 @@ export const AdminYearsStore = signalStore(
     overview: null,
     loading: false,
     error: null,
+    activeFormMode: null,
   }),
   withProps(() => ({
     adminFacade: inject(AdminFacade),
   })),
-  withComputed(({ overview, error }) => ({
+  withComputed(({ overview, error, activeFormMode }) => ({
     hasError: computed(() => error() !== null),
     currentYear: computed(() => overview() ? toYearView(overview()!.currentYear) : null),
     historicalYears: computed(() => overview()?.historicalYears.map(toYearView) ?? []),
+    formDialogOpen: computed(() => activeFormMode() !== null),
   })),
   withMethods((store) => ({
     async load(): Promise<void> {
@@ -63,6 +68,15 @@ export const AdminYearsStore = signalStore(
             : 'לא ניתן לטעון את שנות העבודה.',
         });
       }
+    },
+    openYearForm(mode: AdminYearFormMode): void {
+      patchState(store, { activeFormMode: mode });
+    },
+    closeYearForm(): void {
+      patchState(store, { activeFormMode: null });
+    },
+    applyYearsOverview(overview: AdminYearsOverview): void {
+      patchState(store, { overview, activeFormMode: null });
     },
   })),
   withHooks((store) => ({

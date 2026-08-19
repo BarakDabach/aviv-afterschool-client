@@ -228,6 +228,17 @@ This is a manual and integration dry-run specification for the backend-shaped in
 4. Verify the parent home can no longer load that registration from the repository.
 5. Verify dashboard metrics and queue counts recalculate after removal.
 
+## Admin Year Creation And Editing
+
+1. Open `/admin/years` as an authenticated admin and verify create, duplicate, and edit open the same dialog form.
+2. Attempt to create a year with missing plan prices, missing contract, missing capacity, or missing insurance; verify field-level validation blocks submission.
+3. Create a blank next year with four configured plans, holiday periods, contract file metadata, capacity, and insurance; verify the returned overview promotes it to current year and moves the previous current year into history.
+4. Duplicate the current year and verify plan prices, visibility, capacity, and insurance are prefilled while holidays are empty and no copied-contract display is shown.
+5. Edit the current year before registrations exist and verify plan prices, plan visibility, holidays, contract, capacity, and insurance can be saved.
+6. Edit the current year after at least one submitted registration exists and verify plan prices and insurance are locked while holidays, contract, and capacity remain editable.
+7. Verify parent registration reads the newly active year, active plan prices/visibility, current contract, capacity, insurance amount, and holiday periods from the same year repository.
+8. Force create/update service failures and verify the dialog shows a non-raw Hebrew error without mutating the existing years overview.
+
 ## Invalid Actions, Errors, And Busy State
 
 - Approve an unknown registration ID: expect a domain error and error notification.

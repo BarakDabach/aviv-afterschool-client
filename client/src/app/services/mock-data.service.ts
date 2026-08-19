@@ -23,6 +23,8 @@ import type {
   AdminDashboardData,
   AdminDocument,
   AdminDocumentActionRequest,
+  AdminYearCreateRequest,
+  AdminYearUpdateRequest,
   AdminPaymentMethodRequest,
   AdminRegistrationActionRequest,
   AdminRegistration,
@@ -35,6 +37,14 @@ import { ACTIVE_REGISTRATION_YEAR, AVAILABLE_YEAR_PLANS, REGISTRATION_HOLIDAY_PE
 @Injectable()
 export class MockDataService extends DataService {
   private readonly registrations = new Map<number, RegistrationState>();
+  private readonly years = new Map<number, Year>([[ACTIVE_REGISTRATION_YEAR.id, ACTIVE_REGISTRATION_YEAR]]);
+  private readonly yearPlans = new Map<number, AvailableYearPlan[]>([[ACTIVE_REGISTRATION_YEAR.id, clone(AVAILABLE_YEAR_PLANS)]]);
+  private readonly yearHolidayPeriods = new Map<number, HolidayPeriod[]>([[ACTIVE_REGISTRATION_YEAR.id, clone(REGISTRATION_HOLIDAY_PERIODS)]]);
+  private readonly yearContracts = new Map<number, { fileName: string; mimeType: string } | null>([[ACTIVE_REGISTRATION_YEAR.id, null]]);
+  private activeYearId = ACTIVE_REGISTRATION_YEAR.id;
+  private nextYearId = ACTIVE_REGISTRATION_YEAR.id + 1;
+  private nextYearPlanId = Math.max(...AVAILABLE_YEAR_PLANS.map((yearPlan) => yearPlan.yearPlanId)) + 1;
+  private nextHolidayPeriodId = Math.max(...REGISTRATION_HOLIDAY_PERIODS.map((holiday) => holiday.id)) + 1;
   private nextRegistrationId = 1;
   private nextDocumentId = 1;
 
@@ -43,11 +53,11 @@ export class MockDataService extends DataService {
   }
 
   override async getActiveRegistrationYear(): Promise<Year> {
-    return ACTIVE_REGISTRATION_YEAR;
+    return clone(this.currentYear());
   }
 
   override async getAvailableYearPlans(): Promise<AvailableYearPlan[]> {
-    return clone(AVAILABLE_YEAR_PLANS);
+    return clone(this.currentYearPlans());
   }
 
   override async getParentHome(parentEmail?: string): Promise<ParentHome> {
@@ -66,7 +76,7 @@ export class MockDataService extends DataService {
     }
 
     const activeRegistration = [...registrations]
-      .filter((registration) => registration.year.id === ACTIVE_REGISTRATION_YEAR.id)
+      .filter((registration) => registration.year.id === this.activeYearId)
       .sort(compareRegistrations)
       .at(0) ?? null;
 
@@ -74,7 +84,7 @@ export class MockDataService extends DataService {
       parent: registrations[0].parent,
       activeRegistration,
       registrationHistory: registrations.sort(compareRegistrations),
-      holidayPeriods: REGISTRATION_HOLIDAY_PERIODS,
+      holidayPeriods: this.currentYearHolidayPeriods(),
     });
   }
 
@@ -111,7 +121,7 @@ export class MockDataService extends DataService {
       reviewedAt: null,
     }));
     const children = request.draft.children.map((child) => {
-      const selectedPlan = AVAILABLE_YEAR_PLANS.find((yearPlan) => yearPlan.yearPlanId === child.selectedYearPlanId) ?? null;
+      const selectedPlan = this.plansForYear(request.draft.year.id).find((yearPlan) => yearPlan.yearPlanId === child.selectedYearPlanId) ?? null;
       const discountPercent = 0;
       const planPrice = selectedPlan?.plan.price ?? 0;
 
@@ -185,15 +195,15 @@ export class MockDataService extends DataService {
 
   override async getAdminDashboard(): Promise<AdminDashboardData> {
     const activeRegistrations = [...this.registrations.values()]
-      .filter((registration) => registration.year.id === ACTIVE_REGISTRATION_YEAR.id)
+      .filter((registration) => registration.year.id === this.activeYearId)
       .sort(compareRegistrations);
     const approvedRegistrations = activeRegistrations.filter((registration) => registration.status === RegistrationStatus.Approved);
 
     return clone({
-      activeYear: ACTIVE_REGISTRATION_YEAR.yearNumber,
+      activeYear: this.currentYear().yearNumber,
       totalRegistrations: activeRegistrations.length,
       registeredChildren: approvedRegistrations.reduce((total, registration) => total + registration.children.length, 0),
-      maxChildCapacity: ACTIVE_REGISTRATION_YEAR.maxChildCapacity,
+      maxChildCapacity: this.currentYear().maxChildCapacity,
       registrations: activeRegistrations
         .filter((registration) => registration.status === RegistrationStatus.WaitingForDocuments || registration.status === RegistrationStatus.PendingApproval)
         .map((registration) => this.toAdminRegistration(registration)),
@@ -201,25 +211,77 @@ export class MockDataService extends DataService {
   }
 
   override async getAdminYearsOverview(): Promise<AdminYearsOverview> {
-    const years = new Map<number, Year>([[ACTIVE_REGISTRATION_YEAR.id, ACTIVE_REGISTRATION_YEAR]]);
-
     for (const registration of this.registrations.values()) {
-      years.set(registration.year.id, registration.year);
+      this.years.set(registration.year.id, registration.year);
     }
 
-    const summaries = [...years.values()]
+    return clone(this.buildAdminYearsOverview());
+  }
+
+  override async createAdminYear(request: AdminYearCreateRequest): Promise<AdminYearsOverview> {
+    if (request.yearNumber <= this.currentYear().yearNumber) {
+      throw new Error('שנת העבודה החדשה חייבת להיות מאוחרת מהשנה הנוכחית.');
+    }
+
+    const year: Year = {
+      id: this.nextYearId++,
+      yearNumber: request.yearNumber,
+      maxChildCapacity: request.maxChildCapacity,
+      oneTimeInsuranceAmount: request.oneTimeInsuranceAmount,
+    };
+
+    this.years.set(year.id, year);
+    this.yearPlans.set(year.id, this.toAvailableYearPlans(request.plans));
+    this.yearHolidayPeriods.set(year.id, this.toHolidayPeriods(year.id, request.holidayPeriods));
+    const sourceContract = request.sourceYearId ? this.yearContracts.get(request.sourceYearId) : null;
+    this.yearContracts.set(year.id, {
+      fileName: request.contractFileName || sourceContract?.fileName || '',
+      mimeType: request.contractMimeType || sourceContract?.mimeType || 'application/octet-stream',
+    });
+    this.activeYearId = year.id;
+
+    return clone(this.buildAdminYearsOverview());
+  }
+
+  override async updateAdminYear(request: AdminYearUpdateRequest): Promise<AdminYearsOverview> {
+    const year = this.years.get(request.yearId);
+    if (!year) throw new Error('שנת העבודה לא נמצאה.');
+
+    const updatedYear: Year = {
+      ...year,
+      maxChildCapacity: request.maxChildCapacity,
+      oneTimeInsuranceAmount: request.oneTimeInsuranceAmount ?? year.oneTimeInsuranceAmount,
+    };
+
+    this.years.set(updatedYear.id, updatedYear);
+    if (request.plans) {
+      this.yearPlans.set(updatedYear.id, this.toAvailableYearPlans(request.plans));
+    }
+    this.yearHolidayPeriods.set(updatedYear.id, this.toHolidayPeriods(updatedYear.id, request.holidayPeriods));
+    if (request.contractFileName && request.contractMimeType) {
+      this.yearContracts.set(updatedYear.id, {
+        fileName: request.contractFileName,
+        mimeType: request.contractMimeType,
+      });
+    }
+
+    return clone(this.buildAdminYearsOverview());
+  }
+
+  private buildAdminYearsOverview(): AdminYearsOverview {
+    const summaries = [...this.years.values()]
       .sort((left, right) => right.yearNumber - left.yearNumber)
       .map((year) => this.toAdminYearSummary(year));
-    const currentYear = summaries.find((year) => year.yearId === ACTIVE_REGISTRATION_YEAR.id);
+    const currentYear = summaries.find((year) => year.yearId === this.activeYearId);
 
     if (!currentYear) {
       throw new Error('לא נמצאה שנת עבודה נוכחית.');
     }
 
-    return clone({
+    return {
       currentYear,
       historicalYears: summaries.filter((year) => year.yearId !== currentYear.yearId),
-    });
+    };
   }
 
   override async setAdminPaymentMethod(request: AdminPaymentMethodRequest): Promise<RegistrationState> {
@@ -297,7 +359,7 @@ export class MockDataService extends DataService {
   }
 
   private withCalculatedRequirements(registration: RegistrationState): RegistrationState {
-    const missingDocuments = getMissingDocumentsForRegistration(registration, registration.documents, AVAILABLE_YEAR_PLANS);
+    const missingDocuments = getMissingDocumentsForRegistration(registration, registration.documents, this.plansForYear(registration.year.id));
     return {
       ...registration,
       missingDocuments,
@@ -372,13 +434,64 @@ export class MockDataService extends DataService {
     return {
       yearId: year.id,
       yearNumber: year.yearNumber,
-      isCurrent: year.id === ACTIVE_REGISTRATION_YEAR.id,
+      isCurrent: year.id === this.activeYearId,
       registeredChildren: children.length,
       usedCapacity: children.filter((child) => child.yearStatus === RegistrationChildStatus.Active).length,
       maxChildCapacity: year.maxChildCapacity,
       oneTimeInsuranceAmount: year.oneTimeInsuranceAmount,
+      plans: this.plansForYear(year.id),
+      holidayPeriods: this.holidaysForYear(year.id),
+      contractFileName: this.yearContracts.get(year.id)?.fileName ?? null,
       children,
     };
+  }
+
+  private currentYear(): Year {
+    const year = this.years.get(this.activeYearId);
+    if (!year) throw new Error('לא נמצאה שנת עבודה נוכחית.');
+    return year;
+  }
+
+  private currentYearPlans(): AvailableYearPlan[] {
+    return this.plansForYear(this.activeYearId);
+  }
+
+  private currentYearHolidayPeriods(): HolidayPeriod[] {
+    return this.holidaysForYear(this.activeYearId);
+  }
+
+  private plansForYear(yearId: number): AvailableYearPlan[] {
+    return this.yearPlans.get(yearId) ?? [];
+  }
+
+  private holidaysForYear(yearId: number): HolidayPeriod[] {
+    return this.yearHolidayPeriods.get(yearId) ?? [];
+  }
+
+  private toAvailableYearPlans(plans: AdminYearCreateRequest['plans']): AvailableYearPlan[] {
+    return plans.map((plan) => ({
+      yearPlanId: this.nextYearPlanId++,
+      plan: {
+        id: plan.planId,
+        name: plan.name,
+        price: plan.price,
+        hours: plan.hours,
+        isActive: plan.isActive,
+        requiresStandingOrder: plan.requiresStandingOrder,
+      },
+    }));
+  }
+
+  private toHolidayPeriods(yearId: number, holidayPeriods: AdminYearCreateRequest['holidayPeriods']): HolidayPeriod[] {
+    return holidayPeriods
+      .filter((holiday) => holiday.name || holiday.startDate || holiday.endDate)
+      .map((holiday) => ({
+        id: this.nextHolidayPeriodId++,
+        yearId,
+        name: holiday.name || 'חופשה',
+        startDate: holiday.startDate,
+        endDate: holiday.endDate,
+      }));
   }
 
   private toAdminDocument(document: RegistrationDocument, coversChildren?: string[]): AdminDocument {

@@ -71,6 +71,9 @@ function createOverview(): AdminYearsOverview {
       usedCapacity: 1,
       maxChildCapacity: 30,
       oneTimeInsuranceAmount: 200,
+      plans: [],
+      holidayPeriods: [],
+      contractFileName: null,
       children: [
         child(10, 1, 'אורי לוי', Gender.Male, RegistrationChildStatus.Active, RegistrationStatus.Approved),
         child(10, 2, 'דני לוי', Gender.Male, RegistrationChildStatus.Left, RegistrationStatus.PendingApproval),
@@ -85,6 +88,9 @@ function createOverview(): AdminYearsOverview {
       usedCapacity: 0,
       maxChildCapacity: 28,
       oneTimeInsuranceAmount: 180,
+      plans: [],
+      holidayPeriods: [],
+      contractFileName: null,
       children: [],
     }],
   };

@@ -4,19 +4,19 @@
   <div class="mt-7 grid gap-3">
     <button
       hlmBtn
-      disabled
       type="button"
       class="h-[var(--app-button-height)] w-full rounded-[var(--app-control-radius)] border-0 bg-primary px-4 text-[length:var(--app-button-size)] font-black text-white sm:h-8 sm:px-3 sm:text-[length:var(--app-muted-size)]"
+      (click)="requestCreateYear()"
     >
       <ng-icon name="lucidePlus" />
       יצירת שנה חדשה
     </button>
     <button
       hlmBtn
-      disabled
       variant="outline"
       type="button"
       class="h-[var(--app-button-height)] w-full rounded-[var(--app-control-radius)] border-brand px-4 text-[length:var(--app-button-size)] font-bold text-brand sm:h-8 sm:px-3 sm:text-[length:var(--app-muted-size)]"
+      (click)="requestDuplicateYear()"
     >
       <ng-icon name="lucideCopy" />
       שכפול שנה נוכחית
@@ -38,9 +38,9 @@
         <app-admin-summary-cards [cards]="currentYearSummaryCards()" containerClass="grid grid-cols-2 gap-3 mb-5" />
         <button
           hlmBtn
-          disabled
           type="button"
           class="h-[var(--app-button-height)] w-full rounded-[var(--app-control-radius)] border-0 bg-primary px-4 text-[length:var(--app-button-size)] font-black text-white sm:h-8 sm:px-3 sm:text-[length:var(--app-muted-size)]"
+          (click)="requestEditYear()"
         >
           <ng-icon name="lucidePencil" />
           עריכת שנה

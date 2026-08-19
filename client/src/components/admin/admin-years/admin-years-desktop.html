@@ -8,26 +8,26 @@
     <div class="flex items-center gap-3">
       <button
         hlmBtn
-        disabled
         variant="outline"
         type="button"
         class="h-[var(--app-button-height)] w-auto rounded-[var(--app-control-radius)] border-brand px-4 text-[length:var(--app-button-size)] font-bold text-brand sm:h-8 sm:flex-none sm:px-3 sm:text-[length:var(--app-muted-size)]"
+        (click)="requestDuplicateYear()"
       >
         <ng-icon name="lucideCopy" /> שכפול שנה נוכחית
       </button>
       <button
         hlmBtn
-        disabled
         type="button"
         class="h-[var(--app-button-height)] w-auto rounded-[var(--app-control-radius)] border-0 bg-primary px-4 text-[length:var(--app-button-size)] font-black text-white sm:h-8 sm:flex-none sm:px-3 sm:text-[length:var(--app-muted-size)]"
+        (click)="requestCreateYear()"
       >
         <ng-icon name="lucidePlus" /> יצירת שנה חדשה
       </button>
       <button
         hlmBtn
-        disabled
         type="button"
         class="h-[var(--app-button-height)] w-auto rounded-[var(--app-control-radius)] border-0 bg-primary px-4 text-[length:var(--app-button-size)] font-black text-white sm:h-8 sm:flex-none sm:px-3 sm:text-[length:var(--app-muted-size)]"
+        (click)="requestEditYear()"
       >
         <ng-icon name="lucidePencil" /> עריכת שנה
       </button>

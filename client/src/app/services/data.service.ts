@@ -10,6 +10,8 @@ import type { AuthenticatedUser } from '../types/auth.type';
 import type {
   AdminDashboardData,
   AdminDocumentActionRequest,
+  AdminYearCreateRequest,
+  AdminYearUpdateRequest,
   AdminPaymentMethodRequest,
   AdminRegistrationActionRequest,
   AdminYearsOverview,
@@ -35,6 +37,10 @@ export abstract class DataService {
   abstract getAdminDashboard(): Promise<AdminDashboardData>;
 
   abstract getAdminYearsOverview(): Promise<AdminYearsOverview>;
+
+  abstract createAdminYear(request: AdminYearCreateRequest): Promise<AdminYearsOverview>;
+
+  abstract updateAdminYear(request: AdminYearUpdateRequest): Promise<AdminYearsOverview>;
 
   abstract setAdminPaymentMethod(request: AdminPaymentMethodRequest): Promise<RegistrationState>;
 

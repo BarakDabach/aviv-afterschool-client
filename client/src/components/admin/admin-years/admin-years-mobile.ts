@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, input } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCalendarDays, lucideCopy, lucidePencil, lucidePlus, lucideShield, lucideUsersRound } from '@ng-icons/lucide';
 import { HlmAccordionImports } from '@spartan-ng/helm/accordion';
@@ -32,6 +32,9 @@ type AdminYearSummaryCards = {
 export class AdminYearsMobile {
   readonly currentYear = input.required<AdminYearView>();
   readonly historicalYears = input.required<AdminYearView[]>();
+  @Output() readonly createYear = new EventEmitter<void>();
+  @Output() readonly duplicateYear = new EventEmitter<void>();
+  @Output() readonly editYear = new EventEmitter<void>();
 
   readonly currentYearSummaryCards = computed<readonly AdminSummaryCard[]>(() => buildYearSummaryCards(this.currentYear(), true));
   readonly historicalYearsSummaryCards = computed<readonly AdminYearSummaryCards[]>(() =>
@@ -40,6 +43,18 @@ export class AdminYearsMobile {
       cards: buildYearSummaryCards(year, false),
     })),
   );
+
+  protected requestCreateYear(): void {
+    this.createYear.emit();
+  }
+
+  protected requestDuplicateYear(): void {
+    this.duplicateYear.emit();
+  }
+
+  protected requestEditYear(): void {
+    this.editYear.emit();
+  }
 }
 
 function buildYearSummaryCards(year: AdminYearView, isCurrent: boolean): AdminSummaryCard[] {

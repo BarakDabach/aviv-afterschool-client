@@ -6,6 +6,7 @@ import { MockAuthFacade } from './facades/mock-auth.facade';
 import { DataService } from './services/data.service';
 import { MockDataService } from './services/mock-data.service';
 import { SonnerNotificationService } from './services/sonner-notification.service';
+import { provideSpartanHlm } from '@spartan-ng/helm/utils';
 
 import { routes } from './app.routes';
 
@@ -19,6 +20,7 @@ export const appConfig: ApplicationConfig = {
         anchorScrolling: 'enabled',
       }),
     ),
+    provideSpartanHlm(),
     {
       provide: AuthFacade,
       useClass: MockAuthFacade,

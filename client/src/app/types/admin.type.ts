@@ -1,5 +1,7 @@
 import type {
+  AvailableYearPlan,
   Gender,
+  HolidayPeriod,
   PaymentMethod,
   RegistrationChildStatus,
   RegistrationStatus,
@@ -69,6 +71,9 @@ export interface AdminYearSummary {
   usedCapacity: number;
   maxChildCapacity: number;
   oneTimeInsuranceAmount: number;
+  plans: AvailableYearPlan[];
+  holidayPeriods: HolidayPeriod[];
+  contractFileName: string | null;
   children: AdminYearChild[];
 }
 
@@ -90,4 +95,40 @@ export interface AdminDocumentActionRequest {
 
 export interface AdminRegistrationActionRequest {
   registrationId: number;
+}
+
+export interface AdminYearPlanRequest {
+  planId: number;
+  name: string;
+  price: number;
+  hours: string;
+  isActive: boolean;
+  requiresStandingOrder: boolean;
+}
+
+export interface AdminYearHolidayRequest {
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface AdminYearCreateRequest {
+  sourceYearId?: number;
+  yearNumber: number;
+  maxChildCapacity: number;
+  oneTimeInsuranceAmount: number;
+  contractFileName: string;
+  contractMimeType: string;
+  plans: AdminYearPlanRequest[];
+  holidayPeriods: AdminYearHolidayRequest[];
+}
+
+export interface AdminYearUpdateRequest {
+  yearId: number;
+  maxChildCapacity: number;
+  oneTimeInsuranceAmount?: number;
+  contractFileName?: string;
+  contractMimeType?: string;
+  plans?: AdminYearPlanRequest[];
+  holidayPeriods: AdminYearHolidayRequest[];
 }
