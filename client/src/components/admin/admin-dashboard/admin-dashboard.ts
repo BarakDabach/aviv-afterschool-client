@@ -20,10 +20,11 @@ import {
 import { BrnCollapsibleImports } from '@spartan-ng/brain/collapsible';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { AdminDashboardStore } from './admin-dashboard.store';
+import { AdminSummaryCards } from '../admin-summary-cards/admin-summary-cards';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [NgClass, NgTemplateOutlet, NgIcon, BrnCollapsibleImports, HlmButtonImports],
+  imports: [NgClass, NgTemplateOutlet, NgIcon, AdminSummaryCards, BrnCollapsibleImports, HlmButtonImports],
   providers: [
     AdminDashboardStore,
     provideIcons({

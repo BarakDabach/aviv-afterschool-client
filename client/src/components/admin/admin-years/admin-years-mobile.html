@@ -1,0 +1,83 @@
+<section class="relative z-10 mx-auto w-full max-w-[var(--app-dashboard-content-width)] pt-6" aria-labelledby="mobile-years-title">
+  <h1 id="mobile-years-title" class="m-0 text-center text-[2.1rem] font-black leading-tight text-brand">שנות עבודה</h1>
+
+  <div class="mt-7 grid gap-3">
+    <button
+      hlmBtn
+      disabled
+      type="button"
+      class="h-[var(--app-button-height)] w-full rounded-[var(--app-control-radius)] border-0 bg-primary px-4 text-[length:var(--app-button-size)] font-black text-white sm:h-8 sm:px-3 sm:text-[length:var(--app-muted-size)]"
+    >
+      <ng-icon name="lucidePlus" />
+      יצירת שנה חדשה
+    </button>
+    <button
+      hlmBtn
+      disabled
+      variant="outline"
+      type="button"
+      class="h-[var(--app-button-height)] w-full rounded-[var(--app-control-radius)] border-brand px-4 text-[length:var(--app-button-size)] font-bold text-brand sm:h-8 sm:px-3 sm:text-[length:var(--app-muted-size)]"
+    >
+      <ng-icon name="lucideCopy" />
+      שכפול שנה נוכחית
+    </button>
+  </div>
+
+  <hlm-accordion type="multiple" class="mt-4 overflow-visible rounded-[var(--app-card-radius)] border-border bg-card/80">
+    <hlm-accordion-item [isOpened]="true" class="border-0 bg-transparent!">
+      <hlm-accordion-trigger
+        triggerClass="min-h-20 items-center px-4 py-4 text-brand no-underline hover:no-underline"
+      >
+        <div class="flex min-w-0 flex-1 items-center justify-between gap-3 pe-2">
+          <strong class="text-2xl font-black" dir="ltr">{{ currentYear().label }}</strong>
+          <span hlmBadge variant="secondary" class="bg-surface-sage/70 px-3 py-1.5 text-sm text-brand">השנה הנוכחית</span>
+        </div>
+      </hlm-accordion-trigger>
+
+      <hlm-accordion-content class="overflow-hidden data-[state=closed]:px-0 data-[state=closed]:pb-0 data-[state=open]:px-3 data-[state=open]:pb-3">
+        <app-admin-summary-cards [cards]="currentYearSummaryCards()" containerClass="grid grid-cols-2 gap-3 mb-5" />
+        <button
+          hlmBtn
+          disabled
+          type="button"
+          class="h-[var(--app-button-height)] w-full rounded-[var(--app-control-radius)] border-0 bg-primary px-4 text-[length:var(--app-button-size)] font-black text-white sm:h-8 sm:px-3 sm:text-[length:var(--app-muted-size)]"
+        >
+          <ng-icon name="lucidePencil" />
+          עריכת שנה
+        </button>
+
+        <section class="mt-7" aria-labelledby="mobile-current-children-title">
+          <h2 id="mobile-current-children-title" class="mb-4 text-2xl font-black text-brand">ילדים בשנה</h2>
+          <app-admin-year-children [children]="currentYear().children" layout="mobile" />
+        </section>
+      </hlm-accordion-content>
+    </hlm-accordion-item>
+  </hlm-accordion>
+
+  <section class="mt-4" aria-labelledby="mobile-history-title">
+    <h2 id="mobile-history-title" class="sr-only">שנים קודמות</h2>
+    @for (summary of historicalYearsSummaryCards(); track summary.year.yearId) {
+      <hlm-accordion class="mb-3 overflow-visible rounded-[var(--app-card-radius)] border-border bg-card/80">
+        <hlm-accordion-item class="border-0 bg-transparent!">
+          <hlm-accordion-trigger triggerClass="min-h-20 items-center px-4 py-4 text-brand no-underline hover:no-underline">
+            <div class="min-w-0 flex-1 pe-2">
+              <strong class="block text-xl font-black" dir="ltr">{{ summary.year.label }}</strong>
+              <app-admin-summary-cards [cards]="summary.cards" containerClass="mt-3 grid grid-cols-2 gap-3" />
+            </div>
+          </hlm-accordion-trigger>
+          <hlm-accordion-content class="overflow-hidden data-[state=closed]:px-0 data-[state=closed]:pb-0 data-[state=open]:px-3 data-[state=open]:pb-3">
+            <app-admin-year-children [children]="summary.year.children" layout="mobile" />
+          </hlm-accordion-content>
+        </hlm-accordion-item>
+      </hlm-accordion>
+    } @empty {
+      <div hlmEmpty class="min-h-44 border border-dashed border-border bg-card/55">
+        <div hlmEmptyHeader>
+          <div hlmEmptyMedia variant="icon" class="text-brand"><ng-icon name="lucideUsersRound" /></div>
+          <div hlmEmptyTitle class="font-black text-brand">אין עדיין שנים קודמות</div>
+          <div hlmEmptyDescription>לאחר שתיווצר שנת עבודה נוספת, ההיסטוריה תופיע כאן.</div>
+        </div>
+      </div>
+    }
+  </section>
+</section>

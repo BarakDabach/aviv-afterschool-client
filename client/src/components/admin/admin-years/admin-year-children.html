@@ -1,0 +1,122 @@
+@if (children().length) {
+  @if (layout() === 'desktop') {
+    <div
+      class="overflow-hidden rounded-[var(--app-card-radius)] border border-border bg-card/80"
+      [ngClass]="insetEmpty() ? 'mx-6 mt-4 mb-6' : ''"
+    >
+      <div class="grid grid-cols-[1.3fr_1.25fr_0.9fr_0.9fr] items-center gap-4 border-b border-border bg-surface-warm/55 px-6 py-3 text-sm font-bold text-muted-foreground">
+        <span>ילד/ה</span>
+        <span>תוכנית נוכחית</span>
+        <span>אופן תשלום</span>
+        <span>מצב הרשמה</span>
+      </div>
+      @for (child of children(); track child.registrationId + '-' + child.registrationChildId) {
+        <article class="grid min-h-24 grid-cols-[1.3fr_1.25fr_0.9fr_0.9fr] items-center gap-4 border-b border-border/80 px-6 py-4 last:border-b-0">
+          <div class="flex min-w-0 items-center gap-3">
+            <img class="size-9 shrink-0 object-contain" [src]="child.avatarSrc" [alt]="child.avatarAlt" />
+            <div class="min-w-0">
+              <strong class="block truncate text-lg font-black text-brand">{{ child.fullName }}</strong>
+              <span class="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                <ng-icon name="lucidePhone" class="h-3.5 w-3.5" />
+                <span dir="ltr">{{ child.parentPhoneNumber }}</span>
+              </span>
+              @if (child.removedLabel) {
+                <span hlmBadge variant="destructive" class="mt-1 flex w-fit px-2 py-0.5">{{ child.removedLabel }}</span>
+              }
+            </div>
+          </div>
+          <span hlmBadge variant="secondary" class="w-fit max-w-full whitespace-normal bg-surface-sage/65 px-2 py-0.5 text-right text-foreground">
+            {{ child.planLabel }}
+          </span>
+          <span hlmBadge variant="secondary" class="w-fit bg-surface-sage/65 px-2 py-0.5 text-foreground">
+            {{ child.paymentMethodLabel }}
+          </span>
+          <span
+            hlmBadge
+            [variant]="child.registrationStatusTone === 'danger' ? 'destructive' : 'secondary'"
+            class="w-fit px-2 py-0.5"
+            [ngClass]="{
+              'bg-surface-sage/75 text-brand': child.registrationStatusTone === 'success',
+              'bg-surface-warm text-warning-foreground': child.registrationStatusTone === 'warning',
+              'bg-muted text-muted-foreground': child.registrationStatusTone === 'neutral'
+            }"
+          >
+            {{ child.registrationStatusLabel }}
+          </span>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="grid gap-3">
+      @for (child of children(); track child.registrationId + '-' + child.registrationChildId) {
+        <hlm-card class="gap-0 border-border bg-card/90 py-0 shadow-none">
+          <div hlmCardContent class="p-4">
+            <div class="flex items-start gap-3">
+              <img class="size-10 shrink-0 object-contain" [src]="child.avatarSrc" [alt]="child.avatarAlt" />
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <strong class="text-xl font-black text-brand">{{ child.fullName }}</strong>
+                  @if (child.removedLabel) {
+                    <span hlmBadge variant="destructive" class="px-2 py-0.5">{{ child.removedLabel }}</span>
+                  }
+                </div>
+                <span class="mt-0.5 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <ng-icon name="lucidePhone" class="h-3.5 w-3.5" />
+                  <span dir="ltr">{{ child.parentPhoneNumber }}</span>
+                </span>
+              </div>
+            </div>
+
+            <hlm-separator class="my-4" />
+
+            <dl class="grid grid-cols-3 gap-2 text-center">
+              <div class="min-w-0">
+                <dt class="text-xs text-muted-foreground">תוכנית נבחרת</dt>
+                <dd class="mt-2 mb-0">
+                  <span hlmBadge variant="secondary" class="max-w-full whitespace-normal bg-surface-sage/65 px-2 py-0.5 text-foreground">{{ child.planLabel }}</span>
+                </dd>
+              </div>
+              <div class="min-w-0 border-x border-border px-2">
+                <dt class="text-xs text-muted-foreground">אופן תשלום</dt>
+                <dd class="mt-2 mb-0">
+                  <span hlmBadge variant="secondary" class="whitespace-normal bg-surface-sage/65 px-2 py-0.5 text-foreground">{{ child.paymentMethodLabel }}</span>
+                </dd>
+              </div>
+              <div class="min-w-0">
+                <dt class="text-xs text-muted-foreground">מצב הרשמה</dt>
+                <dd class="mt-2 mb-0">
+                  <span
+                    hlmBadge
+                    [variant]="child.registrationStatusTone === 'danger' ? 'destructive' : 'secondary'"
+                    class="whitespace-normal px-2 py-0.5"
+                    [ngClass]="{
+                      'bg-surface-sage/75 text-brand': child.registrationStatusTone === 'success',
+                      'bg-surface-warm text-warning-foreground': child.registrationStatusTone === 'warning',
+                      'bg-muted text-muted-foreground': child.registrationStatusTone === 'neutral'
+                    }"
+                  >{{ child.registrationStatusLabel }}</span>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </hlm-card>
+      }
+    </div>
+  }
+} @else {
+  <div
+    hlmEmpty
+    class="border border-dashed border-border bg-card/55"
+    [ngClass]="[
+      insetEmpty() ? 'mx-6 mt-4 min-h-48 w-auto' : (layout() === 'desktop' ? 'h-full min-h-48 w-full' : 'min-h-44 w-full')
+    ]"
+  >
+    <div hlmEmptyHeader>
+      <div hlmEmptyMedia variant="icon" class="text-brand">
+        <ng-icon name="lucideUsersRound" />
+      </div>
+      <div hlmEmptyTitle class="font-black text-brand">אין ילדים בשנה זו</div>
+      <div hlmEmptyDescription>ילדים שיוזנו דרך תהליך ההרשמה יופיעו כאן.</div>
+    </div>
+  </div>
+}

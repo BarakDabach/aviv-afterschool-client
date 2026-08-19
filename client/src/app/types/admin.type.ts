@@ -1,3 +1,10 @@
+import type {
+  Gender,
+  PaymentMethod,
+  RegistrationChildStatus,
+  RegistrationStatus,
+} from './registration-status.type';
+
 export type AdminQueue = 'waitingForDocuments' | 'pendingApproval';
 export type AdminRegistrationStatus = 'WaitingForDocuments' | 'PendingApproval';
 export type AdminBillingPeriod = 'Daily' | 'Monthly';
@@ -40,6 +47,34 @@ export interface AdminDashboardData {
   registeredChildren: number;
   maxChildCapacity: number;
   registrations: AdminRegistration[];
+}
+
+export interface AdminYearChild {
+  registrationId: number;
+  registrationChildId: number;
+  fullName: string;
+  gender: Gender;
+  parentPhoneNumber: string;
+  planName: string;
+  paymentMethod: PaymentMethod;
+  registrationStatus: RegistrationStatus;
+  yearStatus: RegistrationChildStatus;
+}
+
+export interface AdminYearSummary {
+  yearId: number;
+  yearNumber: number;
+  isCurrent: boolean;
+  registeredChildren: number;
+  usedCapacity: number;
+  maxChildCapacity: number;
+  oneTimeInsuranceAmount: number;
+  children: AdminYearChild[];
+}
+
+export interface AdminYearsOverview {
+  currentYear: AdminYearSummary;
+  historicalYears: AdminYearSummary[];
 }
 
 export interface AdminPaymentMethodRequest {

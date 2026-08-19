@@ -4,6 +4,7 @@ import {
   DocumentType,
   Gender,
   PaymentMethod,
+  RegistrationChildStatus,
   RegistrationDraftStep,
   RegistrationDocumentScopeKind,
   RegistrationStatus,
@@ -25,8 +26,55 @@ describe('DataService', () => {
     await expect(service.getAuthOtpResendTimeoutSeconds()).resolves.toBe(10);
   });
 
+  it('returns the configured current year and an empty history without admin fixtures', async () => {
+    const service = configureMockService();
+
+    const overview = await service.getAdminYearsOverview();
+
+    expect(overview.currentYear).toMatchObject({
+      yearNumber: 2027,
+      registeredChildren: 0,
+      usedCapacity: 0,
+      maxChildCapacity: 60,
+      oneTimeInsuranceAmount: 200,
+      children: [],
+    });
+    expect(overview.historicalYears).toEqual([]);
+  });
+
+  it('projects parent-submitted children into the admin years overview without exposing birth dates', async () => {
+    const service = configureMockService();
+    const year = await service.getActiveRegistrationYear();
+    const plans = await service.getAvailableYearPlans();
+    const draft = createDraft(year, plans[0].yearPlanId, [
+      { id: 1, fullName: 'אורי לוי' },
+      { id: 2, fullName: 'נועה לוי' },
+    ]);
+
+    await service.submitRegistration({ draft, selectedFiles: [] });
+    const overview = await service.getAdminYearsOverview();
+
+    expect(overview.currentYear.registeredChildren).toBe(2);
+    expect(overview.currentYear.usedCapacity).toBe(2);
+    expect(overview.currentYear.children).toHaveLength(2);
+    expect(overview.currentYear.children[0]).toMatchObject({
+      registrationId: 1,
+      planName: plans[0].plan.name,
+      paymentMethod: PaymentMethod.StandingOrder,
+      registrationStatus: RegistrationStatus.WaitingForDocuments,
+      yearStatus: RegistrationChildStatus.Active,
+    });
+    expect(overview.currentYear.children[0]).not.toHaveProperty('dateOfBirth');
+  });
+
   it('returns submitted parent home data with active registration, history, and holidays', async () => {
     const service = configureMockService();
+    const year = await service.getActiveRegistrationYear();
+    const plans = await service.getAvailableYearPlans();
+    await service.submitRegistration({
+      draft: createDraft(year, plans[0].yearPlanId, [{ id: 1, fullName: 'אורי לוי' }]),
+      selectedFiles: [],
+    });
     const home = await service.getParentHome('parent@example.com');
 
     expect(home.parent.fullName).toBe('דנה לוי');
@@ -37,6 +85,12 @@ describe('DataService', () => {
 
   it('loads a submitted registration by id for parent home drill-in', async () => {
     const service = configureMockService();
+    const year = await service.getActiveRegistrationYear();
+    const plans = await service.getAvailableYearPlans();
+    await service.submitRegistration({
+      draft: createDraft(year, plans[0].yearPlanId, [{ id: 1, fullName: 'אורי לוי' }]),
+      selectedFiles: [],
+    });
     const home = await service.getParentHome('parent@example.com');
     const registrationId = home.activeRegistration!.id;
 

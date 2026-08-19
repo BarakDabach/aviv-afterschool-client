@@ -44,6 +44,7 @@
   --surface-warm: oklch(0.97 0.026 86);
   --surface-sage: oklch(0.91 0.046 118);
   --app-content-width: 35rem;
+  --app-dashboard-content-width: 64rem;
   --app-header-width: 35rem;
   --app-screen-padding: 2.25rem;
   --app-card-radius: 0.72rem;

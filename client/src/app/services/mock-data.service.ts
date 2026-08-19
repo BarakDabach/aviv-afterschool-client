@@ -26,9 +26,11 @@ import type {
   AdminPaymentMethodRequest,
   AdminRegistrationActionRequest,
   AdminRegistration,
+  AdminYearSummary,
+  AdminYearsOverview,
 } from '../types/admin.type';
 import { DataService } from './data.service';
-import { ACTIVE_REGISTRATION_YEAR, ADMIN_CHILD_CAPACITY, AVAILABLE_YEAR_PLANS, REGISTRATION_HOLIDAY_PERIODS } from '../config/registration.config';
+import { ACTIVE_REGISTRATION_YEAR, AVAILABLE_YEAR_PLANS, REGISTRATION_HOLIDAY_PERIODS } from '../config/registration.config';
 
 @Injectable()
 export class MockDataService extends DataService {
@@ -191,10 +193,32 @@ export class MockDataService extends DataService {
       activeYear: ACTIVE_REGISTRATION_YEAR.yearNumber,
       totalRegistrations: activeRegistrations.length,
       registeredChildren: approvedRegistrations.reduce((total, registration) => total + registration.children.length, 0),
-      maxChildCapacity: ADMIN_CHILD_CAPACITY,
+      maxChildCapacity: ACTIVE_REGISTRATION_YEAR.maxChildCapacity,
       registrations: activeRegistrations
         .filter((registration) => registration.status === RegistrationStatus.WaitingForDocuments || registration.status === RegistrationStatus.PendingApproval)
         .map((registration) => this.toAdminRegistration(registration)),
+    });
+  }
+
+  override async getAdminYearsOverview(): Promise<AdminYearsOverview> {
+    const years = new Map<number, Year>([[ACTIVE_REGISTRATION_YEAR.id, ACTIVE_REGISTRATION_YEAR]]);
+
+    for (const registration of this.registrations.values()) {
+      years.set(registration.year.id, registration.year);
+    }
+
+    const summaries = [...years.values()]
+      .sort((left, right) => right.yearNumber - left.yearNumber)
+      .map((year) => this.toAdminYearSummary(year));
+    const currentYear = summaries.find((year) => year.yearId === ACTIVE_REGISTRATION_YEAR.id);
+
+    if (!currentYear) {
+      throw new Error('לא נמצאה שנת עבודה נוכחית.');
+    }
+
+    return clone({
+      currentYear,
+      historicalYears: summaries.filter((year) => year.yearId !== currentYear.yearId),
     });
   }
 
@@ -325,6 +349,35 @@ export class MockDataService extends DataService {
       expanded: false,
       children: childDocuments,
       sharedDocuments: [...sharedDocuments, ...sharedMissingDocuments],
+    };
+  }
+
+  private toAdminYearSummary(year: Year): AdminYearSummary {
+    const registrations = [...this.registrations.values()]
+      .filter((registration) => registration.year.id === year.id)
+      .sort(compareRegistrations);
+    const children = registrations.flatMap((registration) => registration.children.map((child) => ({
+      registrationId: registration.id,
+      registrationChildId: child.id,
+      fullName: child.child.fullName,
+      gender: child.child.gender,
+      parentPhoneNumber: registration.parent.phoneNumber,
+      planName: child.selectedPlan?.plan.name ?? '',
+      paymentMethod: child.paymentMethod
+        ?? (child.selectedPlan?.plan.requiresStandingOrder === false ? PaymentMethod.Cash : PaymentMethod.StandingOrder),
+      registrationStatus: registration.status,
+      yearStatus: child.status,
+    })));
+
+    return {
+      yearId: year.id,
+      yearNumber: year.yearNumber,
+      isCurrent: year.id === ACTIVE_REGISTRATION_YEAR.id,
+      registeredChildren: children.length,
+      usedCapacity: children.filter((child) => child.yearStatus === RegistrationChildStatus.Active).length,
+      maxChildCapacity: year.maxChildCapacity,
+      oneTimeInsuranceAmount: year.oneTimeInsuranceAmount,
+      children,
     };
   }
 

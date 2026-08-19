@@ -12,6 +12,7 @@ import type {
   AdminDocumentActionRequest,
   AdminPaymentMethodRequest,
   AdminRegistrationActionRequest,
+  AdminYearsOverview,
 } from '../types/admin.type';
 
 export abstract class DataService {
@@ -32,6 +33,8 @@ export abstract class DataService {
   abstract uploadRegistrationDocument(request: UploadRegistrationDocumentRequest): Promise<RegistrationState>;
 
   abstract getAdminDashboard(): Promise<AdminDashboardData>;
+
+  abstract getAdminYearsOverview(): Promise<AdminYearsOverview>;
 
   abstract setAdminPaymentMethod(request: AdminPaymentMethodRequest): Promise<RegistrationState>;
 

@@ -60,6 +60,26 @@ This is a manual and integration dry-run specification for the backend-shaped in
 8. While authenticated as a parent with an existing active registration, navigate directly to `/registration`; verify the registration flow opens and allows starting another registration.
 9. While authenticated as an admin, submit a registration through `/registration`; verify the created registration is stored as a normal submitted registration and appears in the admin queues according to its status.
 
+## Admin Working Years Overview
+
+1. Log in as an administrator and open `/admin/years`; verify the current year is the first prominent control and uses the numeric `start-year/end-year` label.
+2. Open `/admin/current-year`; verify it redirects to `/admin/years` and remains protected by the administrator guard.
+3. With no submitted registrations, verify the current-year summary shows zero children, zero used capacity, the service-provided maximum capacity and insurance amount, and an empty children state.
+4. With no historical years, verify the current year remains visible and the separate empty-history state is shown.
+5. Submit registrations through the parent registration flow, reload `/admin/years`, and verify every rendered child comes from those submissions without admin-only fixtures.
+6. Verify each child row shows name, gender, selected plan, payment method, and `מצב הרשמה`, but never shows age or date of birth.
+7. Verify all registration states returned by the service map to the correct Hebrew status text and accessible badge treatment.
+8. Mark a boy and a girl as having left through the real yearly-membership service; verify only those children show `הוסר` and `הוסרה` respectively.
+9. Verify active children do not show any removal label.
+10. Verify the total child count includes active and removed children while used capacity includes only children with yearly status `Active`, regardless of registration approval state.
+11. Create registrations with child-local IDs that repeat across different registrations; verify all children render as distinct rows.
+12. Add multiple historical years through the real year service; verify they appear newest first and each expands to the same child fields as the current year.
+13. Force the overview service to fail; verify the page shows a safe Hebrew error state and retry reloads the service data.
+14. Verify the current-year summary and each historical-year summary block uses the shared card component that matches the dashboard card composition (`value`, `label`, `detail`, and icon bubble) and respects RTL/LTR behavior for numeric fields.
+15. In desktop width (`1440 × 1024`) and mobile width (`390 × 844`), verify that the summary cards on `/admin` and `/admin/years` have consistent visual hierarchy and spacing.
+16. Verify create, duplicate, and edit actions remain disabled until the shared year form is introduced and do not issue service mutations.
+15. Verify the mobile accordion works at `390 × 844`, the desktop dashboard layout works at `1440 × 1024`, all content is RTL, and no row or action is clipped.
+
 ## Login Accessibility And OTP Flow
 
 1. Open the login screen on a mobile viewport.

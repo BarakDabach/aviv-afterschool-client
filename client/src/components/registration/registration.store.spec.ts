@@ -24,6 +24,8 @@ import { RegistrationStore } from './registration.store';
 const activeYear: Year = {
   id: 1,
   yearNumber: 2027,
+  maxChildCapacity: 60,
+  oneTimeInsuranceAmount: 200,
 };
 
 const availableYearPlans: AvailableYearPlan[] = [
@@ -136,7 +138,7 @@ describe('RegistrationStore', () => {
     localStorage.setItem(
       'aviv-registration-draft',
       JSON.stringify({
-        year: { id: 3, yearNumber: 2026 },
+        year: { id: 3, yearNumber: 2026, maxChildCapacity: 60, oneTimeInsuranceAmount: 200 },
         currentStep: RegistrationDraftStep.DocumentsUpload,
         parentDetails: {
           id: 1,
@@ -207,7 +209,7 @@ describe('RegistrationStore', () => {
     localStorage.setItem(
       'aviv-registration-draft',
       JSON.stringify({
-        year: { id: 3, yearNumber: 2026 },
+        year: { id: 3, yearNumber: 2026, maxChildCapacity: 60, oneTimeInsuranceAmount: 200 },
         currentStep: RegistrationDraftStep.DocumentsUpload,
         parentDetails: {
           id: 1,
@@ -269,7 +271,7 @@ describe('RegistrationStore', () => {
     localStorage.setItem(
       'aviv-registration-draft',
       JSON.stringify({
-        year: { id: 3, yearNumber: 2026 },
+        year: { id: 3, yearNumber: 2026, maxChildCapacity: 60, oneTimeInsuranceAmount: 200 },
         currentStep: RegistrationDraftStep.PlanSelection,
         parentDetails: {
           id: 1,

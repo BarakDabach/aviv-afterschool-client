@@ -54,8 +54,10 @@ describe('LoginStore', () => {
           },
         },
         provideRouter([
+          { path: 'login', component: EmptyRouteComponent },
           { path: 'home', component: EmptyRouteComponent },
           { path: 'admin', component: EmptyRouteComponent },
+          { path: 'admin/years', component: EmptyRouteComponent },
         ]),
       ],
     });
@@ -152,8 +154,10 @@ describe('LoginStore', () => {
           },
         },
         provideRouter([
+          { path: 'login', component: EmptyRouteComponent },
           { path: 'home', component: EmptyRouteComponent },
           { path: 'admin', component: EmptyRouteComponent },
+          { path: 'admin/years', component: EmptyRouteComponent },
         ]),
       ],
     });
@@ -181,5 +185,17 @@ describe('LoginStore', () => {
     expect(globalStore.isAdmin()).toBe(true);
     expect(globalStore.email()).toBe('admin@example.com');
     expect(router.url).toBe('/admin');
+  });
+
+  it('honors an admin redirect after OTP verification', async () => {
+    await router.navigateByUrl('/login?redirect=%2Fadmin%2Fyears');
+    store.updateEmail('admin@example.com');
+    await store.requestOtp();
+    store.updateOtp('123456');
+
+    await store.verifyOtp();
+
+    expect(globalStore.isAdmin()).toBe(true);
+    expect(router.url).toBe('/admin/years');
   });
 });

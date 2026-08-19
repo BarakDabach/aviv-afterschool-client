@@ -4,6 +4,7 @@ import type {
   AdminDocumentActionRequest,
   AdminPaymentMethodRequest,
   AdminRegistrationActionRequest,
+  AdminYearsOverview,
 } from '../types/admin.type';
 import type { RegistrationState } from '../types/registration-status.type';
 import { DataService } from '../services/data.service';
@@ -14,6 +15,10 @@ export class AdminFacade {
 
   getDashboard(): Promise<AdminDashboardData> {
     return this.dataService.getAdminDashboard();
+  }
+
+  getYearsOverview(): Promise<AdminYearsOverview> {
+    return this.dataService.getAdminYearsOverview();
   }
 
   setPaymentMethod(request: AdminPaymentMethodRequest): Promise<RegistrationState> {

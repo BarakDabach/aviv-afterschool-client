@@ -64,7 +64,7 @@ async function renderDocumentsStage(availableYearPlans: Array<{ yearPlanId: numb
     documentFileName: vi.fn(() => ''),
     setDocumentScope: vi.fn(),
     selectDocumentFile: vi.fn(),
-    year: signal({ id: 1, yearNumber: 2027 }),
+    year: signal({ id: 1, yearNumber: 2027, maxChildCapacity: 60, oneTimeInsuranceAmount: 200 }),
     availableYearPlans: signal(availableYearPlans),
   };
 

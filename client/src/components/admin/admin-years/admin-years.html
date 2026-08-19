@@ -1,0 +1,46 @@
+<main class="relative min-h-[calc(100dvh-var(--app-sticky-header-height))] overflow-hidden bg-background px-[var(--app-screen-padding)] pb-44 text-foreground" dir="rtl">
+  @if (store.loading()) {
+    <section class="mx-auto grid min-h-80 w-full max-w-[var(--app-dashboard-content-width)] place-items-center" aria-live="polite">
+      <div class="flex items-center gap-3 text-brand">
+        <hlm-spinner class="size-6" />
+        <span class="text-lg font-bold">טוענים את שנות העבודה…</span>
+      </div>
+    </section>
+  } @else if (store.hasError()) {
+    <section class="mx-auto w-full max-w-[var(--app-dashboard-content-width)] py-8 lg:py-10">
+      <div hlmEmpty class="min-h-64 border border-dashed border-border bg-card/80">
+        <div hlmEmptyHeader>
+          <div hlmEmptyMedia variant="icon" class="text-destructive">
+            <ng-icon name="lucideCircleAlert" />
+          </div>
+          <div hlmEmptyTitle class="text-lg font-black text-brand">לא הצלחנו לטעון את שנות העבודה</div>
+          <div hlmEmptyDescription>{{ store.error() }}</div>
+        </div>
+        <div hlmEmptyContent>
+          <button hlmBtn variant="outline" type="button" class="min-h-11 rounded-[var(--app-control-radius)] border-brand text-brand" (click)="store.load()">
+            <ng-icon name="lucideRefreshCw" />
+            ניסיון נוסף
+          </button>
+        </div>
+      </div>
+    </section>
+  } @else if (store.currentYear(); as currentYear) {
+    <app-admin-years-mobile
+      class="block lg:hidden"
+      [currentYear]="currentYear"
+      [historicalYears]="store.historicalYears()"
+    />
+    <app-admin-years-desktop
+      class="hidden lg:block"
+      [currentYear]="currentYear"
+      [historicalYears]="store.historicalYears()"
+    />
+  }
+
+  <img
+    class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-36 w-full object-cover object-bottom opacity-80"
+    src="/assets/landing-footer-foliage.png"
+    alt=""
+    aria-hidden="true"
+  />
+</main>

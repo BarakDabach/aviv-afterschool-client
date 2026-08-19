@@ -21,7 +21,7 @@ export class HlmAccordionContent {
   constructor() {
     classes(
       () =>
-        'px-4 text-sm transition-all data-[state=closed]:h-0 data-[state=open]:h-(--brn-accordion-content-height)',
+        'block overflow-hidden px-4 text-sm transition-all data-[state=closed]:h-0 data-[state=open]:h-(--brn-accordion-content-height)',
     );
   }
 }

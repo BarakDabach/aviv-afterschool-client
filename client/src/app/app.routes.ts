@@ -3,6 +3,7 @@ import { AdminDashboard } from '../components/admin/admin-dashboard/admin-dashbo
 import { AdminDocuments } from '../components/admin/admin-documents/admin-documents';
 import { AdminFamily } from '../components/admin/admin-family/admin-family';
 import { AdminSettings } from '../components/admin/admin-settings/admin-settings';
+import { AdminYears } from '../components/admin/admin-years/admin-years';
 import { LandingPage } from '../components/landing-page/landing-page';
 import { Home } from '../components/home/home';
 import { ParentLogin } from '../components/parent-login/parent-login';
@@ -16,6 +17,8 @@ export const routes: Routes = [
   { path: 'home/:registrationId', component: Home, canActivate: [parentAuthGuard] },
   { path: 'home', component: Home, canActivate: [parentAuthGuard] },
   { path: 'admin', component: AdminDashboard, canActivate: [adminAuthGuard] },
+  { path: 'admin/years', component: AdminYears, canActivate: [adminAuthGuard] },
+  { path: 'admin/current-year', redirectTo: 'admin/years', pathMatch: 'full' },
   { path: 'admin/family', component: AdminFamily, canActivate: [adminAuthGuard] },
   { path: 'admin/settings', component: AdminSettings, canActivate: [adminAuthGuard] },
   { path: 'admin/documents', component: AdminDocuments, canActivate: [adminAuthGuard] },

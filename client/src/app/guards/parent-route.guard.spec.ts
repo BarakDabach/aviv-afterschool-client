@@ -3,7 +3,7 @@ import { provideRouter, Router, UrlTree } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthFacade } from '../facades/auth.facade';
 import { GlobalStore } from '../stores/global.store';
-import { guestOnlyGuard, parentAuthGuard } from './parent-route.guard';
+import { adminAuthGuard, guestOnlyGuard, parentAuthGuard } from './parent-route.guard';
 
 describe('parent route guards', () => {
   let authFacade: {
@@ -64,6 +64,28 @@ describe('parent route guards', () => {
     const result = await TestBed.runInInjectionContext(() => parentAuthGuard({} as never, { url: '/home' } as never));
 
     expect(serializeResult(router, result)).toBe('/admin');
+  });
+
+  it('redirects unauthenticated users to login before loading admin years', async () => {
+    const result = await TestBed.runInInjectionContext(() => adminAuthGuard({} as never, { url: '/admin/years' } as never));
+
+    expect(serializeResult(router, result)).toBe('/login?redirect=%2Fadmin%2Fyears');
+  });
+
+  it('redirects authenticated parents away from admin years', async () => {
+    globalStore.setUser(parentSession('דנה לוי', 'dana@example.com').user);
+
+    const result = await TestBed.runInInjectionContext(() => adminAuthGuard({} as never, { url: '/admin/years' } as never));
+
+    expect(serializeResult(router, result)).toBe('/home');
+  });
+
+  it('allows authenticated admins to open admin years', async () => {
+    globalStore.setUser(adminSession().user);
+
+    const result = await TestBed.runInInjectionContext(() => adminAuthGuard({} as never, { url: '/admin/years' } as never));
+
+    expect(result).toBe(true);
   });
 });
 
